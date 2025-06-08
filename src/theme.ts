@@ -28,7 +28,7 @@ const theme = createTheme({
       main: '#4CAF50',
     },
     background: {
-      default: '#F8F9FA',
+      default: '#E0F2F7',
       paper: '#FFFFFF',
     },
     text: {
@@ -36,7 +36,7 @@ const theme = createTheme({
       secondary: '#6C757D',
     },
     grey: {
-      50: '#F8F9FA',
+      50: '#F9FAFC',
       100: '#F1F3F5',
       200: '#E9ECEF',
       300: '#DEE2E6',
@@ -46,7 +46,7 @@ const theme = createTheme({
       700: '#495057',
       800: '#343A40',
       900: '#212529',
-      A100: '#F8F9FA',
+      A100: '#F9FAFC',
       A200: '#F1F3F5',
       A400: '#DEE2E6',
       A700: '#ADB5BD',
