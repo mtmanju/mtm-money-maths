@@ -13,7 +13,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-  background-color: #ffffff;
+  /* background-color: #ffffff; */ /* Removed to allow theme to apply */
 }
 
 code {

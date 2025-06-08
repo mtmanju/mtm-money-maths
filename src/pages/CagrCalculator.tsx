@@ -26,19 +26,7 @@ import CalculatorPageTemplate from '../components/CalculatorPageTemplate';
 import CalculatorBenefits from '../components/CalculatorBenefits';
 import CalculatorForm from '../components/CalculatorForm';
 
-const getGradientColors = (mode: 'light' | 'dark') => {
-  return mode === 'dark'
-    ? {
-        gradient: 'linear-gradient(135deg, #2c3e50 0%, #3498db 100%)',
-        titleGradient: 'linear-gradient(45deg, #2c3e50 30%, #3498db 90%)',
-        colors: ['#2c3e50', '#3498db', '#2980b9', '#1abc9c', '#16a085'],
-      }
-    : {
-        gradient: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)',
-        titleGradient: 'linear-gradient(45deg, #1a237e 30%, #0d47a1 90%)',
-        colors: ['#1a237e', '#0d47a1', '#1565c0', '#1976d2', '#2196f3'],
-      };
-};
+const PIE_COLORS = ['#3F51B5', '#7986CB', '#9E9E9E', '#CFD8DC']; // Colors from new theme palette
 
 const StyledPaper = styled(Box)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -74,12 +62,11 @@ const ResultCard = styled(Box)(({ theme }) => ({
 const ChartContainer = styled(Box)(({ theme }) => ({
   height: 300,
   marginTop: theme.spacing(4),
-  padding: theme.spacing(2),
+  padding: theme.spacing(3),
   borderRadius: 20,
-  background: 'rgba(255, 255, 255, 0.9)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255, 255, 255, 0.2)',
-  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+  background: theme.palette.background.paper,
+  boxShadow: theme.shadows[1], // Subtle shadow
+  border: `1px solid ${theme.palette.grey[200]}`, // Subtle border
 }));
 
 interface ChartData {
@@ -110,8 +97,6 @@ const CagrCalculator: React.FC = () => {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [pieData, setPieData] = useState<PieData[]>([]);
   const [error, setError] = useState<string>('');
-
-  const { colors: COLORS } = getGradientColors(theme.palette.mode);
 
   const calculateCAGR = () => {
     const initial = parseFloat(initialValue);
@@ -155,7 +140,8 @@ const CagrCalculator: React.FC = () => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
     }).format(value);
   };
 
@@ -252,7 +238,7 @@ const CagrCalculator: React.FC = () => {
           </ChartContainer>
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} md={6}>
         {pieData.length > 0 && (
           <ChartContainer>
             <ResponsiveContainer width="100%" height="100%">
@@ -263,11 +249,13 @@ const CagrCalculator: React.FC = () => {
                   cy="50%"
                   labelLine={false}
                   outerRadius={80}
-                  fill="#8884d8"
                   dataKey="value"
+                  stroke="#FFFFFF"
+                  strokeWidth={2}
+                  minAngle={5}
                 >
                   {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                   ))}
                 </Pie>
                 <Legend />

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Container, Typography, Box, Grid, useTheme, styled } from '@mui/material';
-import { globalStyles } from '../styles/globalStyles';
 
 interface CalculatorPageTemplateProps {
   title: string;
@@ -20,29 +19,29 @@ const CalculatorPageTemplate: React.FC<CalculatorPageTemplateProps> = ({
   const theme = useTheme();
 
   return (
-    <Container maxWidth="lg" sx={{ py: 8 }}>
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
+    <Container maxWidth="lg" sx={{ py: theme.spacing(10) }}>
+      <Box sx={{ textAlign: 'center', mb: theme.spacing(6) }}>
         <Typography
-          variant="h1"
-          component="h1"
+          variant="h2"
           sx={{
-            fontSize: { xs: '2.5rem', md: '4rem' },
-            fontWeight: 700,
+            fontSize: { xs: '1.75rem', md: '2.25rem' },
+            fontWeight: 600,
             mb: 2,
-            ...globalStyles(theme).gradientText,
             letterSpacing: '-0.02em',
+            lineHeight: 1.2,
+            color: theme.palette.text.primary,
           }}
         >
           {title}
         </Typography>
         <Typography
-          variant="h5"
-          color="text.secondary"
+          variant="body1"
           sx={{
             maxWidth: '800px',
             mx: 'auto',
             lineHeight: 1.6,
-            fontWeight: 400,
+            fontSize: { xs: '0.875rem', md: '1rem' },
+            color: theme.palette.text.secondary,
           }}
         >
           {mainDescription}
@@ -58,7 +57,7 @@ const CalculatorPageTemplate: React.FC<CalculatorPageTemplateProps> = ({
         </Grid>
       </Grid>
 
-      <Box sx={{ mt: 6 }}>
+      <Box sx={{ mt: theme.spacing(6) }}>
         {resultComponent}
       </Box>
     </Container>

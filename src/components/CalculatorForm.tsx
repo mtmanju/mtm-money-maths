@@ -17,30 +17,13 @@ import InfoIcon from '@mui/icons-material/Info';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
-  borderRadius: 24,
-  background: theme.palette.mode === 'light'
-    ? 'rgba(255, 255, 255, 0.9)'
-    : 'rgba(17, 24, 39, 0.9)',
-  backdropFilter: 'blur(10px)',
-  border: `1px solid ${theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
-  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  borderRadius: theme.shape.borderRadius * 2,
+  background: theme.palette.background.paper,
+  border: `1px solid ${theme.palette.grey[200]}`,
+  boxShadow: theme.shadows[6],
+  transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
   '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-  },
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  borderRadius: 9999,
-  textTransform: 'none',
-  fontWeight: 500,
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: theme.palette.mode === 'light'
-      ? '0 8px 16px rgba(0, 0, 0, 0.1)'
-      : '0 8px 16px rgba(0, 0, 0, 0.3)',
+    boxShadow: theme.shadows[10],
   },
 }));
 
@@ -79,9 +62,10 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({
         variant="h5" 
         gutterBottom
         sx={{ 
-          fontWeight: 500,
+          fontWeight: 600,
           color: theme.palette.text.primary,
-          mb: 3,
+          mb: 4,
+          fontSize: '1.25rem',
         }}
       >
         {title}
@@ -94,7 +78,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({
               label={field.label}
               variant="outlined"
               value={field.value}
-              onChange={(e) => field.onChange(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
               type={field.type || 'text'}
               InputProps={{
                 startAdornment: field.startAdornment,
@@ -102,32 +86,27 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({
                   <InputAdornment position="end">
                     <Tooltip title={field.tooltip}>
                       <IconButton size="small">
-                        <InfoIcon />
+                        <InfoIcon sx={{ color: theme.palette.text.secondary }} />
                       </IconButton>
                     </Tooltip>
                   </InputAdornment>
                 )),
               }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                },
-              }}
             />
           </Grid>
         ))}
         <Grid item xs={12}>
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-            <StyledButton
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 2 }}>
+            <Button
               variant="outlined"
-              color="secondary"
+              color="primary"
               size="large"
               onClick={onReset}
               startIcon={<RefreshIcon />}
             >
               Reset
-            </StyledButton>
-            <StyledButton
+            </Button>
+            <Button
               variant="contained"
               color="primary"
               size="large"
@@ -135,7 +114,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({
               startIcon={calculateButtonIcon}
             >
               {calculateButtonText}
-            </StyledButton>
+            </Button>
           </Box>
         </Grid>
       </Grid>

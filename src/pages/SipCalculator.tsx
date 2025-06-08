@@ -30,11 +30,9 @@ import CalculatorForm from '../components/CalculatorForm';
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   borderRadius: 24,
-  background: theme.palette.mode === 'light'
-    ? 'rgba(255, 255, 255, 0.9)'
-    : 'rgba(17, 24, 39, 0.9)',
+  background: theme.palette.background.paper,
   backdropFilter: 'blur(10px)',
-  border: `1px solid ${theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
+  border: `1px solid ${theme.palette.grey[200]}`,
   boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
@@ -46,27 +44,25 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 const ResultCard = styled(motion.div)(({ theme }) => ({
   padding: theme.spacing(3),
   borderRadius: 20,
-  background: theme.palette.mode === 'light'
-    ? 'linear-gradient(135deg, #1A1A1A 0%, #333333 100%)'
-    : 'linear-gradient(135deg, #0A0A0A 0%, #222222 100%)',
-  color: 'white',
+  background: theme.palette.background.paper,
+  color: theme.palette.text.primary,
   textAlign: 'center',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  boxShadow: theme.shadows[1],
   '&:hover': {
-    transform: 'scale(1.02)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+    transform: 'none',
+    boxShadow: theme.shadows[3],
   },
 }));
 
 const StyledTable = styled(TableContainer)(({ theme }) => ({
   marginTop: theme.spacing(4),
   borderRadius: 20,
-  background: 'rgba(255, 255, 255, 0.9)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255, 255, 255, 0.2)',
-  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+  background: theme.palette.background.paper,
+  boxShadow: theme.shadows[1],
+  border: `1px solid ${theme.palette.grey[200]}`,
   '& .MuiTableCell-root': {
-    borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+    borderBottom: `1px solid ${theme.palette.grey[100]}`,
   },
   '& .MuiTableHead-root .MuiTableCell-root': {
     fontWeight: 600,
@@ -90,12 +86,6 @@ const SipCalculator: React.FC = () => {
       total: number;
     }>;
   } | null>(null);
-
-  const getBackgroundGradient = (mode: 'light' | 'dark') => {
-    return mode === 'light'
-      ? 'linear-gradient(135deg, #2563EB 0%, #10B981 100%)'
-      : 'linear-gradient(135deg, #1E40AF 0%, #065F46 100%)';
-  };
 
   const calculateSIP = () => {
     const monthly = parseFloat(monthlyInvestment);
@@ -147,7 +137,8 @@ const SipCalculator: React.FC = () => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
     }).format(value);
   };
 
@@ -217,12 +208,11 @@ const SipCalculator: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            sx={{ mb: 4, background: getBackgroundGradient(theme.palette.mode) }}
           >
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-                  <SavingsIcon sx={{ fontSize: 48, color: '#fff', mb: 1 }} />
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  {/* <SavingsIcon sx={{ fontSize: 48, color: theme.palette.primary.contrastText, mb: 1 }} /> */}
                   <Typography variant="h6" color="inherit" sx={{ fontWeight: 600 }}>Total Investment</Typography>
                   <Typography variant="h4" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.totalInvestment)}</Typography>
                 </Box>

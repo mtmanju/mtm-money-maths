@@ -49,27 +49,25 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 const ResultCard = styled(motion.div)(({ theme }) => ({
   padding: theme.spacing(3),
   borderRadius: 20,
-  background: theme.palette.mode === 'light'
-    ? 'linear-gradient(135deg, #1A1A1A 0%, #333333 100%)'
-    : 'linear-gradient(135deg, #0A0A0A 0%, #222222 100%)',
-  color: 'white',
+  background: theme.palette.background.paper,
+  color: theme.palette.text.primary,
   textAlign: 'center',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  boxShadow: theme.shadows[1],
   '&:hover': {
-    transform: 'scale(1.02)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+    transform: 'none',
+    boxShadow: theme.shadows[3],
   },
 }));
 
 const StyledTable = styled(TableContainer)(({ theme }) => ({
   marginTop: theme.spacing(4),
   borderRadius: 20,
-  background: 'rgba(255, 255, 255, 0.9)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255, 255, 255, 0.2)',
-  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+  background: theme.palette.background.paper,
+  boxShadow: theme.shadows[1],
+  border: `1px solid ${theme.palette.grey[200]}`,
   '& .MuiTableCell-root': {
-    borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+    borderBottom: `1px solid ${theme.palette.grey[100]}`,
   },
   '& .MuiTableHead-root .MuiTableCell-root': {
     fontWeight: 600,
@@ -94,12 +92,6 @@ const EmiCalculator: React.FC = () => {
       balance: number;
     }>;
   } | null>(null);
-
-  const getBackgroundGradient = (mode: 'light' | 'dark') => {
-    return mode === 'light'
-      ? 'linear-gradient(135deg, #2563EB 0%, #10B981 100%)'
-      : 'linear-gradient(135deg, #1E40AF 0%, #065F46 100%)';
-  };
 
   const calculateEMI = () => {
     const principal = parseFloat(loanAmount);
@@ -146,7 +138,7 @@ const EmiCalculator: React.FC = () => {
   };
 
   const formatCurrency = (value: number) => {
-    return `₹${value.toLocaleString()}`;
+    return `₹${value.toFixed(2).toLocaleString()}`;
   };
 
   const inputFields = [
@@ -209,32 +201,32 @@ const EmiCalculator: React.FC = () => {
 
   const resultComponent = (
     <Grid container spacing={4}>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={12}>
         {results && (
           <ResultCard
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            sx={{ mb: 4, background: getBackgroundGradient(theme.palette.mode) }}
+            sx={{ mb: 4 }}
           >
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-                  <MonetizationOnIcon sx={{ fontSize: 48, color: '#fff', mb: 1 }} />
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: 1 }}>
+                  {/* <MonetizationOnIcon sx={{ fontSize: 48, color: '#fff', mb: 1 }} /> */}
                   <Typography variant="h6" color="inherit" sx={{ fontWeight: 600 }}>Monthly EMI</Typography>
-                  <Typography variant="h4" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.emi)}</Typography>
+                  <Typography variant="body1" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.emi)}</Typography>
                 </Box>
               </Grid>
-              <Grid item xs={12} md={4}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+              <Grid item xs={12} md={6}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: 1 }}>
                   <Typography variant="h6" color="inherit" sx={{ fontWeight: 600 }}>Total Interest</Typography>
-                  <Typography variant="h4" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.totalInterest)}</Typography>
+                  <Typography variant="body1" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.totalInterest)}</Typography>
                 </Box>
               </Grid>
-              <Grid item xs={12} md={4}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+              <Grid item xs={12} md={12}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: 1 }}>
                   <Typography variant="h6" color="inherit" sx={{ fontWeight: 600 }}>Total Payment</Typography>
-                  <Typography variant="h4" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.totalPayment)}</Typography>
+                  <Typography variant="body1" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.totalPayment)}</Typography>
                 </Box>
               </Grid>
             </Grid>

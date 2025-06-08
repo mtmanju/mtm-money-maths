@@ -37,14 +37,14 @@ import CalculatorPageTemplate from '../components/CalculatorPageTemplate';
 import CalculatorBenefits from '../components/CalculatorBenefits';
 import CalculatorForm from '../components/CalculatorForm';
 
+const PIE_COLORS = ['#3F51B5', '#7986CB', '#9E9E9E', '#CFD8DC'];
+
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   borderRadius: 24,
-  background: theme.palette.mode === 'light'
-    ? 'rgba(255, 255, 255, 0.9)'
-    : 'rgba(17, 24, 39, 0.9)',
+  background: theme.palette.background.paper,
   backdropFilter: 'blur(10px)',
-  border: `1px solid ${theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
+  border: `1px solid ${theme.palette.grey[200]}`,
   boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
@@ -56,27 +56,25 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 const ResultCard = styled(Box)(({ theme }) => ({
   padding: theme.spacing(3),
   borderRadius: 20,
-  background: theme.palette.mode === 'light'
-    ? 'linear-gradient(135deg, #1A1A1A 0%, #333333 100%)'
-    : 'linear-gradient(135deg, #0A0A0A 0%, #222222 100%)',
-  color: 'white',
+  background: theme.palette.background.paper,
+  color: theme.palette.text.primary,
   textAlign: 'center',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  boxShadow: theme.shadows[1],
   '&:hover': {
-    transform: 'scale(1.02)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+    transform: 'none',
+    boxShadow: theme.shadows[3],
   },
 }));
 
 const ChartContainer = styled(Box)(({ theme }) => ({
   height: 300,
   marginTop: theme.spacing(4),
-  padding: theme.spacing(2),
+  padding: theme.spacing(3),
   borderRadius: 20,
-  background: 'rgba(255, 255, 255, 0.9)',
-  backdropFilter: 'blur(10px)',
-  border: '1px solid rgba(255, 255, 255, 0.2)',
-  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+  background: theme.palette.background.paper,
+  boxShadow: theme.shadows[1],
+  border: `1px solid ${theme.palette.grey[200]}`,
 }));
 
 interface ChartData {
@@ -110,12 +108,6 @@ const MutualFundCalculator: React.FC = () => {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [pieData, setPieData] = useState<PieData[]>([]);
 
-  const getBackgroundGradient = (mode: 'light' | 'dark') => {
-    return mode === 'light'
-      ? 'linear-gradient(135deg, #2563EB 0%, #10B981 100%)'
-      : 'linear-gradient(135deg, #1E40AF 0%, #065F46 100%)';
-  };
-
   const calculateMutualFund = () => {
     const monthlyInv = parseFloat(monthlyInvestment);
     const annualRate = parseFloat(expectedReturn) / 100;
@@ -144,6 +136,9 @@ const MutualFundCalculator: React.FC = () => {
       const calculatedTotalInvestment = monthlyInv * months;
       const calculatedTotalCorpus = futureValue;
       const calculatedTotalReturns = calculatedTotalCorpus - calculatedTotalInvestment;
+
+      console.log('Calculated Total Investment:', calculatedTotalInvestment);
+      console.log('Calculated Total Returns:', calculatedTotalReturns);
 
       setResults({
         totalInvestment: calculatedTotalInvestment,
@@ -177,7 +172,8 @@ const MutualFundCalculator: React.FC = () => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
     }).format(value);
   };
 
@@ -243,11 +239,11 @@ const MutualFundCalculator: React.FC = () => {
     <Grid container spacing={4}>
       <Grid item xs={12} md={6}>
         {results && (
-          <ResultCard sx={{ mb: 4, background: getBackgroundGradient(theme.palette.mode) }}>
+          <ResultCard sx={{ mb: 4 }}>
             <Grid container spacing={3} alignItems="center">
               <Grid item xs={12} sm={4}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <MonetizationOnIcon sx={{ fontSize: 48, color: '#fff', mb: 1 }} />
+                  {/* <MonetizationOnIcon sx={{ fontSize: 48, color: theme.palette.primary.contrastText, mb: 1 }} /> */}
                   <Typography variant="h6" color="inherit" sx={{ fontWeight: 600 }}>Total Investment</Typography>
                   <Typography variant="h4" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.totalInvestment)}</Typography>
                 </Box>
@@ -283,7 +279,7 @@ const MutualFundCalculator: React.FC = () => {
           </ChartContainer>
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} md={6}>
         {pieData.length > 0 && (
           <ChartContainer>
             <ResponsiveContainer width="100%" height="100%">
@@ -294,11 +290,13 @@ const MutualFundCalculator: React.FC = () => {
                   cy="50%"
                   labelLine={false}
                   outerRadius={80}
-                  fill="#8884d8"
                   dataKey="value"
+                  stroke="#FFFFFF"
+                  strokeWidth={2}
+                  minAngle={5}
                 >
                   {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={theme.palette.mode === 'light' ? ['#2563EB', '#10B981'][index] : ['#1E40AF', '#065F46'][index]} />
+                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                   ))}
                 </Pie>
                 <Legend />

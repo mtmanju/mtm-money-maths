@@ -5,13 +5,30 @@ import { motion } from 'framer-motion';
 
 const StyledBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(4),
-  borderRadius: 24,
-  background: theme.palette.mode === 'light'
-    ? 'rgba(255, 255, 255, 0.9)'
-    : 'rgba(17, 24, 39, 0.9)',
-  backdropFilter: 'blur(10px)',
-  border: `1px solid ${theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
-  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+}));
+
+const BenefitTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: theme.typography.h4.fontWeight,
+  color: theme.palette.text.primary,
+  fontSize: theme.typography.h4.fontSize,
+  marginBottom: theme.spacing(3),
+}));
+
+const BenefitItem = styled(ListItem)(({ theme }) => ({
+  padding: theme.spacing(1.5, 0),
+  '& .MuiListItemIcon-root': {
+    minWidth: 40,
+  },
+  '& .MuiListItemText-primary': {
+    fontWeight: theme.typography.body1.fontWeight,
+    color: theme.palette.text.primary,
+    fontSize: '1rem',
+  },
+  '& .MuiListItemText-secondary': {
+    color: theme.palette.text.secondary,
+    fontSize: '0.9rem',
+    lineHeight: theme.typography.body2.lineHeight,
+  },
 }));
 
 interface Benefit {
@@ -28,17 +45,9 @@ const CalculatorBenefits: React.FC<CalculatorBenefitsProps> = ({ benefits }) => 
 
   return (
     <StyledBox>
-      <Typography
-        variant="h5"
-        gutterBottom
-        sx={{
-          fontWeight: 600,
-          mb: 3,
-          color: theme.palette.primary.main,
-        }}
-      >
+      <BenefitTitle variant="h4">
         Key Benefits
-      </Typography>
+      </BenefitTitle>
       <List>
         {benefits.map((benefit, index) => (
           <motion.div
@@ -47,23 +56,15 @@ const CalculatorBenefits: React.FC<CalculatorBenefitsProps> = ({ benefits }) => 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <ListItem sx={{ py: 1.5 }}>
+            <BenefitItem>
               <ListItemIcon>
-                <CheckCircleIcon color="primary" />
+                <CheckCircleIcon sx={{ color: theme.palette.primary.main }} />
               </ListItemIcon>
               <ListItemText
-                primary={
-                  <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                    {benefit.title}
-                  </Typography>
-                }
-                secondary={
-                  <Typography variant="body2" color="text.secondary">
-                    {benefit.description}
-                  </Typography>
-                }
+                primary={benefit.title}
+                secondary={benefit.description}
               />
-            </ListItem>
+            </BenefitItem>
           </motion.div>
         ))}
       </List>
