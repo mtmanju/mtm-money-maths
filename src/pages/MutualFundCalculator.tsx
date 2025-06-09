@@ -18,6 +18,7 @@ import {
   Refresh as RefreshIcon,
   MonetizationOn as MonetizationOnIcon,
   AccountBalance as AccountBalanceIcon,
+  TrendingUp as TrendingUpIcon,
 } from '@mui/icons-material';
 import {
   LineChart,
@@ -36,6 +37,8 @@ import { globalStyles } from '../styles/globalStyles';
 import CalculatorPageTemplate from '../components/CalculatorPageTemplate';
 import CalculatorBenefits from '../components/CalculatorBenefits';
 import CalculatorForm from '../components/CalculatorForm';
+import CalculatorResults from '../components/CalculatorResults';
+import { downloadPDF, downloadExcel } from '../utils/downloadUtils';
 
 const PIE_COLORS = ['#3F51B5', '#7986CB', '#9E9E9E', '#CFD8DC'];
 
@@ -77,24 +80,12 @@ const ChartContainer = styled(Box)(({ theme }) => ({
   border: `1px solid ${theme.palette.grey[200]}`,
 }));
 
-interface ChartData {
-  year: number;
-  investment: number;
-  returns: number;
-  corpus: number;
-}
-
 interface PieData {
   name: string;
   value: number;
 }
 
-const MutualFundCalculator: React.FC = () => {
-  const theme = useMuiTheme();
-  const [monthlyInvestment, setMonthlyInvestment] = useState<string>('');
-  const [expectedReturn, setExpectedReturn] = useState<string>('');
-  const [investmentPeriod, setInvestmentPeriod] = useState<string>('');
-  const [results, setResults] = useState<{
+interface CalculatorResult {
     totalInvestment: number;
     totalReturns: number;
     maturityValue: number;
@@ -104,9 +95,21 @@ const MutualFundCalculator: React.FC = () => {
       returns: number;
       total: number;
     }>;
-  } | null>(null);
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [pieData, setPieData] = useState<PieData[]>([]);
+}
+
+interface ChartDataPoint {
+  year: number;
+  value: number;
+}
+
+const MutualFundCalculator: React.FC = () => {
+  const theme = useMuiTheme();
+  const [monthlyInvestment, setMonthlyInvestment] = useState<string>('');
+  const [expectedReturn, setExpectedReturn] = useState<string>('');
+  const [investmentPeriod, setInvestmentPeriod] = useState<string>('');
+  const [results, setResults] = useState<CalculatorResult | null>(null);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [pieData, setPieData] = useState<Array<{ name: string; value: number }>>([]);
 
   const calculateMutualFund = () => {
     const monthlyInv = parseFloat(monthlyInvestment);
@@ -118,16 +121,14 @@ const MutualFundCalculator: React.FC = () => {
       const monthlyRate = annualRate / 12;
 
       let futureValue = 0;
-      const newChartData: ChartData[] = [];
+      const newChartData: ChartDataPoint[] = [];
 
       for (let i = 1; i <= months; i++) {
         futureValue = monthlyInv * (Math.pow(1 + monthlyRate, i) - 1) / monthlyRate;
         if (i % 12 === 0) {
           newChartData.push({
             year: i / 12,
-            investment: monthlyInv * i,
-            returns: futureValue - (monthlyInv * i),
-            corpus: futureValue,
+            value: futureValue,
           });
         }
       }
@@ -144,12 +145,16 @@ const MutualFundCalculator: React.FC = () => {
         totalInvestment: calculatedTotalInvestment,
         totalReturns: calculatedTotalReturns,
         maturityValue: calculatedTotalCorpus,
-        yearlyBreakdown: newChartData.map(data => ({
-          year: data.year,
-          investment: data.investment,
-          returns: data.returns,
-          total: data.corpus,
-        })),
+        yearlyBreakdown: newChartData.map(data => {
+          const yearInvestment = monthlyInv * 12 * data.year;
+          const yearReturns = data.value - yearInvestment;
+          return {
+            year: data.year,
+            investment: yearInvestment,
+            returns: yearReturns,
+            total: data.value,
+          };
+        }),
       });
 
       setPieData([
@@ -235,79 +240,70 @@ const MutualFundCalculator: React.FC = () => {
     <CalculatorBenefits benefits={benefits} />
   );
 
-  const resultComponent = (
-    <Grid container spacing={4}>
-      <Grid item xs={12} md={6}>
-        {results && (
-          <ResultCard sx={{ mb: 4 }}>
-            <Grid container spacing={3} alignItems="center">
-              <Grid item xs={12} sm={4}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  {/* <MonetizationOnIcon sx={{ fontSize: 48, color: theme.palette.primary.contrastText, mb: 1 }} /> */}
-                  <Typography variant="h6" color="inherit" sx={{ fontWeight: 600 }}>Total Investment</Typography>
-                  <Typography variant="h4" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.totalInvestment)}</Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <Typography variant="h6" color="inherit" sx={{ fontWeight: 600 }}>Total Returns</Typography>
-                  <Typography variant="h4" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.totalReturns)}</Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <Typography variant="h6" color="inherit" sx={{ fontWeight: 600 }}>Total Corpus</Typography>
-                  <Typography variant="h4" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.maturityValue)}</Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </ResultCard>
-        )}
-      </Grid>
-      <Grid item xs={12} md={6}>
-        {chartData.length > 0 && (
-          <ChartContainer>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="year" label={{ value: 'Year', position: 'insideBottom', offset: 0 }} />
-                <YAxis label={{ value: 'Corpus (INR)', angle: -90, position: 'insideLeft' }} tickFormatter={(value) => `₹${value.toLocaleString()}`} />
-                <RechartsTooltip formatter={(value: number) => [formatCurrency(value), 'Amount']} />
-                <Line type="monotone" dataKey="corpus" stroke={theme.palette.primary.main} activeDot={{ r: 8 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        )}
-      </Grid>
-      <Grid item xs={12} md={6}>
-        {pieData.length > 0 && (
-          <ChartContainer>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  dataKey="value"
-                  stroke="#FFFFFF"
-                  strokeWidth={2}
-                  minAngle={5}
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Legend />
-                <RechartsTooltip formatter={(value: number) => [formatCurrency(value), 'Amount']} />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        )}
-      </Grid>
-    </Grid>
-  );
+  const resultComponent = results ? (
+    <CalculatorResults
+      summaryItems={[
+        {
+          label: 'Total Investment',
+          value: results.totalInvestment,
+          icon: <MonetizationOnIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+        },
+        {
+          label: 'Total Returns',
+          value: results.totalReturns,
+          icon: <TrendingUpIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+        },
+        {
+          label: 'Total Corpus',
+          value: results.maturityValue,
+          icon: <AccountBalanceIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+        }
+      ]}
+      chartData={chartData}
+      pieData={pieData}
+      yearlyBreakdown={results.yearlyBreakdown.map((row: { year: number; investment: number; returns: number; total: number }) => ({
+        year: row.year,
+        investment: row.investment,
+        returns: row.returns,
+        total: row.total
+      }))}
+      onDownloadPDF={() => {
+        downloadPDF({
+          title: 'Mutual Fund Calculator Results',
+          summary: [
+            { label: 'Total Investment', value: formatCurrency(results.totalInvestment) },
+            { label: 'Total Returns', value: formatCurrency(results.totalReturns) },
+            { label: 'Total Corpus', value: formatCurrency(results.maturityValue) }
+          ],
+          yearlyBreakdown: results.yearlyBreakdown.map(row => ({
+            Year: row.year,
+            Investment: formatCurrency(row.investment),
+            Returns: formatCurrency(row.returns),
+            Total: formatCurrency(row.total)
+          }))
+        });
+      }}
+      onDownloadExcel={() => {
+        downloadExcel({
+          title: 'Mutual Fund Calculator Results',
+          summary: [
+            { label: 'Total Investment', value: formatCurrency(results.totalInvestment) },
+            { label: 'Total Returns', value: formatCurrency(results.totalReturns) },
+            { label: 'Total Corpus', value: formatCurrency(results.maturityValue) }
+          ],
+          yearlyBreakdown: results.yearlyBreakdown.map(row => ({
+            Year: row.year,
+            Investment: formatCurrency(row.investment),
+            Returns: formatCurrency(row.returns),
+            Total: formatCurrency(row.total)
+          }))
+        });
+      }}
+      chartTitle="Investment Growth Over Time"
+      pieChartTitle="Investment Distribution"
+      yearlyBreakdownTitle="Yearly Investment Breakdown"
+    />
+  ) : null;
 
   return (
     <CalculatorPageTemplate

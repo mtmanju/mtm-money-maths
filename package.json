@@ -19,7 +19,9 @@
     "chart.js": "^4.4.1",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "framer-motion": "^11.0.5",
+    "framer-motion": "^11.18.2",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.5.31",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
@@ -29,7 +31,8 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "typescript": "4.9.5",
-    "web-vitals": "^3.5.2"
+    "web-vitals": "^3.5.2",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -26,6 +26,11 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import CalculatorPageTemplate from '../components/CalculatorPageTemplate';
 import CalculatorBenefits from '../components/CalculatorBenefits';
 import CalculatorForm from '../components/CalculatorForm';
+import CalculatorResults from '../components/CalculatorResults';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import { downloadPDF, downloadExcel } from '../utils/downloadUtils';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -70,43 +75,65 @@ const StyledTable = styled(TableContainer)(({ theme }) => ({
   },
 }));
 
+interface CalculatorResult {
+  totalInvestment: number;
+  totalInterest: number;
+  maturityValue: number;
+  yearlyBreakdown: Array<{
+    year: number;
+    investment: number;
+    returns: number;
+    total: number;
+  }>;
+}
+
+interface ChartDataPoint {
+  year: number;
+  value: number;
+}
+
 const SipCalculator: React.FC = () => {
   const theme = useTheme();
   const [monthlyInvestment, setMonthlyInvestment] = useState<string>('');
   const [expectedReturn, setExpectedReturn] = useState<string>('');
   const [investmentPeriod, setInvestmentPeriod] = useState<string>('');
-  const [results, setResults] = useState<{
-    totalInvestment: number;
-    totalInterest: number;
-    maturityValue: number;
-    yearlyBreakdown: Array<{
+  const [results, setResults] = useState<CalculatorResult | null>(null);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [pieData, setPieData] = useState<Array<{ name: string; value: number }>>([]);
+
+  const calculateSIP = () => {
+    const monthlyInv = parseFloat(monthlyInvestment);
+    const rate = parseFloat(expectedReturn) / 100;
+    const years = parseInt(investmentPeriod);
+    const months = years * 12;
+
+    if (isNaN(monthlyInv) || isNaN(rate) || isNaN(years)) {
+      return;
+    }
+
+    let totalInvestment = 0;
+    let totalInterest = 0;
+    let maturityValue = 0;
+    const yearlyBreakdown: Array<{
       year: number;
       investment: number;
       returns: number;
       total: number;
-    }>;
-  } | null>(null);
+    }> = [];
 
-  const calculateSIP = () => {
-    const monthly = parseFloat(monthlyInvestment);
-    const rate = parseFloat(expectedReturn) / 100;
-    const years = parseFloat(investmentPeriod);
-
-    if (monthly && rate && years && monthly > 0 && rate > 0 && years > 0) {
+    if (monthlyInv && rate && years && monthlyInv > 0 && rate > 0 && years > 0) {
       const monthlyRate = rate / 12;
-      const months = years * 12;
-      const totalInvestment = monthly * months;
+      totalInvestment = monthlyInv * months;
       
       // Calculate maturity value using SIP formula
-      const maturityValue = monthly * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
-      const totalInterest = maturityValue - totalInvestment;
+      maturityValue = monthlyInv * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
+      totalInterest = maturityValue - totalInvestment;
 
       // Calculate yearly breakdown
-      const yearlyBreakdown = [];
       for (let year = 1; year <= years; year++) {
         const yearMonths = year * 12;
-        const yearInvestment = monthly * yearMonths;
-        const yearValue = monthly * ((Math.pow(1 + monthlyRate, yearMonths) - 1) / monthlyRate) * (1 + monthlyRate);
+        const yearInvestment = monthlyInv * yearMonths;
+        const yearValue = monthlyInv * ((Math.pow(1 + monthlyRate, yearMonths) - 1) / monthlyRate) * (1 + monthlyRate);
         const yearInterest = yearValue - yearInvestment;
         
         yearlyBreakdown.push({
@@ -116,6 +143,20 @@ const SipCalculator: React.FC = () => {
           total: yearValue,
         });
       }
+
+      // Update chart data
+      const newChartData: ChartDataPoint[] = Array.from({ length: years }, (_, i) => ({
+        year: i + 1,
+        value: yearlyBreakdown[i].total
+      }));
+      setChartData(newChartData);
+
+      // Update pie data
+      const newPieData = [
+        { name: 'Investment', value: totalInvestment },
+        { name: 'Returns', value: totalInterest }
+      ];
+      setPieData(newPieData);
 
       setResults({
         totalInvestment,
@@ -200,66 +241,70 @@ const SipCalculator: React.FC = () => {
     <CalculatorBenefits benefits={benefits} />
   );
 
-  const resultComponent = (
-    <Grid container spacing={4}>
-      <Grid item xs={12} md={6}>
-        {results && (
-          <ResultCard
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  {/* <SavingsIcon sx={{ fontSize: 48, color: theme.palette.primary.contrastText, mb: 1 }} /> */}
-                  <Typography variant="h6" color="inherit" sx={{ fontWeight: 600 }}>Total Investment</Typography>
-                  <Typography variant="h4" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.totalInvestment)}</Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-                  <Typography variant="h6" color="inherit" sx={{ fontWeight: 600 }}>Total Interest</Typography>
-                  <Typography variant="h4" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.totalInterest)}</Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-                  <Typography variant="h6" color="inherit" sx={{ fontWeight: 600 }}>Maturity Value</Typography>
-                  <Typography variant="h4" color="inherit" sx={{ fontWeight: 700 }}>{formatCurrency(results.maturityValue)}</Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </ResultCard>
-        )}
-
-        {results && results.yearlyBreakdown.length > 0 && (
-          <StyledTable>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Year</TableCell>
-                  <TableCell align="right">Investment</TableCell>
-                  <TableCell align="right">Interest</TableCell>
-                  <TableCell align="right">Total</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {results.yearlyBreakdown.map((row) => (
-                  <TableRow key={row.year}>
-                    <TableCell>{row.year}</TableCell>
-                    <TableCell align="right">{formatCurrency(row.investment)}</TableCell>
-                    <TableCell align="right">{formatCurrency(row.returns)}</TableCell>
-                    <TableCell align="right">{formatCurrency(row.total)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </StyledTable>
-        )}
-      </Grid>
-    </Grid>
-  );
+  const resultComponent = results ? (
+    <CalculatorResults
+      summaryItems={[
+        {
+          label: 'Total Investment',
+          value: results.totalInvestment,
+          icon: <MonetizationOnIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+        },
+        {
+          label: 'Total Returns',
+          value: results.totalInterest,
+          icon: <TrendingUpIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+        },
+        {
+          label: 'Maturity Value',
+          value: results.maturityValue,
+          icon: <AccountBalanceIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+        }
+      ]}
+      chartData={chartData}
+      pieData={pieData}
+      yearlyBreakdown={results.yearlyBreakdown.map((row: { year: number; investment: number; returns: number; total: number }) => ({
+        year: row.year,
+        investment: row.investment,
+        returns: row.returns,
+        total: row.total
+      }))}
+      onDownloadPDF={() => {
+        downloadPDF({
+          title: 'SIP Calculator Results',
+          summary: [
+            { label: 'Total Investment', value: formatCurrency(results.totalInvestment) },
+            { label: 'Total Returns', value: formatCurrency(results.totalInterest) },
+            { label: 'Maturity Value', value: formatCurrency(results.maturityValue) }
+          ],
+          yearlyBreakdown: results.yearlyBreakdown.map(row => ({
+            Year: row.year,
+            Investment: formatCurrency(row.investment),
+            Returns: formatCurrency(row.returns),
+            Total: formatCurrency(row.total)
+          }))
+        });
+      }}
+      onDownloadExcel={() => {
+        downloadExcel({
+          title: 'SIP Calculator Results',
+          summary: [
+            { label: 'Total Investment', value: formatCurrency(results.totalInvestment) },
+            { label: 'Total Returns', value: formatCurrency(results.totalInterest) },
+            { label: 'Maturity Value', value: formatCurrency(results.maturityValue) }
+          ],
+          yearlyBreakdown: results.yearlyBreakdown.map(row => ({
+            Year: row.year,
+            Investment: formatCurrency(row.investment),
+            Returns: formatCurrency(row.returns),
+            Total: formatCurrency(row.total)
+          }))
+        });
+      }}
+      chartTitle="SIP Growth Over Time"
+      pieChartTitle="Investment vs Returns"
+      yearlyBreakdownTitle="Yearly SIP Breakdown"
+    />
+  ) : null;
 
   return (
     <CalculatorPageTemplate

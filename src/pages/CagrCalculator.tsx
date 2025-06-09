@@ -8,6 +8,8 @@ import {
   InputAdornment,
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import {
   LineChart,
   Line,
@@ -25,6 +27,8 @@ import { globalStyles } from '../styles/globalStyles';
 import CalculatorPageTemplate from '../components/CalculatorPageTemplate';
 import CalculatorBenefits from '../components/CalculatorBenefits';
 import CalculatorForm from '../components/CalculatorForm';
+import CalculatorResults from '../components/CalculatorResults';
+import { downloadPDF, downloadExcel } from '../utils/downloadUtils';
 
 const PIE_COLORS = ['#3F51B5', '#7986CB', '#9E9E9E', '#CFD8DC']; // Colors from new theme palette
 
@@ -69,13 +73,19 @@ const ChartContainer = styled(Box)(({ theme }) => ({
   border: `1px solid ${theme.palette.grey[200]}`, // Subtle border
 }));
 
-interface ChartData {
-  year: number;
-  value: number;
+interface CalculatorResult {
+  cagr: number;
+  totalReturn: number;
+  absoluteReturn: number;
+  yearlyBreakdown: Array<{
+    year: number;
+    value: number;
+    returns: number;
+  }>;
 }
 
-interface PieData {
-  name: string;
+interface ChartDataPoint {
+  year: number;
   value: number;
 }
 
@@ -84,48 +94,10 @@ const CagrCalculator: React.FC = () => {
   const [initialValue, setInitialValue] = useState<string>('');
   const [finalValue, setFinalValue] = useState<string>('');
   const [investmentPeriod, setInvestmentPeriod] = useState<string>('');
-  const [results, setResults] = useState<{
-    cagr: number;
-    totalGrowth: number;
-    yearlyBreakdown: Array<{
-      year: number;
-      startValue: number;
-      endValue: number;
-      growth: number;
-    }>;
-  } | null>(null);
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [pieData, setPieData] = useState<PieData[]>([]);
+  const [results, setResults] = useState<CalculatorResult | null>(null);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [pieData, setPieData] = useState<Array<{ name: string; value: number }>>([]);
   const [error, setError] = useState<string>('');
-
-  const calculateCAGR = () => {
-    const initial = parseFloat(initialValue);
-    const final = parseFloat(finalValue);
-    const period = parseFloat(investmentPeriod);
-
-    if (initial > 0 && final > 0 && period > 0) {
-      const cagrValue = (Math.pow(final / initial, 1 / period) - 1) * 100;
-      setResults({
-        cagr: cagrValue,
-        totalGrowth: final - initial,
-        yearlyBreakdown: [],
-      });
-
-      // Generate chart data
-      const data: ChartData[] = [];
-      for (let i = 0; i <= period; i++) {
-        const value = initial * Math.pow(1 + cagrValue / 100, i);
-        data.push({ year: i, value: Math.round(value) });
-      }
-      setChartData(data);
-
-      // Generate pie chart data
-      setPieData([
-        { name: 'Initial Investment', value: initial },
-        { name: 'Growth', value: final - initial },
-      ]);
-    }
-  };
 
   const resetForm = () => {
     setInitialValue('');
@@ -134,6 +106,62 @@ const CagrCalculator: React.FC = () => {
     setResults(null);
     setChartData([]);
     setPieData([]);
+    setError('');
+  };
+
+  const calculateResults = () => {
+    const initial = parseFloat(initialValue);
+    const final = parseFloat(finalValue);
+    const period = parseFloat(investmentPeriod);
+
+    if (isNaN(initial) || isNaN(final) || isNaN(period)) {
+      setError('Please enter valid numbers');
+      return;
+    }
+
+    if (initial > 0 && final > 0 && period > 0) {
+      const cagrValue = (Math.pow(final / initial, 1 / period) - 1) * 100;
+      const totalGrowth = final - initial;
+      const cagr = cagrValue;
+      const totalReturn = cagrValue;
+      const absoluteReturn = totalGrowth;
+
+      const yearlyBreakdown: Array<{ year: number; value: number; returns: number }> = [];
+      for (let i = 0; i <= period; i++) {
+        const value = initial * Math.pow(1 + cagrValue / 100, i);
+        const previousValue = i === 0 ? initial : initial * Math.pow(1 + cagrValue / 100, i - 1);
+        const returns = value - previousValue;
+        yearlyBreakdown.push({ 
+          year: i, 
+          value: Math.round(value), 
+          returns: Math.round(returns) 
+        });
+      }
+
+      // Update chart data
+      const newChartData: ChartDataPoint[] = Array.from({ length: period + 1 }, (_, i) => ({
+        year: i + 1,
+        value: yearlyBreakdown[i].value
+      }));
+      setChartData(newChartData);
+
+      // Update pie data
+      const newPieData = [
+        { name: 'Initial Investment', value: initial },
+        { name: 'Returns', value: final - initial }
+      ];
+      setPieData(newPieData);
+
+      setResults({
+        cagr,
+        totalReturn,
+        absoluteReturn,
+        yearlyBreakdown
+      });
+      setError('');
+    } else {
+      setError('Please enter positive numbers');
+    }
   };
 
   const formatCurrency = (value: number) => {
@@ -172,33 +200,35 @@ const CagrCalculator: React.FC = () => {
 
   const inputFields = [
     {
-      label: "Initial Investment Value",
+      label: 'Initial Value',
       value: initialValue,
       onChange: setInitialValue,
-      type: "number",
+      type: 'number',
       startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+      tooltip: 'Enter the initial investment amount'
     },
     {
-      label: "Final Investment Value",
+      label: 'Final Value',
       value: finalValue,
       onChange: setFinalValue,
-      type: "number",
+      type: 'number',
       startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+      tooltip: 'Enter the final investment value'
     },
     {
-      label: "Investment Period (Years)",
+      label: 'Investment Period (Years)',
       value: investmentPeriod,
       onChange: setInvestmentPeriod,
-      type: "number",
-      tooltip: "Number of years for the investment",
-    },
+      type: 'number',
+      tooltip: 'Enter the investment period in years'
+    }
   ];
 
   const formComponent = (
     <CalculatorForm
       title="Input Values"
       inputFields={inputFields}
-      onCalculate={calculateCAGR}
+      onCalculate={calculateResults}
       onReset={resetForm}
       calculateButtonText="Calculate CAGR"
       calculateButtonIcon={<TrendingUpIcon />}
@@ -209,64 +239,67 @@ const CagrCalculator: React.FC = () => {
     <CalculatorBenefits benefits={benefits} />
   );
 
-  const resultComponent = (
-    <Grid container spacing={4}>
-      <Grid item xs={12} md={6}>
-        {results && (
-          <ResultCard sx={{ mb: 4, background: getBackgroundGradient(theme.palette.mode) }}>
-            <Typography variant="h6" gutterBottom>
-              Compound Annual Growth Rate
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 700 }}>
-              {results.cagr.toFixed(2)}%
-            </Typography>
-          </ResultCard>
-        )}
-      </Grid>
-      <Grid item xs={12} md={6}>
-        {chartData.length > 0 && (
-          <ChartContainer>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="year" label={{ value: 'Year', position: 'insideBottom', offset: 0 }} />
-                <YAxis label={{ value: 'Value (INR)', angle: -90, position: 'insideLeft' }} tickFormatter={(value) => `₹${value.toLocaleString()}`} />
-                <RechartsTooltip formatter={(value: number) => [formatCurrency(value), 'Value']} />
-                <Line type="monotone" dataKey="value" stroke={theme.palette.primary.main} activeDot={{ r: 8 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        )}
-      </Grid>
-      <Grid item xs={12} md={6}>
-        {pieData.length > 0 && (
-          <ChartContainer>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
-                  dataKey="value"
-                  stroke="#FFFFFF"
-                  strokeWidth={2}
-                  minAngle={5}
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Legend />
-                <RechartsTooltip formatter={(value: number) => [formatCurrency(value), 'Amount']} />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        )}
-      </Grid>
-    </Grid>
-  );
+  const resultComponent = results ? (
+    <CalculatorResults
+      summaryItems={[
+        {
+          label: 'CAGR',
+          value: `${results.cagr.toFixed(2)}%`,
+          icon: <TrendingUpIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+        },
+        {
+          label: 'Total Return',
+          value: `${results.totalReturn.toFixed(2)}%`,
+          icon: <MonetizationOnIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+        },
+        {
+          label: 'Absolute Return',
+          value: `${results.absoluteReturn.toFixed(2)}%`,
+          icon: <AccountBalanceIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+        }
+      ]}
+      chartData={chartData}
+      pieData={pieData}
+      yearlyBreakdown={results.yearlyBreakdown.map((row: { year: number; value: number; returns: number }) => ({
+        year: row.year,
+        value: row.value,
+        returns: row.returns
+      }))}
+      onDownloadPDF={() => {
+        downloadPDF({
+          title: 'CAGR Calculator Results',
+          summary: [
+            { label: 'CAGR', value: `${results.cagr.toFixed(2)}%` },
+            { label: 'Total Return', value: `${results.totalReturn.toFixed(2)}%` },
+            { label: 'Absolute Return', value: `${results.absoluteReturn.toFixed(2)}%` }
+          ],
+          yearlyBreakdown: results.yearlyBreakdown.map(row => ({
+            Year: row.year,
+            Value: formatCurrency(row.value),
+            Returns: formatCurrency(row.returns)
+          }))
+        });
+      }}
+      onDownloadExcel={() => {
+        downloadExcel({
+          title: 'CAGR Calculator Results',
+          summary: [
+            { label: 'CAGR', value: `${results.cagr.toFixed(2)}%` },
+            { label: 'Total Return', value: `${results.totalReturn.toFixed(2)}%` },
+            { label: 'Absolute Return', value: `${results.absoluteReturn.toFixed(2)}%` }
+          ],
+          yearlyBreakdown: results.yearlyBreakdown.map(row => ({
+            Year: row.year,
+            Value: formatCurrency(row.value),
+            Returns: formatCurrency(row.returns)
+          }))
+        });
+      }}
+      chartTitle="Investment Growth Over Time"
+      pieChartTitle="Investment vs Returns"
+      yearlyBreakdownTitle="Yearly Value Breakdown"
+    />
+  ) : null;
 
   return (
     <CalculatorPageTemplate
