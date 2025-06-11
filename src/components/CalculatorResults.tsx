@@ -21,7 +21,6 @@ import {
   Cell,
   Legend,
 } from 'recharts';
-import DownloadIcon from '@mui/icons-material/Download';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import TableChartIcon from '@mui/icons-material/TableChart';
 
@@ -44,17 +43,6 @@ const SummaryCard = styled(Paper)(({ theme }) => ({
   textAlign: 'center',
   boxShadow: theme.shadows[1],
   border: `1px solid ${theme.palette.grey[200]}`,
-}));
-
-const ChartContainer = styled(Box)(({ theme }) => ({
-  position: 'relative',
-  height: '400px',
-  width: '100%',
-  padding: theme.spacing(2),
-  marginBottom: theme.spacing(4),
-  '& canvas': {
-    padding: theme.spacing(2)
-  }
 }));
 
 interface SummaryItem {
@@ -110,83 +98,6 @@ const CalculatorResults: React.FC<CalculatorResultsProps> = ({
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(value);
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    layout: {
-      padding: {
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: 20
-      }
-    },
-    plugins: {
-      legend: {
-        position: 'top' as const,
-        align: 'start',
-        labels: {
-          boxWidth: 12,
-          padding: 20
-        }
-      },
-      title: {
-        display: true,
-        text: chartTitle,
-        font: {
-          size: 16,
-          weight: 'bold'
-        },
-        padding: {
-          bottom: 20
-        }
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: 'Year',
-          font: {
-            size: 12,
-            weight: 'bold'
-          },
-          padding: {
-            top: 10
-          }
-        },
-        ticks: {
-          maxRotation: 45,
-          minRotation: 45,
-          padding: 10
-        },
-        grid: {
-          display: false
-        }
-      },
-      y: {
-        title: {
-          display: true,
-          text: 'Amount (₹)',
-          font: {
-            size: 12,
-            weight: 'bold'
-          },
-          padding: {
-            bottom: 10
-          }
-        },
-        ticks: {
-          callback: (value: number) => formatCurrency(value),
-          padding: 10
-        },
-        grid: {
-          color: 'rgba(0, 0, 0, 0.1)'
-        }
-      }
-    }
   };
 
   return (

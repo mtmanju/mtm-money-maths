@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Typography, Box, Grid, useTheme, styled } from '@mui/material';
+import { Container, Typography, Box, Grid, useTheme } from '@mui/material';
 
 interface CalculatorPageTemplateProps {
   title: string;

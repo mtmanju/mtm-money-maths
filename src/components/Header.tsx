@@ -60,11 +60,7 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
   },
 }));
 
-interface HeaderProps {
-  onHeightChange: (height: number) => void;
-}
-
-const Header: React.FC<HeaderProps> = ({ onHeightChange }) => {
+const Header: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -80,14 +76,6 @@ const Header: React.FC<HeaderProps> = ({ onHeightChange }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    if (appBarRef.current) {
-      const height = appBarRef.current.offsetHeight;
-      console.log('Header height:', height);
-      onHeightChange(height);
-    }
-  }, [onHeightChange, isMobile, scrolled]);
-
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
@@ -100,7 +88,19 @@ const Header: React.FC<HeaderProps> = ({ onHeightChange }) => {
   ];
 
   return (
-    <StyledAppBar ref={appBarRef} className={scrolled ? 'scrolled' : ''}>
+    <StyledAppBar
+      ref={appBarRef}
+      className={scrolled ? 'scrolled' : ''}
+      position="fixed"
+      sx={{
+        background: theme.palette.mode === 'light'
+          ? 'rgba(255, 255, 255, 0.9)'
+          : 'rgba(17, 24, 39, 0.9)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: `1px solid ${theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+      }}
+    >
       <Container maxWidth="xl">
         <Box sx={{ 
           display: 'flex', 
@@ -110,7 +110,7 @@ const Header: React.FC<HeaderProps> = ({ onHeightChange }) => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <RouterLink to="/" style={{ textDecoration: 'none' }}>
               <LogoText variant="h6">
-                Money Maths
+                MTM Money Maths
               </LogoText>
             </RouterLink>
           </Box>
