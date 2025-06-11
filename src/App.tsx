@@ -7,6 +7,7 @@ import SipCalculator from './pages/SipCalculator';
 import EmiCalculator from './pages/EmiCalculator';
 import MutualFundCalculator from './pages/MutualFundCalculator';
 import CagrCalculator from './pages/CagrCalculator';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/calculators/emi" element={<EmiCalculator />} />
         <Route path="/calculators/mutual-fund" element={<MutualFundCalculator />} />
         <Route path="/calculators/cagr" element={<CagrCalculator />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>
   );

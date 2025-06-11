@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
@@ -32,12 +32,12 @@ const swaggerOptions = {
     info: {
       title: 'Money Maths API',
       version: '1.0.0',
-      description: 'Financial calculation APIs',
+      description: 'API documentation for Money Maths financial calculators',
     },
     servers: [
       {
-        url: `http://localhost:${port}`,
-        description: 'Development server',
+        url: isDevelopment ? 'http://localhost:3001' : 'https://api.moneymaths.com',
+        description: isDevelopment ? 'Development server' : 'Production server',
       },
     ],
   },
@@ -48,11 +48,11 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Routes
-app.use('/api/v1/cagr', cagrRoutes);
+app.use('/api/cagr', cagrRoutes);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', environment: process.env.NODE_ENV });
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok' });
 });
 
 // Error handling middleware

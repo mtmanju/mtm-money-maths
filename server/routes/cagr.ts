@@ -1,7 +1,19 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { calculateCagr } from '../services/cagr.js';
 
 const router = express.Router();
+
+interface CagrRequest {
+  initialValue: number;
+  finalValue: number;
+  years: number;
+}
+
+interface CagrResponse {
+  cagr: number;
+  totalReturn: number;
+  absoluteReturn: number;
+}
 
 /**
  * @swagger
@@ -16,30 +28,19 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             required:
- *               - initialInvestment
- *               - finalInvestmentValue
- *               - investmentPeriod
+ *               - initialValue
+ *               - finalValue
+ *               - years
  *             properties:
- *               initialInvestment:
+ *               initialValue:
  *                 type: number
- *                 description: Initial investment amount
- *                 example: 100000
- *               finalInvestmentValue:
+ *                 description: Initial investment value
+ *               finalValue:
  *                 type: number
  *                 description: Final investment value
- *                 example: 150000
- *               investmentPeriod:
+ *               years:
  *                 type: number
  *                 description: Investment period in years
- *                 example: 5
- *               adjustForInflation:
- *                 type: boolean
- *                 description: Whether to adjust for inflation
- *                 example: true
- *               inflationRate:
- *                 type: number
- *                 description: Annual inflation rate (if adjusting for inflation)
- *                 example: 6
  *     responses:
  *       200:
  *         description: CAGR calculation successful
@@ -50,48 +51,42 @@ const router = express.Router();
  *               properties:
  *                 cagr:
  *                   type: number
- *                   description: Calculated CAGR
- *                   example: 8.45
+ *                   description: Compound Annual Growth Rate
  *                 totalReturn:
  *                   type: number
- *                   description: Total return percentage
- *                   example: 50
+ *                   description: Total return amount
  *                 absoluteReturn:
  *                   type: number
- *                   description: Absolute return amount
- *                   example: 50000
- *                 inflationAdjustedCagr:
- *                   type: number
- *                   description: Inflation-adjusted CAGR
- *                   example: 2.45
- *                 inflationAdjustedValue:
- *                   type: number
- *                   description: Inflation-adjusted final value
- *                   example: 112000
- *                 yearlyBreakdown:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       year:
- *                         type: number
- *                         example: 1
- *                       value:
- *                         type: number
- *                         example: 108450
- *                       inflationAdjustedValue:
- *                         type: number
- *                         example: 102311
+ *                   description: Absolute return percentage
  *       400:
  *         description: Invalid input parameters
  */
-router.post('/calculate', (req, res) => {
-  try {
-    const result = calculateCagr(req.body);
-    res.json(result);
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
+router.post('/calculate', (req: Request<{}, {}, CagrRequest>, res: Response<CagrResponse>) => {
+  const { initialValue, finalValue, years } = req.body;
+
+  // Validate input
+  if (!initialValue || !finalValue || !years) {
+    return res.status(400).json({
+      error: 'Missing required fields',
+    } as any);
   }
+
+  if (initialValue <= 0 || finalValue < 0 || years <= 0) {
+    return res.status(400).json({
+      error: 'Invalid input values',
+    } as any);
+  }
+
+  // Calculate CAGR
+  const cagr = Math.pow(finalValue / initialValue, 1 / years) - 1;
+  const totalReturn = finalValue - initialValue;
+  const absoluteReturn = (totalReturn / initialValue) * 100;
+
+  res.json({
+    cagr,
+    totalReturn,
+    absoluteReturn,
+  });
 });
 
 export default router; 

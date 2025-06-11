@@ -14,6 +14,7 @@ import {
   styled,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: 'transparent',
@@ -108,11 +109,21 @@ const Header: React.FC = () => {
           alignItems: 'center',
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <RouterLink to="/" style={{ textDecoration: 'none' }}>
-              <LogoText variant="h6">
-                MTM Money Maths
-              </LogoText>
-            </RouterLink>
+            <Typography
+              variant="h6"
+              component={RouterLink}
+              to="/"
+              sx={{
+                textDecoration: 'none',
+                color: 'inherit',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <AccountBalanceIcon />
+              Money Maths
+            </Typography>
           </Box>
 
           {isMobile ? (
