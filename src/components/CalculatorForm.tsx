@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   Typography,
   TextField,
@@ -55,6 +55,17 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({
   calculateButtonIcon,
 }) => {
   const theme = useTheme();
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      if (index < inputFields.length - 1) {
+        inputRefs.current[index + 1]?.focus();
+      } else {
+        onCalculate();
+      }
+    }
+  };
 
   return (
     <StyledPaper>
@@ -80,6 +91,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({
               value={field.value}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => field.onChange(e.target.value)}
               type={field.type || 'text'}
+              inputRef={(el) => (inputRefs.current[index] = el)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
               InputProps={{
                 startAdornment: field.startAdornment,
                 endAdornment: field.endAdornment || (field.tooltip && (

@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   useTheme,
   InputAdornment,
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import CalculatorPageTemplate from '../components/CalculatorPageTemplate';
 import CalculatorBenefits from '../components/CalculatorBenefits';
 import CalculatorForm from '../components/CalculatorForm';
 import CalculatorResults from '../components/CalculatorResults';
 import { downloadPDF, downloadExcel } from '../utils/downloadUtils';
+import { formatCurrency, formatPercentage } from '../utils/formatUtils';
 
 interface CalculatorResult {
   cagr: number;
@@ -36,6 +37,7 @@ const CagrCalculator: React.FC = () => {
   const [results, setResults] = useState<CalculatorResult | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [pieData, setPieData] = useState<Array<{ name: string; value: number }>>([]);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const resetForm = () => {
     setInitialValue('');
@@ -55,53 +57,50 @@ const CagrCalculator: React.FC = () => {
       return;
     }
 
-    if (initial > 0 && final > 0 && period > 0) {
-      const cagrValue = (Math.pow(final / initial, 1 / period) - 1) * 100;
-      const totalGrowth = final - initial;
-      const cagr = cagrValue;
-      const totalReturn = cagrValue;
-      const absoluteReturn = totalGrowth;
+    const cagr = Math.pow(final / initial, 1 / period) - 1;
+    const totalReturn = (final - initial) / initial;
+    const absoluteReturn = final - initial;
 
-      const yearlyBreakdown: Array<{ year: number; value: number; returns: number }> = [];
-      for (let i = 0; i <= period; i++) {
-        const value = initial * Math.pow(1 + cagrValue / 100, i);
-        const previousValue = i === 0 ? initial : initial * Math.pow(1 + cagrValue / 100, i - 1);
-        const returns = value - previousValue;
-        yearlyBreakdown.push({ 
-          year: i, 
-          value: Math.round(value), 
-          returns: Math.round(returns) 
-        });
+    // Generate yearly breakdown with returns
+    const yearlyBreakdown = Array.from({ length: period + 1 }, (_, i) => {
+      const value = initial * Math.pow(1 + cagr, i);
+      const previousValue = i === 0 ? initial : initial * Math.pow(1 + cagr, i - 1);
+      const returns = value - previousValue;
+      return {
+        year: i,
+        value: Math.round(value),
+        returns: Math.round(returns)
+      };
+    });
+
+    setResults({
+      cagr,
+      totalReturn,
+      absoluteReturn,
+      yearlyBreakdown
+    });
+
+    // Generate chart data
+    const newChartData = Array.from({ length: period + 1 }, (_, i) => ({
+      year: i,
+      value: initial * Math.pow(1 + cagr, i),
+    }));
+    setChartData(newChartData);
+
+    // Generate pie chart data
+    setPieData([
+      { name: 'Initial Investment', value: initial },
+      { name: 'Returns', value: absoluteReturn },
+    ]);
+
+    // Scroll to results section after a short delay to ensure rendering
+    setTimeout(() => {
+      if (resultsRef.current) {
+        const yOffset = -100; // Offset to show cards from the beginning
+        const y = resultsRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
       }
-
-      const newChartData: ChartDataPoint[] = Array.from({ length: period + 1 }, (_, i) => ({
-        year: i + 1,
-        value: yearlyBreakdown[i].value
-      }));
-      setChartData(newChartData);
-
-      const newPieData = [
-        { name: 'Initial Investment', value: initial },
-        { name: 'Returns', value: final - initial }
-      ];
-      setPieData(newPieData);
-
-      setResults({
-        cagr,
-        totalReturn,
-        absoluteReturn,
-        yearlyBreakdown
-      });
-    }
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 2,
-      minimumFractionDigits: 2,
-    }).format(value);
+    }, 100);
   };
 
   const benefits = [
@@ -149,6 +148,43 @@ const CagrCalculator: React.FC = () => {
     }
   ];
 
+  const handleDownloadPDF = () => {
+    if (!results) return;
+    
+    downloadPDF({
+      title: 'CAGR Calculator Results',
+      summary: [
+        { label: 'Initial Investment', value: formatCurrency(Number(initialValue)) },
+        { label: 'Final Value', value: formatCurrency(Number(finalValue)) },
+        { label: 'Investment Period (Years)', value: investmentPeriod },
+        { label: 'CAGR', value: formatPercentage(results.cagr) },
+        { label: 'Total Return', value: formatPercentage(results.totalReturn) },
+        { label: 'Absolute Return', value: formatPercentage(results.absoluteReturn) }
+      ],
+      description: 'Compound Annual Growth Rate (CAGR) is the annual rate of return on an investment, assuming the returns are reinvested and compounded over time.'
+    });
+  };
+
+  const handleDownloadExcel = () => {
+    if (!results) return;
+    
+    downloadExcel({
+      title: 'CAGR Calculator Results',
+      summary: [
+        { label: 'Initial Investment', value: formatCurrency(Number(initialValue)) },
+        { label: 'Final Value', value: formatCurrency(Number(finalValue)) },
+        { label: 'Investment Period (Years)', value: investmentPeriod },
+        { label: 'CAGR', value: formatPercentage(results.cagr) },
+        { label: 'Total Return', value: formatPercentage(results.totalReturn) },
+        { label: 'Absolute Return', value: formatPercentage(results.absoluteReturn) }
+      ],
+      yearlyBreakdown: chartData.map(point => ({
+        Year: point.year,
+        Value: formatCurrency(point.value)
+      }))
+    });
+  };
+
   const formComponent = (
     <CalculatorForm
       title="Input Values"
@@ -164,59 +200,32 @@ const CagrCalculator: React.FC = () => {
     <CalculatorBenefits benefits={benefits} />
   );
 
-  const resultComponent = results ? (
+  const resultComponent = results && (
     <CalculatorResults
+      ref={resultsRef}
       summaryItems={[
         {
-          label: 'CAGR',
-          value: `${results.cagr.toFixed(2)}%`,
-          icon: <TrendingUpIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+          label: 'Total Investment',
+          value: formatCurrency(Number(initialValue))
         },
         {
-          label: 'Total Return',
-          value: `${results.totalReturn.toFixed(2)}%`,
-          icon: <AccountBalanceIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+          label: 'Total Returns',
+          value: formatCurrency(results.absoluteReturn)
         },
         {
-          label: 'Absolute Return',
-          value: formatCurrency(results.absoluteReturn),
-          icon: <MonetizationOnIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+          label: 'Maturity Value',
+          value: formatCurrency(Number(finalValue))
         }
       ]}
       chartData={chartData}
       pieData={pieData}
       yearlyBreakdown={results.yearlyBreakdown}
-      onDownloadPDF={() => downloadPDF({
-        title: 'CAGR Calculator Results',
-        summary: [
-          { label: 'CAGR', value: `${results.cagr.toFixed(2)}%` },
-          { label: 'Total Return', value: `${results.totalReturn.toFixed(2)}%` },
-          { label: 'Absolute Return', value: formatCurrency(results.absoluteReturn) }
-        ],
-        yearlyBreakdown: results.yearlyBreakdown.map(row => ({
-          Year: row.year,
-          Value: formatCurrency(row.value),
-          Returns: formatCurrency(row.returns)
-        }))
-      })}
-      onDownloadExcel={() => downloadExcel({
-        title: 'CAGR Calculator Results',
-        summary: [
-          { label: 'CAGR', value: `${results.cagr.toFixed(2)}%` },
-          { label: 'Total Return', value: `${results.totalReturn.toFixed(2)}%` },
-          { label: 'Absolute Return', value: formatCurrency(results.absoluteReturn) }
-        ],
-        yearlyBreakdown: results.yearlyBreakdown.map(row => ({
-          Year: row.year,
-          Value: formatCurrency(row.value),
-          Returns: formatCurrency(row.returns)
-        }))
-      })}
-      chartTitle="Investment Growth Over Time"
+      onDownloadPDF={handleDownloadPDF}
+      onDownloadExcel={handleDownloadExcel}
+      chartTitle="Investment Growth"
       pieChartTitle="Investment Distribution"
-      yearlyBreakdownTitle="Yearly Breakdown"
     />
-  ) : null;
+  );
 
   return (
     <CalculatorPageTemplate

@@ -15,36 +15,28 @@
     "@types/node": "^20.11.25",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
-    "axios": "^1.6.7",
-    "chart.js": "^4.4.1",
     "cors": "^2.8.5",
+    "exceljs": "^4.4.0",
     "express": "^4.18.2",
     "framer-motion": "^11.18.2",
-    "jspdf": "^2.5.1",
-    "jspdf-autotable": "^3.5.31",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "react": "^18.2.0",
-    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.1",
-    "react-scripts": "5.0.1",
     "recharts": "^2.15.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
-    "typescript": "4.9.5",
-    "web-vitals": "^3.5.2",
-    "xlsx": "^0.18.5"
+    "typescript": "4.9.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "npm run build:frontend && npm run build:backend",
-    "build:frontend": "react-scripts build",
-    "build:backend": "tsc -p tsconfig.server.json",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "dev": "vite",
+    "build": "npm run clean && tsc && vite build",
+    "preview": "vite preview",
     "server": "cross-env NODE_ENV=development node --loader ts-node/esm server/index.ts",
-    "dev": "concurrently \"npm run server\" \"npm run start\"",
-    "dev:frontend": "react-scripts start",
-    "dev:backend": "cross-env NODE_ENV=development node --loader ts-node/esm server/index.ts"
+    "dev:server": "cross-env NODE_ENV=development node --loader ts-node/esm server/index.ts",
+    "clean": "rimraf dist",
+    "analyze": "vite build --mode analyze"
   },
   "eslintConfig": {
     "extends": [
@@ -71,8 +63,12 @@
     "@types/swagger-ui-express": "^4.1.6",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
+    "@vitejs/plugin-react": "^4.2.1",
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
-    "ts-node": "^10.9.2"
+    "rimraf": "^5.0.5",
+    "terser": "^5.29.2",
+    "ts-node": "^10.9.2",
+    "vite": "^6.3.5"
   }
 }

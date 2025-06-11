@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   useTheme,
   InputAdornment,
 } from '@mui/material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import PaymentsIcon from '@mui/icons-material/Payments';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import CalculatorPageTemplate from '../components/CalculatorPageTemplate';
 import CalculatorBenefits from '../components/CalculatorBenefits';
 import CalculatorForm from '../components/CalculatorForm';
 import CalculatorResults from '../components/CalculatorResults';
 import { downloadPDF, downloadExcel } from '../utils/downloadUtils';
+import { formatCurrency, formatPercentage } from '../utils/formatUtils';
 
 interface CalculatorResult {
   emi: number;
@@ -37,6 +39,7 @@ const EmiCalculator: React.FC = () => {
   const [results, setResults] = useState<CalculatorResult | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [pieData, setPieData] = useState<Array<{ name: string; value: number }>>([]);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const resetForm = () => {
     setLoanAmount('');
@@ -49,70 +52,70 @@ const EmiCalculator: React.FC = () => {
 
   const calculateResults = () => {
     const principal = parseFloat(loanAmount);
-    const rate = parseFloat(interestRate) / 100 / 12; // Monthly interest rate
-    const term = parseFloat(loanTerm) * 12; // Total number of months
+    const rate = parseFloat(interestRate) / 100 / 12; // Monthly rate
+    const time = parseFloat(loanTerm) * 12; // Total months
 
-    if (isNaN(principal) || isNaN(rate) || isNaN(term)) {
+    if (isNaN(principal) || isNaN(rate) || isNaN(time)) {
       return;
     }
 
-    if (principal > 0 && rate > 0 && term > 0) {
-      const emi = principal * rate * Math.pow(1 + rate, term) / (Math.pow(1 + rate, term) - 1);
-      const totalPayment = emi * term;
-      const totalInterest = totalPayment - principal;
+    const emi = (principal * rate * Math.pow(1 + rate, time)) / (Math.pow(1 + rate, time) - 1);
+    const totalPayment = emi * time;
+    const totalInterest = totalPayment - principal;
 
-      const yearlyBreakdown: Array<{ year: number; principal: number; interest: number; balance: number }> = [];
-      let remainingBalance = principal;
+    // Generate yearly breakdown
+    const yearlyBreakdown = [];
+    let remainingBalance = principal;
+    
+    for (let year = 0; year <= parseFloat(loanTerm); year++) {
+      let yearPrincipal = 0;
+      let yearInterest = 0;
+      const monthsInYear = Math.min(12, time - year * 12);
 
-      for (let year = 1; year <= Math.ceil(term / 12); year++) {
-        let yearPrincipal = 0;
-        let yearInterest = 0;
-        const monthsInYear = Math.min(12, term - (year - 1) * 12);
-
-        for (let month = 1; month <= monthsInYear; month++) {
-          const interestPayment = remainingBalance * rate;
-          const principalPayment = emi - interestPayment;
-          remainingBalance -= principalPayment;
-          yearPrincipal += principalPayment;
-          yearInterest += interestPayment;
-        }
-
-        yearlyBreakdown.push({
-          year,
-          principal: Math.round(yearPrincipal),
-          interest: Math.round(yearInterest),
-          balance: Math.round(remainingBalance)
-        });
+      for (let month = 0; month < monthsInYear; month++) {
+        const interestPayment = remainingBalance * rate;
+        const principalPayment = emi - interestPayment;
+        remainingBalance -= principalPayment;
+        yearPrincipal += principalPayment;
+        yearInterest += interestPayment;
       }
 
-      const newChartData: ChartDataPoint[] = yearlyBreakdown.map(item => ({
-        year: item.year,
-        value: item.principal + item.interest
-      }));
-      setChartData(newChartData);
-
-      const newPieData = [
-        { name: 'Principal', value: principal },
-        { name: 'Interest', value: totalInterest }
-      ];
-      setPieData(newPieData);
-
-      setResults({
-        emi: Math.round(emi),
-        totalPayment: Math.round(totalPayment),
-        totalInterest: Math.round(totalInterest),
-        yearlyBreakdown
+      yearlyBreakdown.push({
+        year,
+        principal: Math.round(yearPrincipal),
+        interest: Math.round(yearInterest),
+        balance: Math.round(remainingBalance)
       });
     }
-  };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 2,
-      minimumFractionDigits: 2,
-    }).format(value);
+    setResults({
+      emi,
+      totalPayment,
+      totalInterest,
+      yearlyBreakdown
+    });
+
+    // Generate chart data
+    const newChartData = yearlyBreakdown.map(item => ({
+      year: item.year,
+      value: item.balance
+    }));
+    setChartData(newChartData);
+
+    // Generate pie chart data
+    setPieData([
+      { name: 'Principal', value: principal },
+      { name: 'Interest', value: totalInterest }
+    ]);
+
+    // Scroll to results section after a short delay to ensure rendering
+    setTimeout(() => {
+      if (resultsRef.current) {
+        const yOffset = -100; // Offset to show cards from the beginning
+        const y = resultsRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   const benefits = [
@@ -175,61 +178,74 @@ const EmiCalculator: React.FC = () => {
     <CalculatorBenefits benefits={benefits} />
   );
 
-  const resultComponent = results ? (
+  const handleDownloadPDF = () => {
+    if (!results) return;
+    
+    downloadPDF({
+      title: 'EMI Calculator Results',
+      summary: [
+        { label: 'Loan Amount', value: formatCurrency(Number(loanAmount)) },
+        { label: 'Interest Rate', value: `${interestRate}%` },
+        { label: 'Loan Term (Years)', value: loanTerm.toString() },
+        { label: 'Monthly EMI', value: formatCurrency(results.emi) },
+        { label: 'Total Payment', value: formatCurrency(results.totalPayment) },
+        { label: 'Total Interest', value: formatCurrency(results.totalInterest) }
+      ],
+      description: 'EMI (Equated Monthly Installment) is the fixed payment amount made by a borrower to a lender at a specified date each calendar month.'
+    });
+  };
+
+  const handleDownloadExcel = () => {
+    if (!results) return;
+    
+    downloadExcel({
+      title: 'EMI Calculator Results',
+      summary: [
+        { label: 'Loan Amount', value: formatCurrency(Number(loanAmount)) },
+        { label: 'Interest Rate', value: `${interestRate}%` },
+        { label: 'Loan Term (Years)', value: loanTerm.toString() },
+        { label: 'Monthly EMI', value: formatCurrency(results.emi) },
+        { label: 'Total Payment', value: formatCurrency(results.totalPayment) },
+        { label: 'Total Interest', value: formatCurrency(results.totalInterest) }
+      ],
+      yearlyBreakdown: results.yearlyBreakdown.map(item => ({
+        Year: item.year,
+        'Principal Paid': formatCurrency(item.principal),
+        'Interest Paid': formatCurrency(item.interest),
+        'Remaining Balance': formatCurrency(item.balance)
+      }))
+    });
+  };
+
+  const resultComponent = results && (
     <CalculatorResults
+      ref={resultsRef}
       summaryItems={[
         {
           label: 'Monthly EMI',
           value: formatCurrency(results.emi),
-          icon: <PaymentsIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+          icon: <PaymentsIcon />
         },
         {
           label: 'Total Payment',
           value: formatCurrency(results.totalPayment),
-          icon: <AccountBalanceIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+          icon: <AccountBalanceIcon />
         },
         {
           label: 'Total Interest',
           value: formatCurrency(results.totalInterest),
-          icon: <MonetizationOnIcon sx={{ fontSize: 48, color: theme.palette.primary.main }} />
+          icon: <TrendingUpIcon />
         }
       ]}
       chartData={chartData}
       pieData={pieData}
       yearlyBreakdown={results.yearlyBreakdown}
-      onDownloadPDF={() => downloadPDF({
-        title: 'EMI Calculator Results',
-        summary: [
-          { label: 'Monthly EMI', value: formatCurrency(results.emi) },
-          { label: 'Total Payment', value: formatCurrency(results.totalPayment) },
-          { label: 'Total Interest', value: formatCurrency(results.totalInterest) }
-        ],
-        yearlyBreakdown: results.yearlyBreakdown.map(row => ({
-          Year: row.year,
-          Principal: formatCurrency(row.principal),
-          Interest: formatCurrency(row.interest),
-          Balance: formatCurrency(row.balance)
-        }))
-      })}
-      onDownloadExcel={() => downloadExcel({
-        title: 'EMI Calculator Results',
-        summary: [
-          { label: 'Monthly EMI', value: formatCurrency(results.emi) },
-          { label: 'Total Payment', value: formatCurrency(results.totalPayment) },
-          { label: 'Total Interest', value: formatCurrency(results.totalInterest) }
-        ],
-        yearlyBreakdown: results.yearlyBreakdown.map(row => ({
-          Year: row.year,
-          Principal: formatCurrency(row.principal),
-          Interest: formatCurrency(row.interest),
-          Balance: formatCurrency(row.balance)
-        }))
-      })}
-      chartTitle="Yearly Payment Breakdown"
-      pieChartTitle="Principal vs Interest"
-      yearlyBreakdownTitle="Yearly Breakdown"
+      onDownloadPDF={handleDownloadPDF}
+      onDownloadExcel={handleDownloadExcel}
+      chartTitle="Payment Schedule"
+      pieChartTitle="Payment Distribution"
     />
-  ) : null;
+  );
 
   return (
     <CalculatorPageTemplate
