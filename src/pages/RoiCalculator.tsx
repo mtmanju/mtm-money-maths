@@ -134,30 +134,33 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-const CagrCalculator: React.FC = () => {
+const RoiCalculator: React.FC = () => {
   const theme = useTheme();
-  const [initialValue, setInitialValue] = useState<number>(100000);
+  const [initialInvestment, setInitialInvestment] = useState<number>(100000);
   const [finalValue, setFinalValue] = useState<number>(150000);
   const [years, setYears] = useState<number>(5);
   const [results, setResults] = useState<{
-    cagr: number;
+    roi: number;
+    annualizedRoi: number;
     chartData: any[];
   }>({
-    cagr: 0,
+    roi: 0,
+    annualizedRoi: 0,
     chartData: [],
   });
 
   useEffect(() => {
-    calculateCAGR();
-  }, [initialValue, finalValue, years]);
+    calculateROI();
+  }, [initialInvestment, finalValue, years]);
 
-  const calculateCAGR = () => {
-    const cagr = (Math.pow(finalValue / initialValue, 1 / years) - 1) * 100;
+  const calculateROI = () => {
+    const roi = ((finalValue - initialInvestment) / initialInvestment) * 100;
+    const annualizedRoi = (Math.pow(finalValue / initialInvestment, 1 / years) - 1) * 100;
 
     // Generate chart data
     const chartData = Array.from({ length: years + 1 }, (_, i) => {
       const year = i;
-      const value = initialValue * Math.pow(1 + cagr / 100, year);
+      const value = initialInvestment * (1 + roi / 100 * year);
       return {
         year,
         value: Math.round(value),
@@ -165,7 +168,8 @@ const CagrCalculator: React.FC = () => {
     });
 
     setResults({
-      cagr,
+      roi,
+      annualizedRoi,
       chartData,
     });
   };
@@ -174,13 +178,13 @@ const CagrCalculator: React.FC = () => {
     <StyledPaper>
       <Box>
         <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
-          Initial Value
+          Initial Investment
         </Typography>
         <StyledTextField
           fullWidth
           type="number"
-          value={initialValue}
-          onChange={(e) => setInitialValue(Number(e.target.value))}
+          value={initialInvestment}
+          onChange={(e) => setInitialInvestment(Number(e.target.value))}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -190,8 +194,8 @@ const CagrCalculator: React.FC = () => {
           }}
         />
         <StyledSlider
-          value={initialValue}
-          onChange={(_, newValue) => setInitialValue(newValue as number)}
+          value={initialInvestment}
+          onChange={(_, newValue) => setInitialInvestment(newValue as number)}
           min={1000}
           max={10000000}
           step={1000}
@@ -259,16 +263,16 @@ const CagrCalculator: React.FC = () => {
     <Box>
       <CompactSummary>
         <SummaryItem>
-          <span className="label">CAGR</span>
-          <span className="value">{results.cagr.toFixed(2)}%</span>
+          <span className="label">ROI</span>
+          <span className="value">{results.roi.toFixed(2)}%</span>
         </SummaryItem>
         <SummaryItem>
-          <span className="label">Initial Value</span>
-          <span className="value">{formatCurrency(initialValue)}</span>
+          <span className="label">Annualized ROI</span>
+          <span className="value">{results.annualizedRoi.toFixed(2)}%</span>
         </SummaryItem>
         <SummaryItem>
-          <span className="label">Final Value</span>
-          <span className="value">{formatCurrency(finalValue)}</span>
+          <span className="label">Total Return</span>
+          <span className="value">{formatCurrency(finalValue - initialInvestment)}</span>
         </SummaryItem>
       </CompactSummary>
 
@@ -277,8 +281,8 @@ const CagrCalculator: React.FC = () => {
           <StatIcon>
             <AttachMoneyIcon />
           </StatIcon>
-          <StatLabel>Initial Value</StatLabel>
-          <StatValue>{formatCurrency(initialValue)}</StatValue>
+          <StatLabel>Initial Investment</StatLabel>
+          <StatValue>{formatCurrency(initialInvestment)}</StatValue>
         </StatCard>
         <StatCard>
           <StatIcon>
@@ -330,12 +334,12 @@ const CagrCalculator: React.FC = () => {
 
   return (
     <CalculatorTemplate
-      title="CAGR Calculator"
-      description="Calculate Compound Annual Growth Rate for your investments"
+      title="ROI Calculator"
+      description="Calculate Return on Investment and analyze the profitability of your investments"
       formSection={formSection}
       resultSection={resultSection}
     />
   );
 };
 
-export default CagrCalculator; 
+export default RoiCalculator; 

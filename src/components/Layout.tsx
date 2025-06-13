@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, useTheme } from '@mui/material';
+import { Box, useTheme, Container } from '@mui/material';
 import Header from './Header';
 import Footer from './Footer';
 
@@ -16,7 +16,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        background: theme.palette.background.default,
+        background: '#fff',
+        color: theme.palette.text.primary,
       }}
     >
       <Header />
@@ -27,11 +28,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           width: '100%',
           maxWidth: '100%',
           mx: 'auto',
-          px: { xs: 2, sm: 3, md: 4 },
-          py: { xs: 3, sm: 4, md: 5 },
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        {children}
+        <Container
+          maxWidth="xl"
+          sx={{
+            position: 'relative',
+            zIndex: 1,
+            px: { xs: 2, sm: 3, md: 4 },
+            py: { xs: 4, sm: 6, md: 8 },
+          }}
+        >
+          {children}
+        </Container>
       </Box>
       <Footer />
     </Box>

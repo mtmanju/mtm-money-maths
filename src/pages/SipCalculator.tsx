@@ -1,240 +1,369 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
+  Box,
+  Typography,
+  TextField,
+  Slider,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
   useTheme,
+  styled,
   InputAdornment,
+  Switch,
+  FormControlLabel,
+  Button,
 } from '@mui/material';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import CalculatorPageTemplate from '../components/CalculatorPageTemplate';
-import CalculatorBenefits from '../components/CalculatorBenefits';
-import CalculatorForm from '../components/CalculatorForm';
-import CalculatorResults from '../components/CalculatorResults';
-import { downloadPDF, downloadExcel } from '../utils/downloadUtils';
-import { formatCurrency, formatPercentage } from '../utils/formatUtils';
+import {
+  TrendingUp as TrendingUpIcon,
+  AccountBalance as AccountBalanceIcon,
+  CalendarToday as CalendarTodayIcon,
+  AttachMoney as AttachMoneyIcon,
+  Percent as PercentIcon,
+  CalendarMonth as CalendarMonthIcon,
+} from '@mui/icons-material';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
+import { CalculatorTemplate, StyledPaper, ResultCard, StyledTextField, StyledSlider, ChartContainer } from '../components/CalculatorTemplate';
 
-interface CalculatorResult {
-  maturityValue: number;
-  totalInvestment: number;
-  totalReturns: number;
-  yearlyBreakdown: Array<{
-    year: number;
-    investment: number;
-    returns: number;
-    value: number;
-  }>;
-}
+const GradientButton = styled(Button)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+  color: '#FFFFFF',
+  padding: '12px 24px',
+  borderRadius: '12px',
+  textTransform: 'none',
+  fontSize: '1rem',
+  fontWeight: 600,
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)',
+  },
+}));
 
-interface ChartDataPoint {
-  year: number;
-  value: number;
-}
+const CompactSummary = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  background: 'rgba(34, 40, 70, 0.92)',
+  borderRadius: '18px',
+  boxShadow: '0 4px 16px rgba(90, 107, 255, 0.12)',
+  border: '1.5px solid #5A6BFF',
+  padding: theme.spacing(2, 3),
+  marginBottom: theme.spacing(3),
+  color: '#fff',
+  fontWeight: 700,
+  fontSize: '1.1rem',
+  gap: theme.spacing(2),
+}));
+
+const SummaryItem = styled(Box)(({ theme }) => ({
+  flex: 1,
+  textAlign: 'center',
+  '& .label': {
+    color: '#A7BFFF',
+    fontSize: '0.95rem',
+    fontWeight: 500,
+    marginBottom: 2,
+    display: 'block',
+  },
+  '& .value': {
+    color: '#fff',
+    fontWeight: 800,
+    fontSize: '1.25rem',
+  },
+}));
+
+const StatBar = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: theme.spacing(2),
+  marginBottom: theme.spacing(3),
+  justifyContent: 'space-between',
+}));
+
+const StatCard = styled(Box)(({ theme }) => ({
+  flex: '1 1 180px',
+  minWidth: 150,
+  background: 'rgba(255,255,255,0.7)',
+  borderRadius: '16px',
+  boxShadow: '0 2px 8px rgba(90,107,255,0.08)',
+  border: '1.5px solid #e0e7ef',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: theme.spacing(2, 1.5),
+  textAlign: 'center',
+  color: '#232946',
+  position: 'relative',
+}));
+
+const StatIcon = styled(Box)(({ theme }) => ({
+  fontSize: 28,
+  marginBottom: theme.spacing(0.5),
+  color: '#5A6BFF',
+}));
+
+const StatLabel = styled('span')(({ theme }) => ({
+  fontSize: '0.95rem',
+  color: '#7F8FA6',
+  fontWeight: 500,
+  marginBottom: 2,
+}));
+
+const StatValue = styled('span')(({ theme }) => ({
+  fontWeight: 800,
+  fontSize: '1.25rem',
+  color: '#232946',
+}));
+
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(value);
+};
 
 const SipCalculator: React.FC = () => {
   const theme = useTheme();
-  const [monthlyInvestment, setMonthlyInvestment] = useState<string>('');
-  const [expectedReturn, setExpectedReturn] = useState<string>('');
-  const [investmentPeriod, setInvestmentPeriod] = useState<string>('');
-  const [results, setResults] = useState<CalculatorResult | null>(null);
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  const [pieData, setPieData] = useState<Array<{ name: string; value: number }>>([]);
-  const resultsRef = useRef<HTMLDivElement>(null);
+  const [monthlyInvestment, setMonthlyInvestment] = useState<number>(5000);
+  const [expectedReturn, setExpectedReturn] = useState<number>(12);
+  const [timePeriod, setTimePeriod] = useState<number>(5);
+  const [results, setResults] = useState<{
+    totalInvestment: number;
+    totalReturns: number;
+    maturityValue: number;
+    chartData: any[];
+  }>({
+    totalInvestment: 0,
+    totalReturns: 0,
+    maturityValue: 0,
+    chartData: [],
+  });
 
-  const resetForm = () => {
-    setMonthlyInvestment('');
-    setExpectedReturn('');
-    setInvestmentPeriod('');
-    setResults(null);
-    setChartData([]);
-    setPieData([]);
-  };
+  useEffect(() => {
+    calculateSIP();
+  }, [monthlyInvestment, expectedReturn, timePeriod]);
 
-  const calculateResults = () => {
-    const monthly = parseFloat(monthlyInvestment);
-    const rate = parseFloat(expectedReturn) / 100 / 12; // Monthly rate
-    const period = parseFloat(investmentPeriod) * 12; // Total months
+  const calculateSIP = () => {
+    const monthlyRate = expectedReturn / 100 / 12;
+    const months = timePeriod * 12;
+    const totalInvestment = monthlyInvestment * months;
 
-    if (isNaN(monthly) || isNaN(rate) || isNaN(period)) {
-      return;
-    }
-
-    const maturityValue = monthly * ((Math.pow(1 + rate, period) - 1) / rate);
-    const totalInvestment = monthly * period;
+    // Calculate maturity value using SIP formula
+    const maturityValue = monthlyInvestment * 
+      ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * 
+      (1 + monthlyRate);
+    
     const totalReturns = maturityValue - totalInvestment;
 
-    // Generate yearly breakdown
-    const yearlyBreakdown = Array.from({ length: parseFloat(investmentPeriod) + 1 }, (_, i) => {
-      const yearMonths = Math.min(12, period - i * 12);
-      const yearInvestment = monthly * yearMonths;
-      const yearValue = monthly * ((Math.pow(1 + rate, (i + 1) * 12) - Math.pow(1 + rate, i * 12)) / rate);
+    // Generate chart data
+    const chartData = Array.from({ length: timePeriod + 1 }, (_, i) => {
+      const year = i;
+      const investment = monthlyInvestment * 12 * (year + 1);
+      const months = (year + 1) * 12;
+      const value = monthlyInvestment * 
+        ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * 
+        (1 + monthlyRate);
       return {
-        year: i,
-        investment: Math.round(yearInvestment),
-        returns: Math.round(yearValue - yearInvestment),
-        value: Math.round(yearValue)
+        year,
+        investment: Math.round(investment),
+        value: Math.round(value),
       };
     });
 
     setResults({
-      maturityValue,
       totalInvestment,
       totalReturns,
-      yearlyBreakdown
+      maturityValue,
+      chartData,
     });
-
-    // Generate chart data
-    const newChartData = Array.from({ length: parseFloat(investmentPeriod) + 1 }, (_, i) => ({
-      year: i,
-      value: yearlyBreakdown[i].value
-    }));
-    setChartData(newChartData);
-
-    // Generate pie chart data
-    setPieData([
-      { name: 'Total Investment', value: totalInvestment },
-      { name: 'Returns', value: totalReturns }
-    ]);
-
-    // Scroll to results section after a short delay to ensure rendering
-    setTimeout(() => {
-      if (resultsRef.current) {
-        resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
   };
 
-  const benefits = [
-    {
-      title: "Systematic Investment",
-      description: "Plan your systematic investment strategy and understand potential returns."
-    },
-    {
-      title: "Long-term Planning",
-      description: "Set realistic financial goals based on your investment capacity."
-    },
-    {
-      title: "Return Analysis",
-      description: "Analyze the potential returns on your SIP investments."
-    },
-    {
-      title: "Portfolio Growth",
-      description: "Track the growth of your investment portfolio over time."
-    }
-  ];
+  const formSection = (
+    <StyledPaper>
+    <Box>
+        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
+          Monthly Investment
+        </Typography>
+        <StyledTextField
+          fullWidth
+          type="number"
+          value={monthlyInvestment}
+          onChange={(e) => setMonthlyInvestment(Number(e.target.value))}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <AttachMoneyIcon sx={{ color: theme.palette.text.secondary }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <StyledSlider
+          value={monthlyInvestment}
+          onChange={(_, newValue) => setMonthlyInvestment(newValue as number)}
+          min={1000}
+          max={100000}
+          step={1000}
+          valueLabelDisplay="auto"
+        />
+      </Box>
 
-  const inputFields = [
-    {
-      label: 'Monthly Investment',
-      value: monthlyInvestment,
-      onChange: setMonthlyInvestment,
-      type: 'number',
-      startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-      tooltip: 'Enter your monthly investment amount'
-    },
-    {
-      label: 'Expected Return (per annum)',
-      value: expectedReturn,
-      onChange: setExpectedReturn,
-      type: 'number',
-      endAdornment: <InputAdornment position="end">%</InputAdornment>,
-      tooltip: 'Enter the expected annual return rate'
-    },
-    {
-      label: 'Investment Period (Years)',
-      value: investmentPeriod,
-      onChange: setInvestmentPeriod,
-      type: 'number',
-      tooltip: 'Enter the investment period in years'
-    }
-  ];
+      <Box>
+        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
+          Expected Return (p.a.)
+        </Typography>
+        <StyledTextField
+          fullWidth
+          type="number"
+          value={expectedReturn}
+          onChange={(e) => setExpectedReturn(Number(e.target.value))}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <PercentIcon sx={{ color: theme.palette.text.secondary }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <StyledSlider
+          value={expectedReturn}
+          onChange={(_, newValue) => setExpectedReturn(newValue as number)}
+          min={1}
+          max={30}
+          step={1}
+          valueLabelDisplay="auto"
+        />
+      </Box>
 
-  const formComponent = (
-    <CalculatorForm
-      title="Input Values"
-      inputFields={inputFields}
-      onCalculate={calculateResults}
-      onReset={resetForm}
-      calculateButtonText="Calculate Returns"
-      calculateButtonIcon={<TrendingUpIcon />}
-    />
+      <Box>
+        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
+          Investment Period (Years)
+        </Typography>
+        <StyledTextField
+          fullWidth
+          type="number"
+          value={timePeriod}
+          onChange={(e) => setTimePeriod(Number(e.target.value))}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <CalendarMonthIcon sx={{ color: theme.palette.text.secondary }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <StyledSlider
+          value={timePeriod}
+          onChange={(_, newValue) => setTimePeriod(newValue as number)}
+          min={1}
+          max={30}
+          step={1}
+          valueLabelDisplay="auto"
+        />
+      </Box>
+    </StyledPaper>
   );
 
-  const aboutComponent = (
-    <CalculatorBenefits benefits={benefits} />
-  );
+  const resultSection = (
+    <Box>
+      <CompactSummary>
+        <SummaryItem>
+          <span className="label">Maturity Value</span>
+          <span className="value">{formatCurrency(results.maturityValue)}</span>
+        </SummaryItem>
+        <SummaryItem>
+          <span className="label">Total Investment</span>
+          <span className="value">{formatCurrency(results.totalInvestment)}</span>
+        </SummaryItem>
+        <SummaryItem>
+          <span className="label">Total Returns</span>
+          <span className="value">{formatCurrency(results.totalReturns)}</span>
+        </SummaryItem>
+      </CompactSummary>
 
-  const handleDownloadPDF = () => {
-    if (!results) return;
-    
-    downloadPDF({
-      title: 'SIP Calculator Results',
-      summary: [
-        { label: 'Monthly Investment', value: formatCurrency(Number(monthlyInvestment)) },
-        { label: 'Expected Return', value: `${expectedReturn}%` },
-        { label: 'Investment Period (Years)', value: investmentPeriod },
-        { label: 'Maturity Value', value: formatCurrency(results.maturityValue) },
-        { label: 'Total Investment', value: formatCurrency(results.totalInvestment) },
-        { label: 'Total Returns', value: formatCurrency(results.totalReturns) }
-      ],
-      description: 'SIP (Systematic Investment Plan) Calculator helps you estimate the future value of your regular investments based on the monthly investment amount, expected return rate, and investment period.'
-    });
-  };
+      <StatBar>
+        <StatCard>
+          <StatIcon>
+            <AttachMoneyIcon />
+          </StatIcon>
+          <StatLabel>Monthly Investment</StatLabel>
+          <StatValue>{formatCurrency(monthlyInvestment)}</StatValue>
+        </StatCard>
+        <StatCard>
+          <StatIcon>
+            <PercentIcon />
+          </StatIcon>
+          <StatLabel>Expected Return</StatLabel>
+          <StatValue>{expectedReturn}%</StatValue>
+        </StatCard>
+        <StatCard>
+          <StatIcon>
+            <CalendarMonthIcon />
+          </StatIcon>
+          <StatLabel>Time Period</StatLabel>
+          <StatValue>{timePeriod} years</StatValue>
+        </StatCard>
+      </StatBar>
 
-  const handleDownloadExcel = () => {
-    if (!results) return;
-    
-    downloadExcel({
-      title: 'SIP Calculator Results',
-      summary: [
-        { label: 'Monthly Investment', value: formatCurrency(Number(monthlyInvestment)) },
-        { label: 'Expected Return', value: `${expectedReturn}%` },
-        { label: 'Investment Period (Years)', value: investmentPeriod },
-        { label: 'Maturity Value', value: formatCurrency(results.maturityValue) },
-        { label: 'Total Investment', value: formatCurrency(results.totalInvestment) },
-        { label: 'Total Returns', value: formatCurrency(results.totalReturns) }
-      ],
-      yearlyBreakdown: chartData.map(point => ({
-        Year: point.year,
-        Value: formatCurrency(point.value)
-      }))
-    });
-  };
-
-  const resultComponent = results && (
-    <CalculatorResults
-      ref={resultsRef}
-      summaryItems={[
-        {
-          label: 'Total Investment',
-          value: formatCurrency(results.totalInvestment)
-        },
-        {
-          label: 'Total Returns',
-          value: formatCurrency(results.totalReturns)
-        },
-        {
-          label: 'Maturity Value',
-          value: formatCurrency(results.maturityValue)
-        }
-      ]}
-      chartData={chartData}
-      pieData={pieData}
-      yearlyBreakdown={results.yearlyBreakdown}
-      onDownloadPDF={handleDownloadPDF}
-      onDownloadExcel={handleDownloadExcel}
-      chartTitle="Investment Growth"
-      pieChartTitle="Investment Distribution"
-    />
+      <ChartContainer>
+        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600, mb: 3 }}>
+          Investment Growth
+        </Typography>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={results.chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E0E7FF" />
+            <XAxis dataKey="year" stroke="#7F8FA6" />
+            <YAxis stroke="#7F8FA6" />
+            <RechartsTooltip
+              contentStyle={{
+                background: 'rgba(255,255,255,0.95)',
+                border: '1px solid #E0E7FF',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(90,107,255,0.1)',
+              }}
+            />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="investment"
+              name="Investment"
+              stroke="#5A6BFF"
+              strokeWidth={2}
+              dot={{ fill: '#5A6BFF', strokeWidth: 2 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="value"
+              name="Maturity Value"
+              stroke="#10B981"
+              strokeWidth={2}
+              dot={{ fill: '#10B981', strokeWidth: 2 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </ChartContainer>
+    </Box>
   );
 
   return (
-    <CalculatorPageTemplate
+    <CalculatorTemplate
       title="SIP Calculator"
-      mainDescription="Calculate potential returns on your Systematic Investment Plan (SIP) and plan your financial future."
-      formComponent={formComponent}
-      resultComponent={resultComponent}
-      aboutComponent={aboutComponent}
+      description="Calculate your Systematic Investment Plan returns and plan your investments"
+      formSection={formSection}
+      resultSection={resultSection}
     />
   );
 };

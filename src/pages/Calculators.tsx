@@ -7,183 +7,211 @@ import {
   Card,
   CardContent,
   Box,
-  useTheme as useMuiTheme,
-  styled,
-  CardActions,
   Button,
 } from '@mui/material';
 import {
+  Calculate as CalculateIcon,
   TrendingUp as TrendingUpIcon,
   AccountBalance as AccountBalanceIcon,
-  Savings as SavingsIcon,
   CreditCard as CreditCardIcon,
+  Savings as SavingsIcon,
+  ShowChart as ShowChartIcon,
+  AccountBalanceWallet as AccountBalanceWalletIcon,
+  CompareArrows as CompareArrowsIcon,
+  Assessment as AssessmentIcon,
+  AttachMoney as AttachMoneyIcon,
+  ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material';
 
-const StyledCard = styled(Card)(({ theme }) => ({
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  background: theme.palette.background.paper,
-}));
-
-const CardIconWrapper = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 56,
-  height: 56,
-  borderRadius: 0,
-  backgroundColor: theme.palette.grey[100],
-  border: '1px solid ' + theme.palette.grey[200],
-  boxShadow: 'none',
-  color: theme.palette.primary.main,
-  transition: 'background-color 0.2s ease, border-color 0.2s ease',
-  '&:hover': {
-    transform: 'none',
-    backgroundColor: theme.palette.grey[200],
-    borderColor: theme.palette.grey[300],
-  },
-}));
+const pastelColors = [
+  '#fbeeee', // EMI - pink
+  '#eafafd', // SIP - cyan
+  '#fdfbe7', // FD - yellow
+  '#f3f1fa', // Mutual Fund - purple
+  '#f6faef', // Tax - green
+  '#f8f9fc', // Investment - light gray
+  '#fbeeee', // Loan Comparison - pink
+  '#f3f1fa', // Retirement - purple
+  '#eafafd', // ROI - cyan
+  '#fdfbe7', // CAGR - yellow
+  '#f6faef', // Compound Interest - green
+];
 
 const calculators = [
   {
-    title: 'CAGR Calculator',
-    description: 'Calculate Compound Annual Growth Rate to evaluate investment performance over time',
-    icon: <TrendingUpIcon sx={{ fontSize: 28 }} />,
-    path: '/calculators/cagr',
-  },
-  {
-    title: 'Mutual Fund Calculator',
-    description: 'Estimate returns and analyze performance of your mutual fund investments',
-    icon: <AccountBalanceIcon sx={{ fontSize: 28 }} />,
-    path: '/calculators/mutual-fund',
+    title: 'EMI Calculator',
+    description: 'Calculate your Equated Monthly Installments for loans and plan your repayments.',
+    icon: <CreditCardIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/emi'
   },
   {
     title: 'SIP Calculator',
-    description: 'Plan your Systematic Investment Plan and project future returns',
-    icon: <SavingsIcon sx={{ fontSize: 28 }} />,
-    path: '/calculators/sip',
+    description: 'Plan your Systematic Investment Plan and calculate potential returns over time.',
+    icon: <TrendingUpIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/sip'
   },
   {
-    title: 'EMI Calculator',
-    description: 'Calculate Equated Monthly Installments for loans and mortgages',
-    icon: <CreditCardIcon sx={{ fontSize: 28 }} />,
-    path: '/calculators/emi',
+    title: 'FD Calculator',
+    description: 'Calculate returns on your Fixed Deposits and plan your investments.',
+    icon: <SavingsIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/fd'
   },
+  {
+    title: 'Mutual Fund Calculator',
+    description: 'Analyze your mutual fund investments and track their performance over time.',
+    icon: <AccountBalanceIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/mutual-fund'
+  },
+  {
+    title: 'Tax Calculator',
+    description: 'Calculate your tax liability and plan your tax-saving investments effectively.',
+    icon: <AccountBalanceIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/tax'
+  },
+  {
+    title: 'Investment Calculator',
+    description: 'Plan your investments and calculate potential returns with our comprehensive tool.',
+    icon: <CalculateIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/investment'
+  },
+  {
+    title: 'Loan Comparison',
+    description: 'Compare different loan options and find the best deal for your needs.',
+    icon: <CompareArrowsIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/loan-comparison'
+  },
+  {
+    title: 'Retirement Calculator',
+    description: 'Plan your retirement and calculate the corpus needed for a comfortable life.',
+    icon: <AccountBalanceWalletIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/retirement'
+  },
+  {
+    title: 'ROI Calculator',
+    description: 'Calculate Return on Investment and analyze the profitability of your investments.',
+    icon: <TrendingUpIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/roi'
+  },
+  {
+    title: 'CAGR Calculator',
+    description: 'Calculate Compound Annual Growth Rate for your investments and analyze returns.',
+    icon: <ShowChartIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/cagr'
+  },
+  {
+    title: 'Compound Interest Calculator',
+    description: 'Calculate compound interest and see how your money grows over time.',
+    icon: <AttachMoneyIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/compound'
+  }
 ];
 
-const Calculators: React.FC = () => {
-  const theme = useMuiTheme();
+const CardTitle = (props) => (
+  <Typography
+    sx={{
+      color: '#1A1F36',
+      fontWeight: 700,
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      fontSize: '1.13rem',
+      letterSpacing: '-0.01em',
+      marginBottom: 0,
+    }}
+    {...props}
+  />
+);
 
-  return (
-    <Box sx={{ py: theme.spacing(10) }}>
-      <Container maxWidth="lg">
-        <Box sx={{ textAlign: 'center', mb: theme.spacing(8) }}>
-          <Typography
-            variant="h1"
-            component="h1"
+const CardDesc = (props) => (
+  <Typography
+    sx={{
+      color: '#4E5D78',
+      fontWeight: 400,
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      fontSize: '0.98rem',
+      lineHeight: 1.5,
+      margin: '1rem 0 1.5rem 0',
+    }}
+    {...props}
+  />
+);
+
+const LearnMoreButton = (props) => (
+  <Button
+    variant="outlined"
+    endIcon={<ArrowForwardIcon sx={{ fontSize: 18 }} />}
+    sx={{
+      border: '1.5px solid #1A1F36',
+      color: '#1A1F36',
+      borderRadius: '999px',
+      fontWeight: 500,
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      fontSize: '1rem',
+      textTransform: 'none',
+      background: 'transparent',
+      boxShadow: 'none',
+      padding: '8px 22px',
+      minWidth: 0,
+      transition: 'background 0.2s, color 0.2s, border 0.2s',
+      '&:hover': {
+        background: '#eafafd',
+        borderColor: '#009ca3',
+        color: '#009ca3',
+      },
+    }}
+    {...props}
+  />
+);
+
+const Calculators = () => (
+  <Container maxWidth="xl" sx={{ py: 8 }}>
+    <Typography variant="h4" sx={{ mb: 6, textAlign: 'center', fontWeight: 700, color: '#1A1F36', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+      Our Calculators
+    </Typography>
+    <Grid container spacing={3}>
+      {calculators.map((calc, idx) => (
+        <Grid item xs={12} sm={6} md={4} lg={3} key={calc.title}>
+          <Card
             sx={{
-              fontSize: { xs: theme.typography.h3.fontSize, md: theme.typography.h1.fontSize },
-              fontWeight: theme.typography.h1.fontWeight,
-              mb: 2,
-              letterSpacing: theme.typography.h1.letterSpacing,
-              color: theme.palette.text.primary,
+              background: pastelColors[idx % pastelColors.length],
+              borderRadius: '24px',
+              boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
+              p: 0,
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              border: 'none',
             }}
           >
-            Financial Calculators
-          </Typography>
-          <Typography
-            variant="h5"
-            color="text.secondary"
-            sx={{ 
-              maxWidth: '800px', 
-              mx: 'auto',
-              lineHeight: theme.typography.h5.lineHeight,
-              fontWeight: theme.typography.h5.fontWeight,
-            }}
-          >
-            Make informed financial decisions with our suite of powerful calculators
-          </Typography>
-        </Box>
-
-        <Grid container spacing={4}>
-          {calculators.map((calculator) => (
-            <Grid item xs={12} sm={6} md={3} key={calculator.title}>
-              <RouterLink
-                to={calculator.path}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                <StyledCard>
-                  <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: theme.spacing(3) }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-                      <CardIconWrapper>{calculator.icon}</CardIconWrapper>
-                      <Typography
-                        variant="h6"
-                        component="h2"
-                        gutterBottom
-                        sx={{ 
-                          fontWeight: theme.typography.h6.fontWeight,
-                          ml: 2,
-                          fontSize: theme.typography.h6.fontSize,
-                          color: theme.palette.text.primary,
-                        }}
-                      >
-                        {calculator.title}
-                      </Typography>
-                    </Box>
-                    <Typography 
-                      variant="body1" 
-                      color="text.secondary"
-                      sx={{ lineHeight: theme.typography.body1.lineHeight }}
-                    >
-                      {calculator.description}
-                    </Typography>
-                  </CardContent>
-                  <CardActions sx={{ p: theme.spacing(3), pt: 0, justifyContent: 'flex-end' }}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="large"
-                      startIcon={calculator.icon}
-                    >
-                      Calculate
-                    </Button>
-                  </CardActions>
-                </StyledCard>
-              </RouterLink>
-            </Grid>
-          ))}
+            <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                <Box sx={{
+                  background: '#fff',
+                  borderRadius: '12px',
+                  width: 40,
+                  height: 40,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 1px 4px 0 rgba(30, 34, 90, 0.06)',
+                  mr: 1.5,
+                }}>
+                  {calc.icon}
+                </Box>
+                <CardTitle>{calc.title}</CardTitle>
+              </Box>
+              <CardDesc>{calc.description}</CardDesc>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 'auto' }}>
+                <Box component={RouterLink} to={calc.path} sx={{ textDecoration: 'none', display: 'inline-block' }}>
+                  <LearnMoreButton>
+                    Calculate
+                  </LearnMoreButton>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
         </Grid>
-
-        <Box sx={{ mt: theme.spacing(10), textAlign: 'center' }}>
-          <Typography 
-            variant="h4" 
-            gutterBottom 
-            sx={{ 
-              fontWeight: theme.typography.h4.fontWeight,
-              letterSpacing: theme.typography.h4.letterSpacing,
-              color: theme.palette.text.primary,
-            }}
-          >
-            Why Use Our Calculators?
-          </Typography>
-          <Typography 
-            variant="body1" 
-            color="text.secondary" 
-            sx={{ 
-              maxWidth: '800px', 
-              mx: 'auto',
-              lineHeight: theme.typography.body1.lineHeight,
-            }}
-          >
-            Our financial calculators help you make informed decisions about your investments and loans.
-            Whether you're planning for retirement, investing in mutual funds, or taking out a loan,
-            our tools provide accurate calculations and insights to guide your financial journey.
-          </Typography>
-        </Box>
-      </Container>
-    </Box>
-  );
-};
+      ))}
+    </Grid>
+  </Container>
+);
 
 export default Calculators; 

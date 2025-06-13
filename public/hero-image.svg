@@ -1,44 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
-  <!-- Calculator Body -->
-  <rect x="100" y="50" width="400" height="300" rx="20" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="2"/>
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Elements -->
+  <circle cx="400" cy="300" r="250" fill="url(#gradient1)" opacity="0.1"/>
+  <circle cx="400" cy="300" r="200" fill="url(#gradient2)" opacity="0.1"/>
   
-  <!-- Display -->
-  <rect x="120" y="80" width="360" height="80" rx="10" fill="#F0F0F0" stroke="#E0E0E0" stroke-width="1"/>
-  <text x="300" y="130" font-family="Inter, Arial" font-size="24" fill="#212121" text-anchor="middle">1,234.56</text>
+  <!-- Calculator Base -->
+  <rect x="250" y="150" width="300" height="400" rx="20" fill="white" stroke="#5A6BFF" stroke-width="2"/>
   
-  <!-- Buttons -->
-  <g fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1">
+  <!-- Calculator Screen -->
+  <rect x="270" y="180" width="260" height="80" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
+  <text x="400" y="230" font-family="Inter" font-size="24" fill="#5A6BFF" text-anchor="middle">₹ 1,00,000</text>
+  
+  <!-- Calculator Buttons -->
+  <g>
     <!-- Row 1 -->
-    <rect x="120" y="180" width="80" height="60" rx="10"/>
-    <rect x="210" y="180" width="80" height="60" rx="10"/>
-    <rect x="300" y="180" width="80" height="60" rx="10"/>
-    <rect x="390" y="180" width="80" height="60" rx="10"/>
+    <rect x="270" y="280" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
+    <rect x="340" y="280" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
+    <rect x="410" y="280" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
+    <rect x="480" y="280" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
     
     <!-- Row 2 -->
-    <rect x="120" y="250" width="80" height="60" rx="10"/>
-    <rect x="210" y="250" width="80" height="60" rx="10"/>
-    <rect x="300" y="250" width="80" height="60" rx="10"/>
-    <rect x="390" y="250" width="80" height="60" rx="10"/>
+    <rect x="270" y="350" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
+    <rect x="340" y="350" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
+    <rect x="410" y="350" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
+    <rect x="480" y="350" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
+    
+    <!-- Row 3 -->
+    <rect x="270" y="420" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
+    <rect x="340" y="420" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
+    <rect x="410" y="420" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
+    <rect x="480" y="420" width="60" height="60" rx="10" fill="#F8FAFF" stroke="#5A6BFF" stroke-width="2"/>
   </g>
   
   <!-- Button Labels -->
-  <g font-family="Inter, Arial" font-size="20" fill="#616161" text-anchor="middle">
+  <g font-family="Inter" font-size="20" fill="#5A6BFF" text-anchor="middle">
     <!-- Row 1 -->
-    <text x="160" y="220">7</text>
-    <text x="250" y="220">8</text>
-    <text x="340" y="220">9</text>
-    <text x="430" y="220">÷</text>
+    <text x="300" y="320">7</text>
+    <text x="370" y="320">8</text>
+    <text x="440" y="320">9</text>
+    <text x="510" y="320">÷</text>
     
     <!-- Row 2 -->
-    <text x="160" y="290">4</text>
-    <text x="250" y="290">5</text>
-    <text x="340" y="290">6</text>
-    <text x="430" y="290">×</text>
+    <text x="300" y="390">4</text>
+    <text x="370" y="390">5</text>
+    <text x="440" y="390">6</text>
+    <text x="510" y="390">×</text>
+    
+    <!-- Row 3 -->
+    <text x="300" y="460">1</text>
+    <text x="370" y="460">2</text>
+    <text x="440" y="460">3</text>
+    <text x="510" y="460">-</text>
   </g>
   
   <!-- Decorative Elements -->
-  <circle cx="500" cy="50" r="20" fill="#6699FF" opacity="0.2"/>
-  <circle cx="100" cy="350" r="15" fill="#00CC99" opacity="0.2"/>
-  <circle cx="550" cy="300" r="25" fill="#6699FF" opacity="0.2"/>
+  <circle cx="200" cy="200" r="50" fill="url(#gradient3)" opacity="0.2"/>
+  <circle cx="600" cy="400" r="70" fill="url(#gradient4)" opacity="0.2"/>
+  
+  <!-- Gradients -->
+  <defs>
+    <radialGradient id="gradient1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(400 300) rotate(90) scale(250)">
+      <stop offset="0%" stop-color="#5A6BFF"/>
+      <stop offset="100%" stop-color="#00F5FF"/>
+    </radialGradient>
+    <radialGradient id="gradient2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(400 300) rotate(90) scale(200)">
+      <stop offset="0%" stop-color="#00F5FF"/>
+      <stop offset="100%" stop-color="#5A6BFF"/>
+    </radialGradient>
+    <radialGradient id="gradient3" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(200 200) rotate(90) scale(50)">
+      <stop offset="0%" stop-color="#5A6BFF"/>
+      <stop offset="100%" stop-color="#00F5FF"/>
+    </radialGradient>
+    <radialGradient id="gradient4" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(600 400) rotate(90) scale(70)">
+      <stop offset="0%" stop-color="#00F5FF"/>
+      <stop offset="100%" stop-color="#5A6BFF"/>
+    </radialGradient>
+  </defs>
 </svg> 

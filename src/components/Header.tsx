@@ -1,168 +1,170 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import {
-  AppBar,
-  Box,
-  Container,
-  IconButton,
-  Drawer,
-  List,
-  ListItem,
-  Typography,
-  useTheme,
-  useMediaQuery,
-  styled,
-} from '@mui/material';
+import React, { useState } from 'react';
+import { AppBar, Toolbar, Typography, Box, IconButton, Drawer, List, ListItem, ListItemText, useTheme, useMediaQuery, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
 
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
+const StyledAppBar = styled(AppBar)(() => ({
+  background: '#fff',
+  borderBottom: '1.5px solid #eafafd',
+  boxShadow: '0 1px 2px rgba(30, 34, 90, 0.04)',
+  zIndex: 1200,
+}));
+
+const Logo = styled(Typography)(() => ({
+  color: '#1A1F36',
+  fontWeight: 800,
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '2rem',
+  letterSpacing: '-0.02em',
+  textDecoration: 'none',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    color: '#009ca3',
+    transform: 'translateY(-2px)',
+  },
+}));
+
+const NavButton = styled(Button)(({ theme }) => ({
+  color: '#1A1F36',
+  fontWeight: 600,
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '1rem',
+  borderRadius: 18,
+  textTransform: 'none',
+  padding: '8px 18px',
   background: 'transparent',
   boxShadow: 'none',
-  position: 'fixed',
-  padding: theme.spacing(2, 0),
-  transition: 'background-color 0.3s ease, border-bottom 0.3s ease',
-  zIndex: theme.zIndex.appBar + 100,
-  borderBottom: '1px solid transparent',
-  '&.scrolled': {
-    background: theme.palette.background.paper,
-    boxShadow: 'none',
-    borderBottom: `1px solid ${theme.palette.grey[100]}`,
-  },
-}));
-
-const StyledLink = styled(RouterLink)(({ theme }) => ({
-  textDecoration: 'none',
-  color: theme.palette.text.primary,
-  padding: theme.spacing(1, 2),
-  fontSize: '0.95rem',
-  fontWeight: 500,
-  transition: 'color 0.2s ease',
+  transition: 'all 0.2s',
   '&:hover': {
-    color: theme.palette.primary.main,
+    background: 'rgba(94,226,230,0.25)',
+    color: '#009ca3',
   },
 }));
 
-const LogoText = styled(Typography)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  fontWeight: 700,
-  fontSize: '1.75rem',
-  letterSpacing: '-0.03em',
-}));
-
-const StyledDrawer = styled(Drawer)(({ theme }) => ({
-  '& .MuiDrawer-paper': {
-    width: 280,
-    background: theme.palette.background.default,
-    padding: theme.spacing(4, 3),
-    boxShadow: 'none',
-    borderLeft: `1px solid ${theme.palette.grey[100]}`,
-    borderRadius: 0,
+const CtaButton = styled(Button)(() => ({
+  border: '1.5px solid #1A1F36',
+  color: '#1A1F36',
+  borderRadius: '999px',
+  fontWeight: 500,
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '1rem',
+  textTransform: 'none',
+  background: 'transparent',
+  boxShadow: 'none',
+  padding: '8px 22px',
+  minWidth: 0,
+  transition: 'background 0.2s, color 0.2s, border 0.2s',
+  '&:hover': {
+    background: '#eafafd',
+    borderColor: '#009ca3',
+    color: '#009ca3',
   },
 }));
+
+const navLinks = [
+  { label: 'Calculators', path: '/calculators' },
+  { label: 'About', path: '/about' },
+  { label: 'Contact', path: '/contact' },
+];
 
 const Header: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const appBarRef = useRef<HTMLDivElement>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const location = useLocation();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen);
-  };
-
-  const navItems = [
-    { text: 'Home', path: '/' },
-    { text: 'Calculators', path: '/calculators' },
-    { text: 'About', path: '/about' },
-    { text: 'Contact', path: '/contact' },
-  ];
+  const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
 
   return (
-    <StyledAppBar
-      ref={appBarRef}
-      className={scrolled ? 'scrolled' : ''}
-      position="fixed"
-      sx={{
-        background: theme.palette.mode === 'light'
-          ? 'rgba(255, 255, 255, 0.9)'
-          : 'rgba(17, 24, 39, 0.9)',
-        backdropFilter: 'blur(10px)',
-        borderBottom: `1px solid ${theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
-        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
-      }}
-    >
-      <Container maxWidth="xl">
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography
-              variant="h6"
-              component={RouterLink}
-              to="/"
+    <StyledAppBar position="sticky" elevation={0}>
+      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 80, px: { xs: 3, sm: 6 } }}>
+        <Box component={RouterLink} to="/" sx={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <Logo>Money Maths</Logo>
+        </Box>
+        {isMobile ? (
+          <>
+            <IconButton 
+              edge="end" 
+              color="inherit" 
+              onClick={handleDrawerToggle}
               sx={{
-                textDecoration: 'none',
-                color: 'inherit',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
+                color: '#009ca3',
+                '&:hover': {
+                  background: 'rgba(94,226,230,0.15)',
+                },
               }}
             >
-              <AccountBalanceIcon />
-              Money Maths
-            </Typography>
-          </Box>
-
-          {isMobile ? (
-            <>
-              <IconButton
-                edge="end"
-                aria-label="menu"
-                onClick={toggleDrawer}
-                sx={{ color: theme.palette.text.primary }}
-              >
-                <MenuIcon />
-              </IconButton>
-              <StyledDrawer
-                anchor="right"
-                open={isDrawerOpen}
-                onClose={toggleDrawer}
-              >
+              <MenuIcon />
+            </IconButton>
+            <Drawer 
+              anchor="right" 
+              open={drawerOpen} 
+              onClose={handleDrawerToggle}
+              PaperProps={{
+                sx: {
+                  background: '#fff',
+                  borderLeft: '1.5px solid #eafafd',
+                  boxShadow: '0 4px 20px rgba(30, 34, 90, 0.10)',
+                },
+              }}
+            >
+              <Box sx={{ width: 280, p: 3 }}>
                 <List>
-                  {navItems.map((item) => (
-                    <ListItem key={item.text}>
-                      <StyledLink to={item.path} onClick={toggleDrawer}>
-                        {item.text}
-                      </StyledLink>
+                  {navLinks.map((item) => (
+                    <ListItem 
+                      button 
+                      key={item.label} 
+                      component={RouterLink} 
+                      to={item.path} 
+                      onClick={handleDrawerToggle}
+                      sx={{
+                        borderRadius: 18,
+                        mb: 1,
+                        transition: 'all 0.2s',
+                        background: location.pathname === item.path ? 'rgba(94,226,230,0.15)' : 'transparent',
+                        '&:hover': {
+                          background: 'rgba(94,226,230,0.25)',
+                          color: '#009ca3',
+                        },
+                      }}
+                    >
+                      <ListItemText 
+                        primary={item.label} 
+                        primaryTypographyProps={{
+                          fontWeight: 600,
+                          color: location.pathname === item.path ? '#009ca3' : '#1A1F36',
+                        }}
+                      />
                     </ListItem>
                   ))}
                 </List>
-              </StyledDrawer>
-            </>
-          ) : (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-              {navItems.map((item) => (
-                <StyledLink key={item.text} to={item.path}>
-                  {item.text}
-                </StyledLink>
-              ))}
-            </Box>
-          )}
-        </Box>
-      </Container>
+                <CtaButton fullWidth sx={{ mt: 2 }}>Get Started</CtaButton>
+              </Box>
+            </Drawer>
+          </>
+        ) : (
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            {navLinks.map((item) => (
+              <Box key={item.label} component={RouterLink} to={item.path} sx={{ textDecoration: 'none' }}>
+                <NavButton
+                  sx={{
+                    color: location.pathname === item.path ? '#009ca3' : '#1A1F36',
+                    background: location.pathname === item.path ? 'rgba(94,226,230,0.15)' : 'transparent',
+                    '&:hover': {
+                      background: 'rgba(94,226,230,0.25)',
+                      color: '#009ca3',
+                    },
+                  }}
+                >
+                  {item.label}
+                </NavButton>
+              </Box>
+            ))}
+            <CtaButton>Get Started</CtaButton>
+          </Box>
+        )}
+      </Toolbar>
     </StyledAppBar>
   );
 };

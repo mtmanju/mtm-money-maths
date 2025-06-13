@@ -1,259 +1,381 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
+  Box,
+  Typography,
+  TextField,
+  Slider,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
   useTheme,
+  styled,
   InputAdornment,
+  Switch,
+  FormControlLabel,
+  Button,
 } from '@mui/material';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
-import PaymentsIcon from '@mui/icons-material/Payments';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import CalculatorPageTemplate from '../components/CalculatorPageTemplate';
-import CalculatorBenefits from '../components/CalculatorBenefits';
-import CalculatorForm from '../components/CalculatorForm';
-import CalculatorResults from '../components/CalculatorResults';
-import { downloadPDF, downloadExcel } from '../utils/downloadUtils';
-import { formatCurrency, formatPercentage } from '../utils/formatUtils';
+import {
+  TrendingUp as TrendingUpIcon,
+  AccountBalance as AccountBalanceIcon,
+  CalendarToday as CalendarTodayIcon,
+  AttachMoney as AttachMoneyIcon,
+  Percent as PercentIcon,
+  CalendarMonth as CalendarMonthIcon,
+} from '@mui/icons-material';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
+import { CalculatorTemplate, StyledPaper, ResultCard, StyledTextField, StyledSlider, ChartContainer } from '../components/CalculatorTemplate';
 
-interface CalculatorResult {
-  emi: number;
-  totalPayment: number;
-  totalInterest: number;
-  yearlyBreakdown: Array<{
-    year: number;
-    principal: number;
-    interest: number;
-    balance: number;
-  }>;
-}
+const GradientButton = styled(Button)(({ theme }) => ({
+  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+  color: '#FFFFFF',
+  padding: '12px 24px',
+  borderRadius: '12px',
+  textTransform: 'none',
+  fontSize: '1rem',
+  fontWeight: 600,
+  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)',
+  },
+}));
 
-interface ChartDataPoint {
-  year: number;
-  value: number;
-}
+const CompactSummary = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  background: 'rgba(34, 40, 70, 0.92)',
+  borderRadius: '18px',
+  boxShadow: '0 4px 16px rgba(90, 107, 255, 0.12)',
+  border: '1.5px solid #5A6BFF',
+  padding: theme.spacing(2, 3),
+  marginBottom: theme.spacing(3),
+  color: '#fff',
+  fontWeight: 700,
+  fontSize: '1.1rem',
+  gap: theme.spacing(2),
+}));
+
+const SummaryItem = styled(Box)(({ theme }) => ({
+  flex: 1,
+  textAlign: 'center',
+  '& .label': {
+    color: '#A7BFFF',
+    fontSize: '0.95rem',
+    fontWeight: 500,
+    marginBottom: 2,
+    display: 'block',
+  },
+  '& .value': {
+    color: '#fff',
+    fontWeight: 800,
+    fontSize: '1.25rem',
+  },
+}));
+
+const StatBar = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: theme.spacing(2),
+  marginBottom: theme.spacing(3),
+  justifyContent: 'space-between',
+}));
+
+const StatCard = styled(Box)(({ theme }) => ({
+  flex: '1 1 180px',
+  minWidth: 150,
+  background: 'rgba(255,255,255,0.7)',
+  borderRadius: '16px',
+  boxShadow: '0 2px 8px rgba(90,107,255,0.08)',
+  border: '1.5px solid #e0e7ef',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: theme.spacing(2, 1.5),
+  textAlign: 'center',
+  color: '#232946',
+  position: 'relative',
+}));
+
+const StatIcon = styled(Box)(({ theme }) => ({
+  fontSize: 28,
+  marginBottom: theme.spacing(0.5),
+  color: '#5A6BFF',
+}));
+
+const StatLabel = styled('span')(({ theme }) => ({
+  fontSize: '0.95rem',
+  color: '#7F8FA6',
+  fontWeight: 500,
+  marginBottom: 2,
+}));
+
+const StatValue = styled('span')(({ theme }) => ({
+  fontWeight: 800,
+  fontSize: '1.25rem',
+  color: '#232946',
+}));
 
 const EmiCalculator: React.FC = () => {
   const theme = useTheme();
-  const [loanAmount, setLoanAmount] = useState<string>('');
-  const [interestRate, setInterestRate] = useState<string>('');
-  const [loanTerm, setLoanTerm] = useState<string>('');
-  const [results, setResults] = useState<CalculatorResult | null>(null);
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  const [pieData, setPieData] = useState<Array<{ name: string; value: number }>>([]);
-  const resultsRef = useRef<HTMLDivElement>(null);
+  const [loanAmount, setLoanAmount] = useState<number>(1000000);
+  const [interestRate, setInterestRate] = useState<number>(8.5);
+  const [loanTerm, setLoanTerm] = useState<number>(20);
+  const [monthlyEmi, setMonthlyEmi] = useState<number>(0);
+  const [totalInterest, setTotalInterest] = useState<number>(0);
+  const [totalPayment, setTotalPayment] = useState<number>(0);
+  const [amortizationSchedule, setAmortizationSchedule] = useState<any[]>([]);
 
-  const resetForm = () => {
-    setLoanAmount('');
-    setInterestRate('');
-    setLoanTerm('');
-    setResults(null);
-    setChartData([]);
-    setPieData([]);
-  };
+  useEffect(() => {
+    calculateEmi();
+  }, [loanAmount, interestRate, loanTerm]);
 
-  const calculateResults = () => {
-    const principal = parseFloat(loanAmount);
-    const rate = parseFloat(interestRate) / 100 / 12; // Monthly rate
-    const time = parseFloat(loanTerm) * 12; // Total months
+  const calculateEmi = () => {
+    const principal = loanAmount;
+    const annualInterestRate = interestRate;
+    const years = loanTerm;
 
-    if (isNaN(principal) || isNaN(rate) || isNaN(time)) {
+    if (principal === 0 || annualInterestRate === 0 || years === 0) {
+      setMonthlyEmi(0);
+      setTotalInterest(0);
+      setTotalPayment(0);
+      setAmortizationSchedule([]);
       return;
     }
 
-    const emi = (principal * rate * Math.pow(1 + rate, time)) / (Math.pow(1 + rate, time) - 1);
-    const totalPayment = emi * time;
-    const totalInterest = totalPayment - principal;
+    const monthlyInterestRate = annualInterestRate / 12 / 100;
+    const numberOfPayments = years * 12;
 
-    // Generate yearly breakdown
-    const yearlyBreakdown = [];
-    let remainingBalance = principal;
-    
-    for (let year = 0; year <= parseFloat(loanTerm); year++) {
-      let yearPrincipal = 0;
-      let yearInterest = 0;
-      const monthsInYear = Math.min(12, time - year * 12);
+    const emi = (principal * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments)) /
+      (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
 
-      for (let month = 0; month < monthsInYear; month++) {
-        const interestPayment = remainingBalance * rate;
-        const principalPayment = emi - interestPayment;
-        remainingBalance -= principalPayment;
-        yearPrincipal += principalPayment;
-        yearInterest += interestPayment;
-      }
+    const totalPay = emi * numberOfPayments;
+    const totalInt = totalPay - principal;
 
-      yearlyBreakdown.push({
-        year,
-        principal: Math.round(yearPrincipal),
-        interest: Math.round(yearInterest),
-        balance: Math.round(remainingBalance)
+    setMonthlyEmi(emi);
+    setTotalInterest(totalInt);
+    setTotalPayment(totalPay);
+
+    generateAmortizationSchedule(emi, principal, monthlyInterestRate, numberOfPayments);
+  };
+
+  const generateAmortizationSchedule = (
+    emi: number,
+    principal: number,
+    monthlyInterestRate: number,
+    numberOfPayments: number,
+  ) => {
+    const schedule = [];
+    let outstandingBalance = principal;
+
+    for (let i = 1; i <= Math.min(numberOfPayments, 12); i++) {
+      const interestComponent = outstandingBalance * monthlyInterestRate;
+      const principalComponent = emi - interestComponent;
+      outstandingBalance -= principalComponent;
+
+      schedule.push({
+        month: i,
+        emi: emi,
+        principalComponent: principalComponent,
+        interestComponent: interestComponent,
+        outstandingBalance: outstandingBalance,
       });
     }
-
-    setResults({
-      emi,
-      totalPayment,
-      totalInterest,
-      yearlyBreakdown
-    });
-
-    // Generate chart data
-    const newChartData = yearlyBreakdown.map(item => ({
-      year: item.year,
-      value: item.balance
-    }));
-    setChartData(newChartData);
-
-    // Generate pie chart data
-    setPieData([
-      { name: 'Principal', value: principal },
-      { name: 'Interest', value: totalInterest }
-    ]);
-
-    // Scroll to results section after a short delay to ensure rendering
-    setTimeout(() => {
-      if (resultsRef.current) {
-        const yOffset = -100; // Offset to show cards from the beginning
-        const y = resultsRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
-        window.scrollTo({ top: y, behavior: 'smooth' });
-      }
-    }, 100);
+    setAmortizationSchedule(schedule);
   };
 
-  const benefits = [
-    {
-      title: "Loan Planning",
-      description: "Plan your loan payments effectively by understanding your monthly EMI obligations."
-    },
-    {
-      title: "Budget Management",
-      description: "Better manage your monthly budget by knowing exactly how much you need to pay."
-    },
-    {
-      title: "Interest Analysis",
-      description: "Understand the total interest you'll pay over the loan term and make informed decisions."
-    },
-    {
-      title: "Loan Comparison",
-      description: "Compare different loan options to find the most suitable one for your needs."
-    }
-  ];
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
 
-  const inputFields = [
-    {
-      label: 'Loan Amount',
-      value: loanAmount,
-      onChange: setLoanAmount,
-      type: 'number',
-      startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-      tooltip: 'Enter the loan amount'
-    },
-    {
-      label: 'Interest Rate (per annum)',
-      value: interestRate,
-      onChange: setInterestRate,
-      type: 'number',
-      endAdornment: <InputAdornment position="end">%</InputAdornment>,
-      tooltip: 'Enter the annual interest rate'
-    },
-    {
-      label: 'Loan Term (Years)',
-      value: loanTerm,
-      onChange: setLoanTerm,
-      type: 'number',
-      tooltip: 'Enter the loan term in years'
-    }
-  ];
+  const formSection = (
+    <StyledPaper>
+      <Box>
+        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
+          Loan Amount
+        </Typography>
+        <StyledTextField
+          fullWidth
+          type="number"
+          value={loanAmount}
+          onChange={(e) => setLoanAmount(Number(e.target.value))}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <AttachMoneyIcon sx={{ color: theme.palette.text.secondary }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <StyledSlider
+          value={loanAmount}
+          onChange={(_, newValue) => setLoanAmount(newValue as number)}
+          min={100000}
+          max={50000000}
+          step={100000}
+          valueLabelDisplay="auto"
+        />
+      </Box>
 
-  const formComponent = (
-    <CalculatorForm
-      title="Input Values"
-      inputFields={inputFields}
-      onCalculate={calculateResults}
-      onReset={resetForm}
-      calculateButtonText="Calculate EMI"
-      calculateButtonIcon={<PaymentsIcon />}
-    />
+      <Box>
+        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
+          Interest Rate (p.a.)
+        </Typography>
+        <StyledTextField
+          fullWidth
+          type="number"
+          value={interestRate}
+          onChange={(e) => setInterestRate(Number(e.target.value))}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <PercentIcon sx={{ color: theme.palette.text.secondary }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <StyledSlider
+          value={interestRate}
+          onChange={(_, newValue) => setInterestRate(newValue as number)}
+          min={1}
+          max={30}
+          step={0.1}
+          valueLabelDisplay="auto"
+        />
+      </Box>
+
+      <Box>
+        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
+          Loan Term (Years)
+        </Typography>
+        <StyledTextField
+          fullWidth
+          type="number"
+          value={loanTerm}
+          onChange={(e) => setLoanTerm(Number(e.target.value))}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <CalendarMonthIcon sx={{ color: theme.palette.text.secondary }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <StyledSlider
+          value={loanTerm}
+          onChange={(_, newValue) => setLoanTerm(newValue as number)}
+          min={1}
+          max={30}
+          step={1}
+          valueLabelDisplay="auto"
+        />
+      </Box>
+    </StyledPaper>
   );
 
-  const aboutComponent = (
-    <CalculatorBenefits benefits={benefits} />
-  );
+  const resultSection = (
+    <Box>
+      <CompactSummary>
+        <SummaryItem>
+          <span className="label">Monthly EMI</span>
+          <span className="value">{formatCurrency(monthlyEmi)}</span>
+        </SummaryItem>
+        <SummaryItem>
+          <span className="label">Total Interest</span>
+          <span className="value">{formatCurrency(totalInterest)}</span>
+        </SummaryItem>
+        <SummaryItem>
+          <span className="label">Total Payment</span>
+          <span className="value">{formatCurrency(totalPayment)}</span>
+        </SummaryItem>
+      </CompactSummary>
 
-  const handleDownloadPDF = () => {
-    if (!results) return;
-    
-    downloadPDF({
-      title: 'EMI Calculator Results',
-      summary: [
-        { label: 'Loan Amount', value: formatCurrency(Number(loanAmount)) },
-        { label: 'Interest Rate', value: `${interestRate}%` },
-        { label: 'Loan Term (Years)', value: loanTerm.toString() },
-        { label: 'Monthly EMI', value: formatCurrency(results.emi) },
-        { label: 'Total Payment', value: formatCurrency(results.totalPayment) },
-        { label: 'Total Interest', value: formatCurrency(results.totalInterest) }
-      ],
-      description: 'EMI (Equated Monthly Installment) is the fixed payment amount made by a borrower to a lender at a specified date each calendar month.'
-    });
-  };
+      <StatBar>
+        <StatCard>
+          <StatIcon>
+            <AttachMoneyIcon />
+          </StatIcon>
+          <StatLabel>Loan Amount</StatLabel>
+          <StatValue>{formatCurrency(loanAmount)}</StatValue>
+        </StatCard>
+        <StatCard>
+          <StatIcon>
+            <PercentIcon />
+          </StatIcon>
+          <StatLabel>Interest Rate</StatLabel>
+          <StatValue>{interestRate}%</StatValue>
+        </StatCard>
+        <StatCard>
+          <StatIcon>
+            <CalendarMonthIcon />
+          </StatIcon>
+          <StatLabel>Loan Term</StatLabel>
+          <StatValue>{loanTerm} years</StatValue>
+        </StatCard>
+      </StatBar>
 
-  const handleDownloadExcel = () => {
-    if (!results) return;
-    
-    downloadExcel({
-      title: 'EMI Calculator Results',
-      summary: [
-        { label: 'Loan Amount', value: formatCurrency(Number(loanAmount)) },
-        { label: 'Interest Rate', value: `${interestRate}%` },
-        { label: 'Loan Term (Years)', value: loanTerm.toString() },
-        { label: 'Monthly EMI', value: formatCurrency(results.emi) },
-        { label: 'Total Payment', value: formatCurrency(results.totalPayment) },
-        { label: 'Total Interest', value: formatCurrency(results.totalInterest) }
-      ],
-      yearlyBreakdown: results.yearlyBreakdown.map(item => ({
-        Year: item.year,
-        'Principal Paid': formatCurrency(item.principal),
-        'Interest Paid': formatCurrency(item.interest),
-        'Remaining Balance': formatCurrency(item.balance)
-      }))
-    });
-  };
-
-  const resultComponent = results && (
-    <CalculatorResults
-      ref={resultsRef}
-      summaryItems={[
-        {
-          label: 'Monthly EMI',
-          value: formatCurrency(results.emi),
-          icon: <PaymentsIcon />
-        },
-        {
-          label: 'Total Payment',
-          value: formatCurrency(results.totalPayment),
-          icon: <AccountBalanceIcon />
-        },
-        {
-          label: 'Total Interest',
-          value: formatCurrency(results.totalInterest),
-          icon: <TrendingUpIcon />
-        }
-      ]}
-      chartData={chartData}
-      pieData={pieData}
-      yearlyBreakdown={results.yearlyBreakdown}
-      onDownloadPDF={handleDownloadPDF}
-      onDownloadExcel={handleDownloadExcel}
-      chartTitle="Payment Schedule"
-      pieChartTitle="Payment Distribution"
-    />
+      <ChartContainer>
+        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600, mb: 3 }}>
+          Amortization Schedule
+        </Typography>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={amortizationSchedule}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E0E7FF" />
+            <XAxis dataKey="month" stroke="#7F8FA6" />
+            <YAxis stroke="#7F8FA6" />
+            <RechartsTooltip
+              contentStyle={{
+                background: 'rgba(255,255,255,0.95)',
+                border: '1px solid #E0E7FF',
+                borderRadius: '8px',
+                boxShadow: '0 4px 12px rgba(90,107,255,0.1)',
+              }}
+            />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="principalComponent"
+              name="Principal"
+              stroke="#5A6BFF"
+              strokeWidth={2}
+              dot={{ fill: '#5A6BFF', strokeWidth: 2 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="interestComponent"
+              name="Interest"
+              stroke="#10B981"
+              strokeWidth={2}
+              dot={{ fill: '#10B981', strokeWidth: 2 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </ChartContainer>
+    </Box>
   );
 
   return (
-    <CalculatorPageTemplate
+    <CalculatorTemplate
       title="EMI Calculator"
-      mainDescription="Calculate your Equated Monthly Installment (EMI) to plan your loan payments effectively."
-      formComponent={formComponent}
-      resultComponent={resultComponent}
-      aboutComponent={aboutComponent}
+      description="Calculate your Equated Monthly Installments and plan your loan repayment"
+      formSection={formSection}
+      resultSection={resultSection}
     />
   );
 };

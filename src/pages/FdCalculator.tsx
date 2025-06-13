@@ -134,38 +134,60 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-const CagrCalculator: React.FC = () => {
+const FdCalculator: React.FC = () => {
   const theme = useTheme();
-  const [initialValue, setInitialValue] = useState<number>(100000);
-  const [finalValue, setFinalValue] = useState<number>(150000);
-  const [years, setYears] = useState<number>(5);
+  const [principal, setPrincipal] = useState<number>(100000);
+  const [interestRate, setInterestRate] = useState<number>(7);
+  const [tenure, setTenure] = useState<number>(1);
+  const [compoundingFrequency, setCompoundingFrequency] = useState<'yearly' | 'quarterly' | 'monthly'>('quarterly');
   const [results, setResults] = useState<{
-    cagr: number;
+    maturityValue: number;
+    totalInterest: number;
     chartData: any[];
   }>({
-    cagr: 0,
+    maturityValue: 0,
+    totalInterest: 0,
     chartData: [],
   });
 
   useEffect(() => {
-    calculateCAGR();
-  }, [initialValue, finalValue, years]);
+    calculateFD();
+  }, [principal, interestRate, tenure, compoundingFrequency]);
 
-  const calculateCAGR = () => {
-    const cagr = (Math.pow(finalValue / initialValue, 1 / years) - 1) * 100;
+  const calculateFD = () => {
+    const rate = interestRate / 100;
+    let n: number;
+    switch (compoundingFrequency) {
+      case 'yearly':
+        n = 1;
+        break;
+      case 'quarterly':
+        n = 4;
+        break;
+      case 'monthly':
+        n = 12;
+        break;
+      default:
+        n = 4;
+    }
+
+    const maturityValue = principal * Math.pow(1 + rate / n, n * tenure);
+    const totalInterest = maturityValue - principal;
 
     // Generate chart data
-    const chartData = Array.from({ length: years + 1 }, (_, i) => {
+    const chartData = Array.from({ length: tenure + 1 }, (_, i) => {
       const year = i;
-      const value = initialValue * Math.pow(1 + cagr / 100, year);
+      const value = principal * Math.pow(1 + rate / n, n * year);
       return {
         year,
+        principal: principal,
         value: Math.round(value),
       };
     });
 
     setResults({
-      cagr,
+      maturityValue,
+      totalInterest,
       chartData,
     });
   };
@@ -174,13 +196,13 @@ const CagrCalculator: React.FC = () => {
     <StyledPaper>
       <Box>
         <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
-          Initial Value
+          Principal Amount
         </Typography>
         <StyledTextField
           fullWidth
           type="number"
-          value={initialValue}
-          onChange={(e) => setInitialValue(Number(e.target.value))}
+          value={principal}
+          onChange={(e) => setPrincipal(Number(e.target.value))}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -190,8 +212,8 @@ const CagrCalculator: React.FC = () => {
           }}
         />
         <StyledSlider
-          value={initialValue}
-          onChange={(_, newValue) => setInitialValue(newValue as number)}
+          value={principal}
+          onChange={(_, newValue) => setPrincipal(newValue as number)}
           min={1000}
           max={10000000}
           step={1000}
@@ -201,40 +223,40 @@ const CagrCalculator: React.FC = () => {
 
       <Box>
         <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
-          Final Value
+          Interest Rate (p.a.)
         </Typography>
         <StyledTextField
           fullWidth
           type="number"
-          value={finalValue}
-          onChange={(e) => setFinalValue(Number(e.target.value))}
+          value={interestRate}
+          onChange={(e) => setInterestRate(Number(e.target.value))}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <AttachMoneyIcon sx={{ color: theme.palette.text.secondary }} />
+                <PercentIcon sx={{ color: theme.palette.text.secondary }} />
               </InputAdornment>
             ),
           }}
         />
         <StyledSlider
-          value={finalValue}
-          onChange={(_, newValue) => setFinalValue(newValue as number)}
-          min={1000}
-          max={10000000}
-          step={1000}
+          value={interestRate}
+          onChange={(_, newValue) => setInterestRate(newValue as number)}
+          min={1}
+          max={15}
+          step={0.1}
           valueLabelDisplay="auto"
         />
       </Box>
 
       <Box>
         <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
-          Time Period (Years)
+          Tenure (Years)
         </Typography>
         <StyledTextField
           fullWidth
           type="number"
-          value={years}
-          onChange={(e) => setYears(Number(e.target.value))}
+          value={tenure}
+          onChange={(e) => setTenure(Number(e.target.value))}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -244,13 +266,43 @@ const CagrCalculator: React.FC = () => {
           }}
         />
         <StyledSlider
-          value={years}
-          onChange={(_, newValue) => setYears(newValue as number)}
+          value={tenure}
+          onChange={(_, newValue) => setTenure(newValue as number)}
           min={1}
-          max={30}
+          max={10}
           step={1}
           valueLabelDisplay="auto"
         />
+      </Box>
+
+      <Box>
+        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
+          Compounding Frequency
+        </Typography>
+        <FormControl fullWidth>
+          <Select
+            value={compoundingFrequency}
+            onChange={(e) => setCompoundingFrequency(e.target.value as 'yearly' | 'monthly' | 'quarterly')}
+            sx={{
+              borderRadius: '16px',
+              backgroundColor: 'rgba(255,255,255,0.15)',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#e0e7ef',
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#2563eb',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#10b981',
+                borderWidth: '2px',
+              },
+            }}
+          >
+            <MenuItem value="yearly">Yearly</MenuItem>
+            <MenuItem value="quarterly">Quarterly</MenuItem>
+            <MenuItem value="monthly">Monthly</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
     </StyledPaper>
   );
@@ -259,16 +311,16 @@ const CagrCalculator: React.FC = () => {
     <Box>
       <CompactSummary>
         <SummaryItem>
-          <span className="label">CAGR</span>
-          <span className="value">{results.cagr.toFixed(2)}%</span>
+          <span className="label">Maturity Value</span>
+          <span className="value">{formatCurrency(results.maturityValue)}</span>
         </SummaryItem>
         <SummaryItem>
-          <span className="label">Initial Value</span>
-          <span className="value">{formatCurrency(initialValue)}</span>
+          <span className="label">Total Interest</span>
+          <span className="value">{formatCurrency(results.totalInterest)}</span>
         </SummaryItem>
         <SummaryItem>
-          <span className="label">Final Value</span>
-          <span className="value">{formatCurrency(finalValue)}</span>
+          <span className="label">Principal</span>
+          <span className="value">{formatCurrency(principal)}</span>
         </SummaryItem>
       </CompactSummary>
 
@@ -277,22 +329,22 @@ const CagrCalculator: React.FC = () => {
           <StatIcon>
             <AttachMoneyIcon />
           </StatIcon>
-          <StatLabel>Initial Value</StatLabel>
-          <StatValue>{formatCurrency(initialValue)}</StatValue>
+          <StatLabel>Principal</StatLabel>
+          <StatValue>{formatCurrency(principal)}</StatValue>
         </StatCard>
         <StatCard>
           <StatIcon>
-            <AttachMoneyIcon />
+            <PercentIcon />
           </StatIcon>
-          <StatLabel>Final Value</StatLabel>
-          <StatValue>{formatCurrency(finalValue)}</StatValue>
+          <StatLabel>Interest Rate</StatLabel>
+          <StatValue>{interestRate}%</StatValue>
         </StatCard>
         <StatCard>
           <StatIcon>
             <CalendarMonthIcon />
           </StatIcon>
-          <StatLabel>Time Period</StatLabel>
-          <StatValue>{years} years</StatValue>
+          <StatLabel>Tenure</StatLabel>
+          <StatValue>{tenure} years</StatValue>
         </StatCard>
       </StatBar>
 
@@ -316,11 +368,19 @@ const CagrCalculator: React.FC = () => {
             <Legend />
             <Line
               type="monotone"
-              dataKey="value"
-              name="Investment Value"
+              dataKey="principal"
+              name="Principal"
               stroke="#5A6BFF"
               strokeWidth={2}
               dot={{ fill: '#5A6BFF', strokeWidth: 2 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="value"
+              name="Maturity Value"
+              stroke="#10B981"
+              strokeWidth={2}
+              dot={{ fill: '#10B981', strokeWidth: 2 }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -330,12 +390,12 @@ const CagrCalculator: React.FC = () => {
 
   return (
     <CalculatorTemplate
-      title="CAGR Calculator"
-      description="Calculate Compound Annual Growth Rate for your investments"
+      title="Fixed Deposit Calculator"
+      description="Calculate your Fixed Deposit returns and plan your investments"
       formSection={formSection}
       resultSection={resultSection}
     />
   );
 };
 
-export default CagrCalculator; 
+export default FdCalculator; 
