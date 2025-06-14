@@ -2,19 +2,9 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  TextField,
-  Slider,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Grid,
   useTheme,
   styled,
   InputAdornment,
-  Switch,
-  FormControlLabel,
-  Button,
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -34,54 +24,60 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { CalculatorTemplate, StyledPaper, ResultCard, StyledTextField, StyledSlider, ChartContainer } from '../components/CalculatorTemplate';
+import { CalculatorTemplate } from '../components/CalculatorTemplate';
+import {
+  StyledPaper,
+  ResultCard,
+  StyledSlider,
+  ChartContainer,
 
-const GradientButton = styled(Button)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-  color: '#FFFFFF',
-  padding: '12px 24px',
-  borderRadius: '12px',
-  textTransform: 'none',
-  fontSize: '1rem',
-  fontWeight: 600,
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)',
-  },
-}));
+  colors,
+  typography,
+  CalculatorHeading,
+  StyledTableContainer,
+  tableStyles,
+  tableHeaderCell,
+  tableCell,
+  chartAxisStyle,
+  chartTooltipStyle,
+  chartTooltipItemStyle,
+  chartTooltipLabelStyle,
+  chartLegendStyle,
+} from '../components/calculatorStyles';
+import { CustomNumberField } from '../components/CustomNumberField';
 
 const CompactSummary = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  background: 'rgba(34, 40, 70, 0.92)',
-  borderRadius: '18px',
-  boxShadow: '0 4px 16px rgba(90, 107, 255, 0.12)',
-  border: '1.5px solid #5A6BFF',
-  padding: theme.spacing(2, 3),
+  background: colors.background,
+  borderRadius: '24px',
+  boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
+  border: `1.5px solid ${colors.border}`,
+  padding: theme.spacing(3, 4),
   marginBottom: theme.spacing(3),
-  color: '#fff',
-  fontWeight: 700,
-  fontSize: '1.1rem',
-  gap: theme.spacing(2),
+  transition: 'box-shadow 0.2s, transform 0.2s',
+  '&:hover': {
+    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.12)',
+    transform: 'translateY(-4px) scale(1.02)',
+  },
 }));
 
 const SummaryItem = styled(Box)(({ theme }) => ({
   flex: 1,
   textAlign: 'center',
   '& .label': {
-    color: '#A7BFFF',
-    fontSize: '0.95rem',
-    fontWeight: 500,
+    color: colors.secondary,
+    fontSize: typography.label.fontSize,
+    fontWeight: typography.label.fontWeight,
     marginBottom: 2,
     display: 'block',
   },
   '& .value': {
-    color: '#fff',
-    fontWeight: 800,
-    fontSize: '1.25rem',
+    color: colors.primary,
+    fontWeight: typography.value.fontWeight,
+    fontSize: typography.value.fontSize,
+    fontFamily: typography.fontFamily,
   },
 }));
 
@@ -96,36 +92,26 @@ const StatBar = styled(Box)(({ theme }) => ({
 const StatCard = styled(Box)(({ theme }) => ({
   flex: '1 1 180px',
   minWidth: 150,
-  background: 'rgba(255,255,255,0.7)',
-  borderRadius: '16px',
-  boxShadow: '0 2px 8px rgba(90,107,255,0.08)',
-  border: '1.5px solid #e0e7ef',
+  background: colors.background,
+  borderRadius: '24px',
+  boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
+  border: `1.5px solid ${colors.border}`,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  padding: theme.spacing(2, 1.5),
+  padding: theme.spacing(2.5, 2),
   textAlign: 'center',
-  color: '#232946',
-  position: 'relative',
+  transition: 'box-shadow 0.2s, transform 0.2s',
+  '&:hover': {
+    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.12)',
+    transform: 'translateY(-4px) scale(1.02)',
+  },
 }));
 
 const StatIcon = styled(Box)(({ theme }) => ({
   fontSize: 28,
-  marginBottom: theme.spacing(0.5),
-  color: '#5A6BFF',
-}));
-
-const StatLabel = styled('span')(({ theme }) => ({
-  fontSize: '0.95rem',
-  color: '#7F8FA6',
-  fontWeight: 500,
-  marginBottom: 2,
-}));
-
-const StatValue = styled('span')(({ theme }) => ({
-  fontWeight: 800,
-  fontSize: '1.25rem',
-  color: '#232946',
+  marginBottom: theme.spacing(1),
+  color: colors.accent.primary,
 }));
 
 const EmiCalculator: React.FC = () => {
@@ -180,7 +166,7 @@ const EmiCalculator: React.FC = () => {
     const schedule = [];
     let outstandingBalance = principal;
 
-    for (let i = 1; i <= Math.min(numberOfPayments, 12); i++) {
+    for (let i = 1; i <= numberOfPayments; i++) {
       const interestComponent = outstandingBalance * monthlyInterestRate;
       const principalComponent = emi - interestComponent;
       outstandingBalance -= principalComponent;
@@ -204,21 +190,41 @@ const EmiCalculator: React.FC = () => {
     }).format(value);
   };
 
+  const handleLoanAmountChange = (value: number | string) => {
+    if (typeof value === 'number') {
+      setLoanAmount(value);
+    }
+  };
+
+  const handleInterestRateChange = (value: number | string) => {
+    if (typeof value === 'number') {
+      setInterestRate(value);
+    }
+  };
+
+  const handleLoanTermChange = (value: number | string) => {
+    if (typeof value === 'number') {
+      setLoanTerm(value);
+    }
+  };
+
   const formSection = (
     <StyledPaper>
       <Box>
-        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
-          Loan Amount
-        </Typography>
-        <StyledTextField
+        <CustomNumberField
           fullWidth
-          type="number"
+          label="Loan Amount"
           value={loanAmount}
-          onChange={(e) => setLoanAmount(Number(e.target.value))}
+          onChange={handleLoanAmountChange}
+          min={10000}
+          max={50000000}
+          step={10000}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <AttachMoneyIcon sx={{ color: theme.palette.text.secondary }} />
+                <Typography sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 22, mr: 0.5 }}>
+                  ₹
+                </Typography>
               </InputAdornment>
             ),
           }}
@@ -226,26 +232,28 @@ const EmiCalculator: React.FC = () => {
         <StyledSlider
           value={loanAmount}
           onChange={(_, newValue) => setLoanAmount(newValue as number)}
-          min={100000}
+          min={10000}
           max={50000000}
-          step={100000}
+          step={10000}
           valueLabelDisplay="auto"
+          valueLabelFormat={formatCurrency}
         />
       </Box>
-
       <Box>
-        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
-          Interest Rate (p.a.)
-        </Typography>
-        <StyledTextField
+        <CustomNumberField
           fullWidth
-          type="number"
+          label="Interest Rate (%)"
           value={interestRate}
-          onChange={(e) => setInterestRate(Number(e.target.value))}
+          onChange={handleInterestRateChange}
+          min={1}
+          max={30}
+          step={0.1}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <PercentIcon sx={{ color: theme.palette.text.secondary }} />
+                <Typography sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }}>
+                  %
+                </Typography>
               </InputAdornment>
             ),
           }}
@@ -257,22 +265,22 @@ const EmiCalculator: React.FC = () => {
           max={30}
           step={0.1}
           valueLabelDisplay="auto"
+          valueLabelFormat={(v) => `${v}%`}
         />
       </Box>
-
       <Box>
-        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
-          Loan Term (Years)
-        </Typography>
-        <StyledTextField
+        <CustomNumberField
           fullWidth
-          type="number"
+          label="Loan Term (Years)"
           value={loanTerm}
-          onChange={(e) => setLoanTerm(Number(e.target.value))}
+          onChange={handleLoanTermChange}
+          min={1}
+          max={30}
+          step={1}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <CalendarMonthIcon sx={{ color: theme.palette.text.secondary }} />
+                <CalendarMonthIcon sx={{ color: '#00bfc6', fontWeight: 400 }} />
               </InputAdornment>
             ),
           }}
@@ -284,85 +292,90 @@ const EmiCalculator: React.FC = () => {
           max={30}
           step={1}
           valueLabelDisplay="auto"
+          valueLabelFormat={(v) => `${v} yrs`}
         />
       </Box>
     </StyledPaper>
   );
 
+  const inputDetailsCard = (
+    <ResultCard bgcolor="#f8f9fc" sx={{ p: 2, mb: 2, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, gap: 0.5 }}>
+        <span className="label">Loan Amount</span>
+        <span className="value">{formatCurrency(loanAmount)}</span>
+      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, gap: 0.5 }}>
+        <span className="label">Interest Rate</span>
+        <span className="value">{interestRate}%</span>
+      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, gap: 0.5 }}>
+        <span className="label">Loan Term</span>
+        <span className="value">{loanTerm} years</span>
+      </Box>
+    </ResultCard>
+  );
+
   const resultSection = (
     <Box>
-      <CompactSummary>
-        <SummaryItem>
+      {inputDetailsCard}
+      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
+        <ResultCard bgcolor="#eafafd">
           <span className="label">Monthly EMI</span>
           <span className="value">{formatCurrency(monthlyEmi)}</span>
-        </SummaryItem>
-        <SummaryItem>
+        </ResultCard>
+        <ResultCard bgcolor="#fbeeee">
           <span className="label">Total Interest</span>
           <span className="value">{formatCurrency(totalInterest)}</span>
-        </SummaryItem>
-        <SummaryItem>
+        </ResultCard>
+        <ResultCard bgcolor="#f3f1fa">
           <span className="label">Total Payment</span>
           <span className="value">{formatCurrency(totalPayment)}</span>
-        </SummaryItem>
-      </CompactSummary>
-
-      <StatBar>
-        <StatCard>
-          <StatIcon>
-            <AttachMoneyIcon />
-          </StatIcon>
-          <StatLabel>Loan Amount</StatLabel>
-          <StatValue>{formatCurrency(loanAmount)}</StatValue>
-        </StatCard>
-        <StatCard>
-          <StatIcon>
-            <PercentIcon />
-          </StatIcon>
-          <StatLabel>Interest Rate</StatLabel>
-          <StatValue>{interestRate}%</StatValue>
-        </StatCard>
-        <StatCard>
-          <StatIcon>
-            <CalendarMonthIcon />
-          </StatIcon>
-          <StatLabel>Loan Term</StatLabel>
-          <StatValue>{loanTerm} years</StatValue>
-        </StatCard>
-      </StatBar>
+        </ResultCard>
+      </Box>
 
       <ChartContainer>
-        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600, mb: 3 }}>
+        <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
           Amortization Schedule
         </Typography>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={amortizationSchedule}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E0E7FF" />
-            <XAxis dataKey="month" stroke="#7F8FA6" />
-            <YAxis stroke="#7F8FA6" />
-            <RechartsTooltip
-              contentStyle={{
-                background: 'rgba(255,255,255,0.95)',
-                border: '1px solid #E0E7FF',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(90,107,255,0.1)',
-              }}
+          <LineChart data={amortizationSchedule} style={{ fontFamily: typography.fontFamily }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" />
+            <XAxis
+              dataKey="month"
+              stroke={colors.secondary}
+              tick={chartAxisStyle}
+              axisLine={{ stroke: colors.border }}
+              tickLine={{ stroke: colors.border }}
             />
-            <Legend />
+            <YAxis
+              stroke={colors.secondary}
+              tick={chartAxisStyle}
+              axisLine={{ stroke: colors.border }}
+              tickLine={{ stroke: colors.border }}
+              tickFormatter={(value) => value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            />
+            <RechartsTooltip
+              contentStyle={chartTooltipStyle}
+              itemStyle={chartTooltipItemStyle}
+              labelStyle={chartTooltipLabelStyle}
+              formatter={(value) => value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            />
+            <Legend wrapperStyle={chartLegendStyle} />
             <Line
               type="monotone"
               dataKey="principalComponent"
               name="Principal"
-              stroke="#5A6BFF"
+              stroke={colors.accent.secondary}
               strokeWidth={2}
-              dot={{ fill: '#5A6BFF', strokeWidth: 2 }}
+              dot={{ fill: colors.accent.secondary, strokeWidth: 2 }}
             />
             <Line
               type="monotone"
               dataKey="interestComponent"
               name="Interest"
-              stroke="#10B981"
+              stroke={colors.accent.primary}
               strokeWidth={2}
-              dot={{ fill: '#10B981', strokeWidth: 2 }}
+              dot={{ fill: colors.accent.primary, strokeWidth: 2 }}
             />
           </LineChart>
         </ResponsiveContainer>
@@ -370,12 +383,68 @@ const EmiCalculator: React.FC = () => {
     </Box>
   );
 
+  // Aggregate amortization schedule by year
+  const yearlySchedule = [];
+  if (amortizationSchedule.length > 0) {
+    let year = 1;
+    let emiSum = 0, principalSum = 0, interestSum = 0;
+    let lastOutstanding = amortizationSchedule[0].outstandingBalance;
+    for (let i = 0; i < amortizationSchedule.length; i++) {
+      emiSum += amortizationSchedule[i].emi;
+      principalSum += amortizationSchedule[i].principalComponent;
+      interestSum += amortizationSchedule[i].interestComponent;
+      lastOutstanding = amortizationSchedule[i].outstandingBalance;
+      if ((i + 1) % 12 === 0 || i === amortizationSchedule.length - 1) {
+        yearlySchedule.push({
+          year,
+          emi: emiSum,
+          principalComponent: principalSum,
+          interestComponent: interestSum,
+          outstandingBalance: lastOutstanding,
+        });
+        year++;
+        emiSum = 0;
+        principalSum = 0;
+        interestSum = 0;
+      }
+    }
+  }
+
+  // Table section for yearly amortization schedule
+  const tableSection = yearlySchedule.length > 0 ? (
+    <StyledTableContainer>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: typography.fontFamily, fontSize: '0.9rem', color: colors.secondary }}>
+        <thead>
+          <tr>
+            <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>Year</th>
+            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>EMI</th>
+            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Principal</th>
+            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Interest</th>
+            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {yearlySchedule.map((row) => (
+            <tr key={row.year}>
+              <td style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>{row.year}</td>
+              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.emi)}</td>
+              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.principalComponent)}</td>
+              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.interestComponent)}</td>
+              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.outstandingBalance)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </StyledTableContainer>
+  ) : null;
+
   return (
     <CalculatorTemplate
       title="EMI Calculator"
-      description="Calculate your Equated Monthly Installments and plan your loan repayment"
+      description="Calculate your Equated Monthly Installments for loans and plan your repayments."
       formSection={formSection}
       resultSection={resultSection}
+      tableSection={tableSection}
     />
   );
 };

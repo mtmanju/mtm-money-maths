@@ -195,7 +195,7 @@ const theme = createTheme({
             },
             '&.Mui-focused': {
               borderColor: '#5A6BFF',
-              boxShadow: '0 0 0 4px rgba(90, 107, 255, 0.1)',
+              boxShadow: 'none',
             },
           },
         },
@@ -230,14 +230,14 @@ const theme = createTheme({
           '& .MuiSlider-thumb': {
             width: 16,
             height: 16,
-            background: 'linear-gradient(135deg, #5A6BFF 0%, #00F5FF 100%)',
-            boxShadow: '0 2px 8px rgba(90, 107, 255, 0.25)',
+            background: '#5A6BFF',
+            boxShadow: 'none',
             '&:hover': {
-              boxShadow: '0 4px 12px rgba(90, 107, 255, 0.35)',
+              boxShadow: 'none',
             },
           },
           '& .MuiSlider-track': {
-            background: 'linear-gradient(90deg, #5A6BFF 0%, #00F5FF 100%)',
+            background: '#5A6BFF',
           },
           '& .MuiSlider-rail': {
             background: 'rgba(90, 107, 255, 0.1)',

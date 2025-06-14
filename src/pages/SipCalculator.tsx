@@ -34,54 +34,62 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { CalculatorTemplate, StyledPaper, ResultCard, StyledTextField, StyledSlider, ChartContainer } from '../components/CalculatorTemplate';
-
-const GradientButton = styled(Button)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-  color: '#FFFFFF',
-  padding: '12px 24px',
-  borderRadius: '12px',
-  textTransform: 'none',
-  fontSize: '1rem',
-  fontWeight: 600,
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.15)',
-  },
-}));
+import { CalculatorTemplate } from '../components/CalculatorTemplate';
+import {
+  StyledPaper,
+  ResultCard,
+  StyledSlider,
+  ChartContainer,
+  colors,
+  typography,
+  CalculatorHeading,
+  StyledTableContainer,
+  tableStyles,
+  tableHeaderCell,
+  tableCell,
+  chartAxisStyle,
+  chartTooltipStyle,
+  chartTooltipItemStyle,
+  chartTooltipLabelStyle,
+  chartLegendStyle,
+} from '../components/calculatorStyles';
+import { CustomNumberField } from '../components/CustomNumberField';
+import { formatCurrency } from '../utils/formatUtils';
+import { CalculatorResultCards } from '../components/CalculatorResultCards';
+import { CalculatorTable } from '../components/CalculatorTable';
 
 const CompactSummary = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  background: 'rgba(34, 40, 70, 0.92)',
-  borderRadius: '18px',
-  boxShadow: '0 4px 16px rgba(90, 107, 255, 0.12)',
-  border: '1.5px solid #5A6BFF',
-  padding: theme.spacing(2, 3),
+  background: colors.background,
+  borderRadius: '24px',
+  boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
+  border: `1.5px solid ${colors.border}`,
+  padding: theme.spacing(3, 4),
   marginBottom: theme.spacing(3),
-  color: '#fff',
-  fontWeight: 700,
-  fontSize: '1.1rem',
-  gap: theme.spacing(2),
+  transition: 'box-shadow 0.2s, transform 0.2s',
+  '&:hover': {
+    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.12)',
+    transform: 'translateY(-4px) scale(1.02)',
+  },
 }));
 
 const SummaryItem = styled(Box)(({ theme }) => ({
   flex: 1,
   textAlign: 'center',
   '& .label': {
-    color: '#A7BFFF',
-    fontSize: '0.95rem',
-    fontWeight: 500,
+    color: colors.secondary,
+    fontSize: typography.label.fontSize,
+    fontWeight: typography.label.fontWeight,
     marginBottom: 2,
     display: 'block',
   },
   '& .value': {
-    color: '#fff',
-    fontWeight: 800,
-    fontSize: '1.25rem',
+    color: colors.primary,
+    fontWeight: typography.value.fontWeight,
+    fontSize: typography.value.fontSize,
+    fontFamily: typography.fontFamily,
   },
 }));
 
@@ -96,78 +104,75 @@ const StatBar = styled(Box)(({ theme }) => ({
 const StatCard = styled(Box)(({ theme }) => ({
   flex: '1 1 180px',
   minWidth: 150,
-  background: 'rgba(255,255,255,0.7)',
-  borderRadius: '16px',
-  boxShadow: '0 2px 8px rgba(90,107,255,0.08)',
-  border: '1.5px solid #e0e7ef',
+  background: colors.background,
+  borderRadius: '24px',
+  boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
+  border: `1.5px solid ${colors.border}`,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  padding: theme.spacing(2, 1.5),
+  padding: theme.spacing(2.5, 2),
   textAlign: 'center',
-  color: '#232946',
-  position: 'relative',
+  transition: 'box-shadow 0.2s, transform 0.2s',
+  '&:hover': {
+    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.12)',
+    transform: 'translateY(-4px) scale(1.02)',
+  },
 }));
 
 const StatIcon = styled(Box)(({ theme }) => ({
   fontSize: 28,
-  marginBottom: theme.spacing(0.5),
-  color: '#5A6BFF',
+  marginBottom: theme.spacing(1),
+  color: colors.accent.primary,
 }));
-
-const StatLabel = styled('span')(({ theme }) => ({
-  fontSize: '0.95rem',
-  color: '#7F8FA6',
-  fontWeight: 500,
-  marginBottom: 2,
-}));
-
-const StatValue = styled('span')(({ theme }) => ({
-  fontWeight: 800,
-  fontSize: '1.25rem',
-  color: '#232946',
-}));
-
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(value);
-};
 
 const SipCalculator: React.FC = () => {
   const theme = useTheme();
   const [monthlyInvestment, setMonthlyInvestment] = useState<number>(5000);
   const [expectedReturn, setExpectedReturn] = useState<number>(12);
   const [timePeriod, setTimePeriod] = useState<number>(5);
+  const [considerInflation, setConsiderInflation] = useState<boolean>(false);
+  const [inflationRate, setInflationRate] = useState<number>(6);
   const [results, setResults] = useState<{
     totalInvestment: number;
     totalReturns: number;
     maturityValue: number;
     chartData: any[];
+    inflationAdjustedMaturity?: number | null;
+    inflationAdjustedReturns?: number | null;
   }>({
     totalInvestment: 0,
     totalReturns: 0,
     maturityValue: 0,
     chartData: [],
+    inflationAdjustedMaturity: null,
+    inflationAdjustedReturns: null,
   });
 
   useEffect(() => {
     calculateSIP();
-  }, [monthlyInvestment, expectedReturn, timePeriod]);
+  }, [monthlyInvestment, expectedReturn, timePeriod, considerInflation, inflationRate]);
 
   const calculateSIP = () => {
+    // Always use expectedReturn for nominal values
     const monthlyRate = expectedReturn / 100 / 12;
     const months = timePeriod * 12;
     const totalInvestment = monthlyInvestment * months;
 
-    // Calculate maturity value using SIP formula
+    // Nominal maturity value
     const maturityValue = monthlyInvestment * 
       ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * 
       (1 + monthlyRate);
     
     const totalReturns = maturityValue - totalInvestment;
+
+    // Inflation-adjusted values (only if enabled)
+    let inflationAdjustedMaturity = null;
+    let inflationAdjustedReturns = null;
+    if (considerInflation) {
+      inflationAdjustedMaturity = maturityValue / Math.pow(1 + inflationRate / 100, timePeriod);
+      inflationAdjustedReturns = inflationAdjustedMaturity - totalInvestment;
+    }
 
     // Generate chart data
     const chartData = Array.from({ length: timePeriod + 1 }, (_, i) => {
@@ -177,10 +182,15 @@ const SipCalculator: React.FC = () => {
       const value = monthlyInvestment * 
         ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * 
         (1 + monthlyRate);
+      let inflationAdjusted = null;
+      if (considerInflation) {
+        inflationAdjusted = value / Math.pow(1 + inflationRate / 100, year + 1);
+      }
       return {
         year,
         investment: Math.round(investment),
         value: Math.round(value),
+        inflationAdjusted: inflationAdjusted !== null ? Math.round(inflationAdjusted) : null,
       };
     });
 
@@ -189,24 +199,28 @@ const SipCalculator: React.FC = () => {
       totalReturns,
       maturityValue,
       chartData,
+      inflationAdjustedMaturity,
+      inflationAdjustedReturns,
     });
   };
 
   const formSection = (
     <StyledPaper>
-    <Box>
-        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
-          Monthly Investment
-        </Typography>
-        <StyledTextField
+      <Box>
+        <CustomNumberField
           fullWidth
-          type="number"
+          label="Monthly Investment"
           value={monthlyInvestment}
-          onChange={(e) => setMonthlyInvestment(Number(e.target.value))}
+          onChange={(value) => setMonthlyInvestment(typeof value === 'number' ? value : 0)}
+          min={1000}
+          max={100000}
+          step={1000}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <AttachMoneyIcon sx={{ color: theme.palette.text.secondary }} />
+                <Typography sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 22, mr: 0.5 }}>
+                  ₹
+                </Typography>
               </InputAdornment>
             ),
           }}
@@ -222,18 +236,18 @@ const SipCalculator: React.FC = () => {
       </Box>
 
       <Box>
-        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
-          Expected Return (p.a.)
-        </Typography>
-        <StyledTextField
+        <CustomNumberField
           fullWidth
-          type="number"
+          label="Expected Return (p.a.)"
           value={expectedReturn}
-          onChange={(e) => setExpectedReturn(Number(e.target.value))}
+          onChange={(value) => setExpectedReturn(typeof value === 'number' ? value : 0)}
+          min={1}
+          max={30}
+          step={0.1}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <PercentIcon sx={{ color: theme.palette.text.secondary }} />
+                <PercentIcon sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }} />
               </InputAdornment>
             ),
           }}
@@ -243,24 +257,24 @@ const SipCalculator: React.FC = () => {
           onChange={(_, newValue) => setExpectedReturn(newValue as number)}
           min={1}
           max={30}
-          step={1}
+          step={0.1}
           valueLabelDisplay="auto"
         />
       </Box>
 
       <Box>
-        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
-          Investment Period (Years)
-        </Typography>
-        <StyledTextField
+        <CustomNumberField
           fullWidth
-          type="number"
+          label="Time Period (Years)"
           value={timePeriod}
-          onChange={(e) => setTimePeriod(Number(e.target.value))}
+          onChange={(value) => setTimePeriod(typeof value === 'number' ? value : 0)}
+          min={1}
+          max={40}
+          step={1}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <CalendarMonthIcon sx={{ color: theme.palette.text.secondary }} />
+                <CalendarMonthIcon sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 22, mr: 0.5 }} />
               </InputAdornment>
             ),
           }}
@@ -269,101 +283,126 @@ const SipCalculator: React.FC = () => {
           value={timePeriod}
           onChange={(_, newValue) => setTimePeriod(newValue as number)}
           min={1}
-          max={30}
+          max={40}
           step={1}
           valueLabelDisplay="auto"
         />
       </Box>
+
+      <FormControlLabel
+        control={
+          <Switch
+            checked={considerInflation}
+            onChange={(_, checked) => setConsiderInflation(checked)}
+            color="primary"
+          />
+        }
+        label="Consider Inflation"
+        sx={{ mt: 2, mb: 1, ml: 0.5, fontWeight: 600 }}
+      />
+      {considerInflation && (
+        <Box>
+          <CustomNumberField
+            fullWidth
+            label="Expected Inflation Rate (p.a.)"
+            value={inflationRate}
+            onChange={(value) => setInflationRate(typeof value === 'number' ? value : 0)}
+            min={0}
+            max={15}
+            step={0.1}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PercentIcon sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <StyledSlider
+            value={inflationRate}
+            onChange={(_, newValue) => setInflationRate(newValue as number)}
+            min={0}
+            max={15}
+            step={0.1}
+            valueLabelDisplay="auto"
+          />
+        </Box>
+      )}
     </StyledPaper>
   );
 
+  const nominalCards = [
+    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), bgcolor: '#fbeeee' },
+    { label: 'Total Returns', value: formatCurrency(results.totalReturns), bgcolor: '#f3f1fa' },
+    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), bgcolor: '#eafafd' },
+  ];
+  const inflationCards = considerInflation
+    ? [
+        { label: 'Total Returns', value: formatCurrency(results.inflationAdjustedReturns ?? 0), bgcolor: '#fbeeee' },
+        { label: 'Maturity Value', value: formatCurrency(results.inflationAdjustedMaturity ?? 0), bgcolor: '#eafafd' },
+      ]
+    : [];
+
   const resultSection = (
     <Box>
-      <CompactSummary>
-        <SummaryItem>
-          <span className="label">Maturity Value</span>
-          <span className="value">{formatCurrency(results.maturityValue)}</span>
-        </SummaryItem>
-        <SummaryItem>
-          <span className="label">Total Investment</span>
-          <span className="value">{formatCurrency(results.totalInvestment)}</span>
-        </SummaryItem>
-        <SummaryItem>
-          <span className="label">Total Returns</span>
-          <span className="value">{formatCurrency(results.totalReturns)}</span>
-        </SummaryItem>
-      </CompactSummary>
-
-      <StatBar>
-        <StatCard>
-          <StatIcon>
-            <AttachMoneyIcon />
-          </StatIcon>
-          <StatLabel>Monthly Investment</StatLabel>
-          <StatValue>{formatCurrency(monthlyInvestment)}</StatValue>
-        </StatCard>
-        <StatCard>
-          <StatIcon>
-            <PercentIcon />
-          </StatIcon>
-          <StatLabel>Expected Return</StatLabel>
-          <StatValue>{expectedReturn}%</StatValue>
-        </StatCard>
-        <StatCard>
-          <StatIcon>
-            <CalendarMonthIcon />
-          </StatIcon>
-          <StatLabel>Time Period</StatLabel>
-          <StatValue>{timePeriod} years</StatValue>
-        </StatCard>
-      </StatBar>
-
+      <CalculatorResultCards items={nominalCards} />
+      {considerInflation && <CalculatorResultCards items={inflationCards} sectionTitle="Inflation Adjusted" />}
       <ChartContainer>
-        <Typography variant="h6" gutterBottom sx={{ color: theme.palette.text.primary, fontWeight: 600, mb: 3 }}>
+        <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
           Investment Growth
         </Typography>
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={results.chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E0E7FF" />
-            <XAxis dataKey="year" stroke="#7F8FA6" />
-            <YAxis stroke="#7F8FA6" />
-            <RechartsTooltip
-              contentStyle={{
-                background: 'rgba(255,255,255,0.95)',
-                border: '1px solid #E0E7FF',
-                borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(90,107,255,0.1)',
-              }}
-            />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="investment"
-              name="Investment"
-              stroke="#5A6BFF"
-              strokeWidth={2}
-              dot={{ fill: '#5A6BFF', strokeWidth: 2 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="value"
-              name="Maturity Value"
-              stroke="#10B981"
-              strokeWidth={2}
-              dot={{ fill: '#10B981', strokeWidth: 2 }}
-            />
+          <LineChart data={results.chartData} style={{ fontFamily: typography.fontFamily }}>
+            <CartesianGrid strokeDasharray="3 3" stroke={colors.border} />
+            <XAxis dataKey="year" stroke={colors.secondary} tick={chartAxisStyle} axisLine={{ stroke: colors.border }} tickLine={{ stroke: colors.border }} />
+            <YAxis stroke={colors.secondary} tick={chartAxisStyle} axisLine={{ stroke: colors.border }} tickLine={{ stroke: colors.border }} />
+            <RechartsTooltip contentStyle={chartTooltipStyle} itemStyle={chartTooltipItemStyle} labelStyle={chartTooltipLabelStyle} />
+            <Legend wrapperStyle={chartLegendStyle} />
+            <Line type="monotone" dataKey="investment" name="Investment" stroke={colors.accent.primary} strokeWidth={2} dot={{ fill: colors.accent.primary, strokeWidth: 2 }} />
+            <Line type="monotone" dataKey="value" name="Maturity Value" stroke={colors.accent.secondary} strokeWidth={2} dot={{ fill: colors.accent.secondary, strokeWidth: 2 }} />
+            {considerInflation && (
+              <Line
+                type="monotone"
+                dataKey="inflationAdjusted"
+                name="Inflation Adjusted Maturity Value"
+                stroke="#e57373"
+                strokeWidth={2}
+                dot={{ fill: '#e57373', strokeWidth: 2 }}
+                strokeDasharray="6 3"
+                isAnimationActive={false}
+              />
+            )}
           </LineChart>
         </ResponsiveContainer>
       </ChartContainer>
     </Box>
   );
 
+  const tableColumns = [
+    { label: 'Year', key: 'year' },
+    { label: 'Total Investment', key: 'investment' },
+    { label: 'Maturity Value', key: 'value' },
+    ...(considerInflation ? [{ label: 'Maturity Value (Inflation Adjusted)', key: 'inflationAdjusted' }] : []),
+  ];
+  const tableRows = results.chartData.map((row, idx) => ({
+    ...row,
+    year: row.year + 1,
+    inflationAdjusted: considerInflation ? formatCurrency(row.inflationAdjusted ?? 0) : undefined,
+    investment: formatCurrency(row.investment),
+    value: formatCurrency(row.value),
+  }));
+
+  const tableSection = (
+    <CalculatorTable columns={tableColumns} rows={tableRows} />
+  );
+
   return (
     <CalculatorTemplate
       title="SIP Calculator"
-      description="Calculate your Systematic Investment Plan returns and plan your investments"
+      description="Calculate the future value of your SIP investments and see how your wealth can grow over time."
       formSection={formSection}
       resultSection={resultSection}
+      tableSection={tableSection}
     />
   );
 };

@@ -121,4 +121,15 @@ img {
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.MuiOutlinedInput-root:focus,
+.MuiOutlinedInput-root.Mui-focused,
+.MuiOutlinedInput-root input:focus,
+.MuiOutlinedInput-root input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
 } 

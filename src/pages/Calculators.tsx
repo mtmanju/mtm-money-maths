@@ -106,7 +106,12 @@ const calculators = [
   }
 ];
 
-const CardTitle = (props) => (
+interface CardTitleProps {
+  children: React.ReactNode;
+  [key: string]: any;
+}
+
+const CardTitle = (props: CardTitleProps) => (
   <Typography
     sx={{
       color: '#1A1F36',
@@ -120,7 +125,12 @@ const CardTitle = (props) => (
   />
 );
 
-const CardDesc = (props) => (
+interface CardDescProps {
+  children: React.ReactNode;
+  [key: string]: any;
+}
+
+const CardDesc = (props: CardDescProps) => (
   <Typography
     sx={{
       color: '#4E5D78',
@@ -134,7 +144,12 @@ const CardDesc = (props) => (
   />
 );
 
-const LearnMoreButton = (props) => (
+interface LearnMoreButtonProps {
+  children: React.ReactNode;
+  [key: string]: any;
+}
+
+const LearnMoreButton = (props: LearnMoreButtonProps) => (
   <Button
     variant="outlined"
     endIcon={<ArrowForwardIcon sx={{ fontSize: 18 }} />}
