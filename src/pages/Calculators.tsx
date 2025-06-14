@@ -21,6 +21,7 @@ import {
   Assessment as AssessmentIcon,
   AttachMoney as AttachMoneyIcon,
   ArrowForward as ArrowForwardIcon,
+  Home as HomeIcon,
 } from '@mui/icons-material';
 
 const pastelColors = [
@@ -57,16 +58,52 @@ const calculators = [
     path: '/fd'
   },
   {
+    title: 'RD Calculator',
+    description: 'Calculate returns on your Recurring Deposits and plan your regular investments.',
+    icon: <SavingsIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/rd'
+  },
+  {
+    title: 'PPF Calculator',
+    description: 'Calculate returns on your Public Provident Fund investments and plan your tax savings.',
+    icon: <AccountBalanceIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/ppf'
+  },
+  {
+    title: 'NPS Calculator',
+    description: 'Plan your National Pension Scheme investments and calculate potential retirement corpus.',
+    icon: <AccountBalanceWalletIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/nps'
+  },
+  {
+    title: 'Gratuity Calculator',
+    description: 'Calculate your gratuity amount based on your salary and years of service.',
+    icon: <AccountBalanceIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/gratuity'
+  },
+  {
+    title: 'HRA Calculator',
+    description: 'Calculate your House Rent Allowance and tax benefits.',
+    icon: <HomeIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/hra'
+  },
+  {
+    title: 'Income Tax Calculator',
+    description: 'Calculate your tax liability and plan your tax-saving investments effectively.',
+    icon: <AccountBalanceIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/income-tax'
+  },
+  {
+    title: 'GST Calculator',
+    description: 'Calculate Goods and Services Tax for your business transactions.',
+    icon: <CalculateIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+    path: '/gst'
+  },
+  {
     title: 'Mutual Fund Calculator',
     description: 'Analyze your mutual fund investments and track their performance over time.',
     icon: <AccountBalanceIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
     path: '/mutual-fund'
-  },
-  {
-    title: 'Tax Calculator',
-    description: 'Calculate your tax liability and plan your tax-saving investments effectively.',
-    icon: <AccountBalanceIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
-    path: '/tax'
   },
   {
     title: 'Investment Calculator',

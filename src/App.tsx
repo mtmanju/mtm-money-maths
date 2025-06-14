@@ -7,6 +7,9 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import SipCalculator from './pages/SipCalculator';
 import EmiCalculator from './pages/EmiCalculator';
+import FdCalculator from './pages/FdCalculator';
+import RdCalculator from './pages/RdCalculator';
+import PpfCalculator from './pages/PpfCalculator';
 import NotFound from './pages/NotFound';
 import Calculators from './pages/Calculators';
 import './styles/global.css';
@@ -60,6 +63,21 @@ function App() {
               <Route path="/calculators" element={<Calculators />} />
               <Route path="/emi" element={<EmiCalculator />} />
               <Route path="/sip" element={<SipCalculator />} />
+              <Route path="/fd" element={<FdCalculator />} />
+              <Route path="/rd" element={<RdCalculator />} />
+              <Route path="/ppf" element={<PpfCalculator />} />
+              <Route path="/nps" element={<NotFound />} />
+              <Route path="/gratuity" element={<NotFound />} />
+              <Route path="/hra" element={<NotFound />} />
+              <Route path="/income-tax" element={<NotFound />} />
+              <Route path="/gst" element={<NotFound />} />
+              <Route path="/mutual-fund" element={<NotFound />} />
+              <Route path="/investment" element={<NotFound />} />
+              <Route path="/loan-comparison" element={<NotFound />} />
+              <Route path="/retirement" element={<NotFound />} />
+              <Route path="/roi" element={<NotFound />} />
+              <Route path="/cagr" element={<NotFound />} />
+              <Route path="/compound" element={<NotFound />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
