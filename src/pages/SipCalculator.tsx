@@ -15,6 +15,13 @@ import {
   Switch,
   FormControlLabel,
   Button,
+  Paper,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -33,6 +40,8 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Legend,
+  AreaChart,
+  Area,
 } from 'recharts';
 import { CalculatorTemplate } from '../components/CalculatorTemplate';
 import {
@@ -125,82 +134,99 @@ const StatIcon = styled(Box)(({ theme }) => ({
   color: colors.accent.primary,
 }));
 
+interface YearlyBreakdown {
+  year: number;
+  investment: number;
+  interest: number;
+  total: number;
+}
+
 const SipCalculator: React.FC = () => {
   const theme = useTheme();
-  const [monthlyInvestment, setMonthlyInvestment] = useState<number>(5000);
+  const [monthlyInvestment, setMonthlyInvestment] = useState<number>(10000);
   const [expectedReturn, setExpectedReturn] = useState<number>(12);
   const [timePeriod, setTimePeriod] = useState<number>(5);
+  const [stepUpEnabled, setStepUpEnabled] = useState<boolean>(false);
+  const [stepUpPercentage, setStepUpPercentage] = useState<number>(10);
   const [considerInflation, setConsiderInflation] = useState<boolean>(false);
   const [inflationRate, setInflationRate] = useState<number>(6);
   const [results, setResults] = useState<{
+    maturityValue: number;
     totalInvestment: number;
     totalReturns: number;
-    maturityValue: number;
+    inflationAdjustedMaturity: number;
+    inflationAdjustedReturns: number;
     chartData: any[];
-    inflationAdjustedMaturity?: number | null;
-    inflationAdjustedReturns?: number | null;
   }>({
+    maturityValue: 0,
     totalInvestment: 0,
     totalReturns: 0,
-    maturityValue: 0,
+    inflationAdjustedMaturity: 0,
+    inflationAdjustedReturns: 0,
     chartData: [],
-    inflationAdjustedMaturity: null,
-    inflationAdjustedReturns: null,
   });
 
   useEffect(() => {
     calculateSIP();
-  }, [monthlyInvestment, expectedReturn, timePeriod, considerInflation, inflationRate]);
+  }, [monthlyInvestment, expectedReturn, timePeriod, stepUpEnabled, stepUpPercentage, considerInflation, inflationRate]);
 
   const calculateSIP = () => {
-    // Always use expectedReturn for nominal values
-    const monthlyRate = expectedReturn / 100 / 12;
+    const monthlyRate = expectedReturn / 12 / 100;
     const months = timePeriod * 12;
-    const totalInvestment = monthlyInvestment * months;
+    let totalInvestment = 0;
+    let maturityValue = 0;
+    let currentMonthly = monthlyInvestment;
+    let monthCounter = 0;
+    const chartData = [];
 
-    // Nominal maturity value
-    const maturityValue = monthlyInvestment * 
-      ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * 
-      (1 + monthlyRate);
-    
+    // For yearly breakdown
+    for (let year = 1; year <= timePeriod; year++) {
+      let yearInvestment = 0;
+      let yearValue = maturityValue;
+      for (let m = 1; m <= 12; m++) {
+        monthCounter++;
+        // Step-up logic: increase SIP at the start of each year (except first)
+        if (stepUpEnabled && m === 1 && year > 1) {
+          currentMonthly = currentMonthly * (1 + stepUpPercentage / 100);
+        }
+        maturityValue = (maturityValue + currentMonthly) * (1 + monthlyRate);
+        yearInvestment += currentMonthly;
+      }
+      totalInvestment += yearInvestment;
+      chartData.push({
+        year,
+        investment: totalInvestment,
+        returns: maturityValue - totalInvestment,
+        total: maturityValue,
+      });
+    }
+
     const totalReturns = maturityValue - totalInvestment;
 
-    // Inflation-adjusted values (only if enabled)
-    let inflationAdjustedMaturity = null;
-    let inflationAdjustedReturns = null;
+    // Inflation adjustment
+    let inflationAdjustedMaturity = maturityValue;
+    let inflationAdjustedReturns = totalReturns;
     if (considerInflation) {
       inflationAdjustedMaturity = maturityValue / Math.pow(1 + inflationRate / 100, timePeriod);
       inflationAdjustedReturns = inflationAdjustedMaturity - totalInvestment;
     }
 
-    // Generate chart data
-    const chartData = Array.from({ length: timePeriod + 1 }, (_, i) => {
-      const year = i;
-      const investment = monthlyInvestment * 12 * (year + 1);
-      const months = (year + 1) * 12;
-      const value = monthlyInvestment * 
-        ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * 
-        (1 + monthlyRate);
-      let inflationAdjusted = null;
-      if (considerInflation) {
-        inflationAdjusted = value / Math.pow(1 + inflationRate / 100, year + 1);
-      }
-      return {
-        year,
-        investment: Math.round(investment),
-        value: Math.round(value),
-        inflationAdjusted: inflationAdjusted !== null ? Math.round(inflationAdjusted) : null,
-      };
-    });
-
     setResults({
+      maturityValue,
       totalInvestment,
       totalReturns,
-      maturityValue,
-      chartData,
       inflationAdjustedMaturity,
       inflationAdjustedReturns,
+      chartData,
     });
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(value);
   };
 
   const formSection = (
@@ -211,9 +237,9 @@ const SipCalculator: React.FC = () => {
           label="Monthly Investment"
           value={monthlyInvestment}
           onChange={(value) => setMonthlyInvestment(typeof value === 'number' ? value : 0)}
-          min={1000}
+          min={500}
           max={100000}
-          step={1000}
+          step={500}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -227,13 +253,13 @@ const SipCalculator: React.FC = () => {
         <StyledSlider
           value={monthlyInvestment}
           onChange={(_, newValue) => setMonthlyInvestment(newValue as number)}
-          min={1000}
+          min={500}
           max={100000}
-          step={1000}
+          step={500}
           valueLabelDisplay="auto"
+          valueLabelFormat={formatCurrency}
         />
       </Box>
-
       <Box>
         <CustomNumberField
           fullWidth
@@ -246,7 +272,9 @@ const SipCalculator: React.FC = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <PercentIcon sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }} />
+                <Typography sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }}>
+                  %
+                </Typography>
               </InputAdornment>
             ),
           }}
@@ -258,9 +286,9 @@ const SipCalculator: React.FC = () => {
           max={30}
           step={0.1}
           valueLabelDisplay="auto"
+          valueLabelFormat={(v) => `${v}%`}
         />
       </Box>
-
       <Box>
         <CustomNumberField
           fullWidth
@@ -268,12 +296,14 @@ const SipCalculator: React.FC = () => {
           value={timePeriod}
           onChange={(value) => setTimePeriod(typeof value === 'number' ? value : 0)}
           min={1}
-          max={40}
+          max={30}
           step={1}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <CalendarMonthIcon sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 22, mr: 0.5 }} />
+                <Typography sx={{ color: '#00bfc6', fontWeight: 400 }}>
+                  Y
+                </Typography>
               </InputAdornment>
             ),
           }}
@@ -282,71 +312,68 @@ const SipCalculator: React.FC = () => {
           value={timePeriod}
           onChange={(_, newValue) => setTimePeriod(newValue as number)}
           min={1}
-          max={40}
+          max={30}
           step={1}
           valueLabelDisplay="auto"
+          valueLabelFormat={(v) => `${v} yrs`}
         />
       </Box>
-
-      <FormControlLabel
-        control={
-          <Switch
-            checked={considerInflation}
-            onChange={(_, checked) => setConsiderInflation(checked)}
-            color="primary"
-          />
-        }
-        label="Consider Inflation"
-        sx={{ mt: 2, mb: 1, ml: 0.5, fontWeight: 600 }}
-      />
-      {considerInflation && (
-        <Box>
+      <Box>
+        <FormControlLabel
+          control={<Switch checked={stepUpEnabled} onChange={(_, checked) => setStepUpEnabled(checked)} />}
+          label="Enable Step-up SIP"
+        />
+        {stepUpEnabled && (
           <CustomNumberField
             fullWidth
-            label="Expected Inflation Rate (p.a.)"
+            label="Step-up Percentage"
+            value={stepUpPercentage}
+            onChange={(value) => setStepUpPercentage(typeof value === 'number' ? value : 0)}
+            min={0}
+            max={100}
+            step={1}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+            }}
+            helperText="Annual increase in investment amount"
+          />
+        )}
+      </Box>
+      <Box>
+        <FormControlLabel
+          control={<Switch checked={considerInflation} onChange={(_, checked) => setConsiderInflation(checked)} />}
+          label="Consider Inflation"
+        />
+        {considerInflation && (
+          <CustomNumberField
+            fullWidth
+            label="Inflation Rate"
             value={inflationRate}
             onChange={(value) => setInflationRate(typeof value === 'number' ? value : 0)}
             min={0}
             max={15}
             step={0.1}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PercentIcon sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }} />
-                </InputAdornment>
-              ),
+              endAdornment: <InputAdornment position="end">%</InputAdornment>,
             }}
           />
-          <StyledSlider
-            value={inflationRate}
-            onChange={(_, newValue) => setInflationRate(newValue as number)}
-            min={0}
-            max={15}
-            step={0.1}
-            valueLabelDisplay="auto"
-          />
-        </Box>
-      )}
+        )}
+      </Box>
     </StyledPaper>
   );
 
   const resultSection = (
     <Box>
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-        <ResultCard title="Total Investment" value={formatCurrency(results.totalInvestment)} variant="primary" />
-        <ResultCard title="Total Returns" value={formatCurrency(results.totalReturns)} variant="secondary" />
-        <ResultCard title="Maturity Value" value={formatCurrency(results.maturityValue)} variant="purple" />
+        <ResultCard title="Maturity Value" value={formatCurrency(results.maturityValue)} variant="primary" />
+        <ResultCard title="Total Investment" value={formatCurrency(results.totalInvestment)} variant="secondary" />
+        <ResultCard title="Total Returns" value={formatCurrency(results.totalReturns)} variant="purple" />
       </Box>
       {considerInflation && (
-        <>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: colors.primary, mb: 1 }}>
-            Inflation Adjusted
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-            <ResultCard title="Total Returns" value={formatCurrency(results.inflationAdjustedReturns ?? 0)} variant="secondary" />
-            <ResultCard title="Maturity Value" value={formatCurrency(results.inflationAdjustedMaturity ?? 0)} variant="purple" />
-          </Box>
-        </>
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
+          <ResultCard title="Inflation Adjusted Maturity" value={formatCurrency(results.inflationAdjustedMaturity)} variant="primary" />
+          <ResultCard title="Inflation Adjusted Returns" value={formatCurrency(results.inflationAdjustedReturns)} variant="secondary" />
+        </Box>
       )}
       <ChartContainer>
         <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
@@ -355,52 +382,95 @@ const SipCalculator: React.FC = () => {
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={results.chartData} style={{ fontFamily: typography.fontFamily }}>
             <CartesianGrid strokeDasharray="3 3" stroke={colors.border} />
-            <XAxis dataKey="year" stroke={colors.secondary} tick={chartAxisStyle} axisLine={{ stroke: colors.border }} tickLine={{ stroke: colors.border }} />
-            <YAxis stroke={colors.secondary} tick={chartAxisStyle} axisLine={{ stroke: colors.border }} tickLine={{ stroke: colors.border }} />
-            <RechartsTooltip contentStyle={chartTooltipStyle} itemStyle={chartTooltipItemStyle} labelStyle={chartTooltipLabelStyle} />
+            <XAxis
+              dataKey="year"
+              stroke={colors.secondary}
+              tick={chartAxisStyle}
+              axisLine={{ stroke: colors.border }}
+              tickLine={{ stroke: colors.border }}
+              label={{ value: 'Years', position: 'insideBottom', offset: -5 }}
+            />
+            <YAxis
+              stroke={colors.secondary}
+              tick={chartAxisStyle}
+              axisLine={{ stroke: colors.border }}
+              tickLine={{ stroke: colors.border }}
+              tickFormatter={(value) => formatCurrency(value)}
+              label={{ value: 'Amount', angle: -90, position: 'insideLeft' }}
+            />
+            <RechartsTooltip
+              contentStyle={chartTooltipStyle}
+              itemStyle={chartTooltipItemStyle}
+              labelStyle={chartTooltipLabelStyle}
+              formatter={(value: number) => formatCurrency(value)}
+              labelFormatter={(label) => `Year ${label}`}
+            />
             <Legend wrapperStyle={chartLegendStyle} />
-            <Line type="monotone" dataKey="investment" name="Investment" stroke={colors.accent.primary} strokeWidth={2} dot={{ fill: colors.accent.primary, strokeWidth: 2 }} />
-            <Line type="monotone" dataKey="value" name="Maturity Value" stroke={colors.accent.secondary} strokeWidth={2} dot={{ fill: colors.accent.secondary, strokeWidth: 2 }} />
-            {considerInflation && (
-              <Line
-                type="monotone"
-                dataKey="inflationAdjusted"
-                name="Inflation Adjusted Maturity Value"
-                stroke="#e57373"
-                strokeWidth={2}
-                dot={{ fill: '#e57373', strokeWidth: 2 }}
-                strokeDasharray="6 3"
-                isAnimationActive={false}
-              />
-            )}
+            <Line
+              type="monotone"
+              dataKey="total"
+              name="Total Value"
+              stroke={colors.accent.secondary}
+              strokeWidth={2}
+              dot={{ fill: colors.accent.secondary, strokeWidth: 2 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="investment"
+              name="Investment"
+              stroke={colors.accent.primary}
+              strokeWidth={2}
+              dot={{ fill: colors.accent.primary, strokeWidth: 2 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="returns"
+              name="Returns"
+              stroke={colors.accent.purple}
+              strokeWidth={2}
+              dot={{ fill: colors.accent.purple, strokeWidth: 2 }}
+            />
           </LineChart>
         </ResponsiveContainer>
       </ChartContainer>
     </Box>
   );
 
-  const tableColumns = [
-    { label: 'Year', key: 'year' },
-    { label: 'Total Investment', key: 'investment' },
-    { label: 'Maturity Value', key: 'value' },
-    ...(considerInflation ? [{ label: 'Maturity Value (Inflation Adjusted)', key: 'inflationAdjusted' }] : []),
-  ];
-  const tableRows = results.chartData.map((row, idx) => ({
-    ...row,
-    year: row.year + 1,
-    inflationAdjusted: considerInflation ? formatCurrency(row.inflationAdjusted ?? 0) : undefined,
-    investment: formatCurrency(row.investment),
-    value: formatCurrency(row.value),
-  }));
-
   const tableSection = (
-    <CalculatorTable columns={tableColumns} rows={tableRows} />
+    <StyledTableContainer>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: typography.fontFamily, fontSize: '0.9rem', color: colors.secondary }}>
+        <thead>
+          <tr>
+            <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>Year</th>
+            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Investment</th>
+            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Returns</th>
+            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Total Value</th>
+            {considerInflation && (
+              <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Inflation Adjusted Value</th>
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {results.chartData.map((row) => (
+            <tr key={row.year}>
+              <td style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>{row.year}</td>
+              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.investment)}</td>
+              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.returns)}</td>
+              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.total)}</td>
+              {considerInflation && (
+                <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.total / Math.pow(1 + inflationRate / 100, row.year))}</td>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </StyledTableContainer>
   );
 
   return (
     <CalculatorTemplate
       title="SIP Calculator"
-      description="Calculate the future value of your SIP investments and see how your wealth can grow over time."
+      description="Calculate returns on your Systematic Investment Plan (SIP) investments"
       formSection={formSection}
       resultSection={resultSection}
       tableSection={tableSection}

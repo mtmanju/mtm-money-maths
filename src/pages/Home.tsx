@@ -4,8 +4,6 @@ import {
   Container,
   Typography,
   Grid,
-  Card,
-  CardContent,
   Box,
   useTheme,
   styled,
@@ -23,7 +21,6 @@ import {
   ShowChart as ShowChartIcon,
   AccountBalanceWallet as AccountBalanceWalletIcon,
   CompareArrows as CompareArrowsIcon,
-  Assessment as AssessmentIcon,
   AttachMoney as AttachMoneyIcon,
   ArrowForward as ArrowForwardIcon,
   CheckCircle as CheckCircleIcon,
@@ -58,28 +55,6 @@ const HeroSection = styled(Box)(({ theme }) => ({
   alignItems: 'flex-start',
   justifyContent: 'flex-start',
   minHeight: '85vh',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: '-10%',
-    left: '-15%',
-    width: '40vw',
-    height: '60vh',
-    background: 'radial-gradient(circle at 30% 40%, #eafafd 60%, transparent 100%)',
-    zIndex: 0,
-    borderRadius: '50%',
-  },
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    bottom: '-10%',
-    right: '-15%',
-    width: '40vw',
-    height: '60vh',
-    background: 'radial-gradient(circle at 70% 60%, #eafafd 60%, transparent 100%)',
-    zIndex: 0,
-    borderRadius: '50%',
-  },
 }));
 
 const HeroAccent = styled('span')(() => ({
@@ -321,7 +296,7 @@ const Home: React.FC = () => {
                 fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5.2rem', lg: '6rem' },
                 mt: 1
               }}>
-                Money Maths today.
+                Money Maths
               </Box>
             </Typography>
             <Typography
@@ -337,7 +312,7 @@ const Home: React.FC = () => {
                 lineHeight: 1.4,
               }}
             >
-              Transform your financial planning with fast, accurate, and private calculators—free for everyone.
+              Transform your financial planning with fast, accurate, and private calculators free for everyone.
             </Typography>
             <Button
               component={RouterLink}
@@ -673,7 +648,7 @@ const Home: React.FC = () => {
               pl: 0,
             }}
           >
-            Experience <Box component="span" sx={{ color: '#1A1F36', display: 'inline', fontWeight: 800 }}>Money Maths</Box> today.
+            Experience <Box component="span" sx={{ color: '#1A1F36', display: 'inline', fontWeight: 800 }}>Money Maths</Box>
           </Typography>
           <Typography
             sx={{
@@ -686,7 +661,7 @@ const Home: React.FC = () => {
               pl: 0,
             }}
           >
-            Transform your financial planning with fast, accurate, and private calculators—free for everyone.
+            Transform your financial planning with fast, accurate, and private calculators free for everyone.
           </Typography>
           <Button
             variant="contained"

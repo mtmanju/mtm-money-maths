@@ -37,12 +37,18 @@ interface FDResults {
     total: number;
     inflationAdjusted?: number;
   }>;
+  yearlyBreakdown: Array<{
+    year: number;
+    investment: number;
+    interest: number;
+    total: number;
+  }>;
 }
 
 const FdCalculator: React.FC = () => {
   const [principal, setPrincipal] = useState<number>(100000);
-  const [interestRate, setInterestRate] = useState<number>(7);
-  const [timePeriod, setTimePeriod] = useState<number>(5);
+  const [interestRate, setInterestRate] = useState<number>(7.5);
+  const [timePeriod, setTimePeriod] = useState<number>(1);
   const [considerInflation, setConsiderInflation] = useState<boolean>(false);
   const [inflationRate, setInflationRate] = useState<number>(6);
   const [results, setResults] = useState<FDResults>({
@@ -51,6 +57,7 @@ const FdCalculator: React.FC = () => {
     totalInvestment: 0,
     interestRate: 0,
     chartData: [],
+    yearlyBreakdown: [],
   });
 
   useEffect(() => {
@@ -58,15 +65,19 @@ const FdCalculator: React.FC = () => {
   }, [principal, interestRate, timePeriod, considerInflation, inflationRate]);
 
   const calculateFD = () => {
-    const monthlyInterestRate = interestRate / 100 / 12;
-    const totalMonths = timePeriod * 12;
-    const maturityValue = principal * Math.pow(1 + monthlyInterestRate, totalMonths);
+    // Convert annual rate to quarterly rate
+    const quarterlyRate = interestRate / 100 / 4;
+    const totalQuarters = timePeriod * 4;
+    
+    // Calculate maturity value using quarterly compounding
+    const maturityValue = principal * Math.pow(1 + quarterlyRate, totalQuarters);
     const totalInterest = maturityValue - principal;
 
     // Generate chart data
     const chartData = Array.from({ length: timePeriod + 1 }, (_, i) => {
       const year = i;
-      const value = principal * Math.pow(1 + monthlyInterestRate, year * 12);
+      const quarters = year * 4;
+      const value = principal * Math.pow(1 + quarterlyRate, quarters);
       const interest = value - principal;
       const inflationAdjusted = considerInflation
         ? value / Math.pow(1 + inflationRate / 100, year)
@@ -78,6 +89,22 @@ const FdCalculator: React.FC = () => {
         interest,
         total: value,
         inflationAdjusted,
+      };
+    });
+
+    // Generate yearly breakdown
+    const yearlyBreakdown = Array.from({ length: timePeriod }, (_, i) => {
+      const year = i + 1;
+      const quarters = year * 4;
+      const investment = principal;
+      const total = principal * Math.pow(1 + quarterlyRate, quarters);
+      const interest = total - investment;
+
+      return {
+        year,
+        investment,
+        interest,
+        total,
       };
     });
 
@@ -93,6 +120,7 @@ const FdCalculator: React.FC = () => {
         ? (maturityValue / Math.pow(1 + inflationRate / 100, timePeriod)) - principal
         : undefined,
       chartData,
+      yearlyBreakdown,
     });
   };
 

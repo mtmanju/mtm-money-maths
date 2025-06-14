@@ -155,11 +155,11 @@ const CompoundCalculator: React.FC = () => {
       };
     });
 
-    // Generate yearly breakdown
+    // Generate yearly breakdown with corrected calculation
     const yearlyBreakdown = Array.from({ length: timePeriod }, (_, i) => {
       const year = i + 1;
       const periodsInYear = compoundingFrequency;
-      const investment = principal + (principal * year * periodsInYear * ratePerPeriod);
+      const investment = principal; // Fixed: investment is just the principal
       const total = principal * Math.pow(1 + ratePerPeriod, year * periodsInYear);
       const interest = total - investment;
 

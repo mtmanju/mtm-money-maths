@@ -23,6 +23,7 @@ import {
   ArrowForward as ArrowForwardIcon,
   Home as HomeIcon,
 } from '@mui/icons-material';
+import { GradientBackground, colors, typography } from '../components/calculatorStyles';
 
 const pastelColors = [
   '#fbeeee', // EMI - pink
@@ -36,6 +37,21 @@ const pastelColors = [
   '#eafafd', // ROI - cyan
   '#fdfbe7', // CAGR - yellow
   '#f6faef', // Compound Interest - green
+];
+
+// Add corresponding dark colors for icons
+const iconColors = [
+  '#e57373', // EMI - dark pink
+  '#00bfc6', // SIP - dark cyan
+  '#ffb74d', // FD - dark yellow
+  '#9575cd', // Mutual Fund - dark purple
+  '#81c784', // Tax - dark green
+  '#78909c', // Investment - dark gray
+  '#e57373', // Loan Comparison - dark pink
+  '#9575cd', // Retirement - dark purple
+  '#00bfc6', // ROI - dark cyan
+  '#ffb74d', // CAGR - dark yellow
+  '#81c784', // Compound Interest - dark green
 ];
 
 const calculators = [
@@ -214,56 +230,88 @@ const LearnMoreButton = (props: LearnMoreButtonProps) => (
 );
 
 const Calculators = () => (
-  <Container maxWidth="xl" sx={{ py: 8 }}>
-    <Typography variant="h4" sx={{ mb: 6, textAlign: 'center', fontWeight: 700, color: '#1A1F36', fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
-      Our Calculators
-    </Typography>
-    <Grid container spacing={3}>
-      {calculators.map((calc, idx) => (
-        <Grid item xs={12} sm={6} md={4} lg={3} key={calc.title}>
-          <Card
-            sx={{
-              background: pastelColors[idx % pastelColors.length],
-              borderRadius: '24px',
-              boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
-              p: 0,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              border: 'none',
-            }}
-          >
-            <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                <Box sx={{
-                  background: '#fff',
-                  borderRadius: '12px',
-                  width: 40,
-                  height: 40,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 1px 4px 0 rgba(30, 34, 90, 0.06)',
-                  mr: 1.5,
-                }}>
-                  {calc.icon}
+  <GradientBackground>
+    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
+      <Box sx={{ mb: 4, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+        <Typography
+          variant="h1"
+          sx={{
+            fontWeight: 600,
+            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontSize: { xs: '1.2rem', sm: '1.8rem', md: '2.2rem', lg: '2.8rem' },
+            lineHeight: 1.08,
+            letterSpacing: '-0.03em',
+            mb: 2,
+            color: '#1A1F36',
+            textAlign: 'left',
+          }}
+        >
+          Financial{' '}
+          <Box component="span" sx={{ color: '#00bfc6', fontWeight: 600 }}>
+            Calculators
+          </Box>
+        </Typography>
+        <Typography
+          component="span"
+          sx={{
+            color: colors.secondary,
+            fontWeight: 400,
+            fontSize: { xs: '0.92rem', md: '1rem' },
+            fontFamily: typography.fontFamily,
+            mb: 0,
+            lineHeight: 1.2,
+          }}
+        >
+          Choose from our collection of free, accurate, and easy-to-use financial calculators
+        </Typography>
+      </Box>
+      <Grid container spacing={3}>
+        {calculators.map((calc, idx) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={calc.title}>
+            <Card
+              sx={{
+                background: pastelColors[idx % pastelColors.length],
+                borderRadius: '24px',
+                boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
+                p: 0,
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                border: 'none',
+              }}
+            >
+              <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                  <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mr: 1.5,
+                  }}>
+                    {React.cloneElement(calc.icon, {
+                      sx: { 
+                        fontSize: 28,
+                        color: iconColors[idx % iconColors.length]
+                      }
+                    })}
+                  </Box>
+                  <CardTitle>{calc.title}</CardTitle>
                 </Box>
-                <CardTitle>{calc.title}</CardTitle>
-              </Box>
-              <CardDesc>{calc.description}</CardDesc>
-              <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 'auto' }}>
-                <Box component={RouterLink} to={calc.path} sx={{ textDecoration: 'none', display: 'inline-block' }}>
-                  <LearnMoreButton>
-                    Calculate
-                  </LearnMoreButton>
+                <CardDesc>{calc.description}</CardDesc>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 'auto' }}>
+                  <Box component={RouterLink} to={calc.path} sx={{ textDecoration: 'none', display: 'inline-block' }}>
+                    <LearnMoreButton>
+                      Calculate
+                    </LearnMoreButton>
+                  </Box>
                 </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
-  </Container>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
+  </GradientBackground>
 );
 
 export default Calculators; 
