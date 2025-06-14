@@ -1,35 +1,57 @@
 import React from 'react';
-import { StyledTableContainer, tableStyles, tableHeaderCell, tableCell } from './calculatorStyles';
+import { StyledTableContainer } from './calculatorStyles';
+import { colors, typography } from './calculatorStyles';
 
-export interface CalculatorTableColumn {
+interface Column {
   label: string;
   key: string;
 }
 
-export const CalculatorTable: React.FC<{
-  columns: CalculatorTableColumn[];
+interface CalculatorTableProps {
+  columns: Column[];
   rows: any[];
-}> = ({ columns, rows }) => (
-  <StyledTableContainer>
-    <table style={tableStyles as React.CSSProperties}>
-      <thead>
-        <tr>
-          {columns.map((col, idx) => (
-            <th key={col.key} style={tableHeaderCell as React.CSSProperties}>{col.label}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row, idx) => (
-          <tr key={idx}>
-            {columns.map((col) => (
-              <td key={col.key} style={tableCell as React.CSSProperties}>
-                {row[col.key]}
-              </td>
+}
+
+export const CalculatorTable: React.FC<CalculatorTableProps> = ({ columns, rows }) => {
+  return (
+    <StyledTableContainer>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: typography.fontFamily, fontSize: '0.9rem', color: colors.secondary }}>
+        <thead>
+          <tr>
+            {columns.map((column) => (
+              <th 
+                key={column.key}
+                style={{ 
+                  padding: '12px', 
+                  textAlign: column.key === 'year' || column.key === 'month' ? 'left' : 'right', 
+                  borderBottom: '1px solid #E0E0E0',
+                  fontWeight: 600
+                }}
+              >
+                {column.label}
+              </th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
-  </StyledTableContainer>
-); 
+        </thead>
+        <tbody>
+          {rows.map((row, index) => (
+            <tr key={index}>
+              {columns.map((column) => (
+                <td 
+                  key={column.key}
+                  style={{ 
+                    padding: '12px', 
+                    textAlign: column.key === 'year' || column.key === 'month' ? 'left' : 'right', 
+                    borderBottom: '1px solid #E0E0E0'
+                  }}
+                >
+                  {row[column.key]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </StyledTableContainer>
+  );
+}; 

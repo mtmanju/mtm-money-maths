@@ -37,7 +37,6 @@ import {
 import { CalculatorTemplate } from '../components/CalculatorTemplate';
 import {
   StyledPaper,
-  ResultCard,
   StyledSlider,
   ChartContainer,
   colors,
@@ -55,8 +54,8 @@ import {
 } from '../components/calculatorStyles';
 import { CustomNumberField } from '../components/CustomNumberField';
 import { formatCurrency } from '../utils/formatUtils';
-import { CalculatorResultCards } from '../components/CalculatorResultCards';
 import { CalculatorTable } from '../components/CalculatorTable';
+import { ResultCard } from '../components/ResultCard';
 
 const CompactSummary = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -331,22 +330,24 @@ const SipCalculator: React.FC = () => {
     </StyledPaper>
   );
 
-  const nominalCards = [
-    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), bgcolor: '#fbeeee' },
-    { label: 'Total Returns', value: formatCurrency(results.totalReturns), bgcolor: '#f3f1fa' },
-    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), bgcolor: '#eafafd' },
-  ];
-  const inflationCards = considerInflation
-    ? [
-        { label: 'Total Returns', value: formatCurrency(results.inflationAdjustedReturns ?? 0), bgcolor: '#fbeeee' },
-        { label: 'Maturity Value', value: formatCurrency(results.inflationAdjustedMaturity ?? 0), bgcolor: '#eafafd' },
-      ]
-    : [];
-
   const resultSection = (
     <Box>
-      <CalculatorResultCards items={nominalCards} />
-      {considerInflation && <CalculatorResultCards items={inflationCards} sectionTitle="Inflation Adjusted" />}
+      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
+        <ResultCard title="Total Investment" value={formatCurrency(results.totalInvestment)} variant="primary" />
+        <ResultCard title="Total Returns" value={formatCurrency(results.totalReturns)} variant="secondary" />
+        <ResultCard title="Maturity Value" value={formatCurrency(results.maturityValue)} variant="purple" />
+      </Box>
+      {considerInflation && (
+        <>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: colors.primary, mb: 1 }}>
+            Inflation Adjusted
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
+            <ResultCard title="Total Returns" value={formatCurrency(results.inflationAdjustedReturns ?? 0)} variant="secondary" />
+            <ResultCard title="Maturity Value" value={formatCurrency(results.inflationAdjustedMaturity ?? 0)} variant="purple" />
+          </Box>
+        </>
+      )}
       <ChartContainer>
         <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
           Investment Growth

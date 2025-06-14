@@ -5,7 +5,6 @@ import {
   Typography,
   FormControlLabel,
   Switch,
-  TableContainer,
 } from '@mui/material';
 import {
   CalendarMonth as CalendarMonthIcon,
@@ -14,9 +13,11 @@ import {
 } from '@mui/icons-material';
 import { CalculatorTemplate } from '../components/CalculatorTemplate';
 import { CustomNumberField } from '../components/CustomNumberField';
-import { StyledPaper, StyledSlider, ResultCard, ChartContainer, StyledTableContainer } from '../components/calculatorStyles';
+import { StyledPaper, StyledSlider, ChartContainer } from '../components/calculatorStyles';
 import { colors, typography } from '../components/calculatorStyles';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+import { CalculatorResultCards } from '../components/CalculatorResultCards';
+import { CalculatorTable } from '../components/CalculatorTable';
 
 interface RDResults {
   maturityValue: number;
@@ -269,39 +270,24 @@ const RdCalculator: React.FC = () => {
     </StyledPaper>
   );
 
-  const nominalCards = [
-    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), bgcolor: '#eafafd' },
-    { label: 'Total Interest', value: formatCurrency(results.totalInterest), bgcolor: '#fbeeee' },
-    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), bgcolor: '#f3f1fa' },
+  const resultCards = [
+    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), variant: 'primary' as const },
+    { label: 'Total Interest', value: formatCurrency(results.totalInterest), variant: 'secondary' as const },
+    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), variant: 'purple' as const },
   ];
 
   const inflationCards = considerInflation
     ? [
-        { label: 'Inflation Adjusted Maturity', value: formatCurrency(results.inflationAdjustedMaturity ?? 0), bgcolor: '#eafafd' },
+        { label: 'Inflation Adjusted Value', value: formatCurrency(results.inflationAdjustedMaturity ?? 0), bgcolor: '#eafafd' },
         { label: 'Inflation Adjusted Returns', value: formatCurrency(results.inflationAdjustedReturns ?? 0), bgcolor: '#fbeeee' },
       ]
     : [];
 
   const resultSection = (
     <Box>
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-        {nominalCards.map((card, index) => (
-          <ResultCard key={index} bgcolor={card.bgcolor}>
-            <span className="label">{card.label}</span>
-            <span className="value">{card.value}</span>
-          </ResultCard>
-        ))}
-      </Box>
-      {considerInflation && (
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-          {inflationCards.map((card, index) => (
-            <ResultCard key={index} bgcolor={card.bgcolor}>
-              <span className="label">{card.label}</span>
-              <span className="value">{card.value}</span>
-            </ResultCard>
-          ))}
-        </Box>
-      )}
+      <CalculatorResultCards items={resultCards} />
+      {considerInflation && <CalculatorResultCards items={inflationCards} sectionTitle="Inflation Adjusted" />}
+      
       <ChartContainer>
         <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
           Investment Growth
@@ -309,22 +295,53 @@ const RdCalculator: React.FC = () => {
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={results.chartData} style={{ fontFamily: typography.fontFamily }}>
             <CartesianGrid strokeDasharray="3 3" stroke={colors.border} />
-            <XAxis dataKey="year" stroke={colors.secondary} tick={chartAxisStyle} axisLine={{ stroke: colors.border }} tickLine={{ stroke: colors.border }} />
-            <YAxis stroke={colors.secondary} tick={chartAxisStyle} axisLine={{ stroke: colors.border }} tickLine={{ stroke: colors.border }} />
-            <RechartsTooltip contentStyle={chartTooltipStyle} itemStyle={chartTooltipItemStyle} labelStyle={chartTooltipLabelStyle} />
+            <XAxis 
+              dataKey="year" 
+              stroke={colors.secondary} 
+              tick={chartAxisStyle} 
+              axisLine={{ stroke: colors.border }} 
+              tickLine={{ stroke: colors.border }}
+              label={{ value: 'Years', position: 'insideBottom', offset: -5 }}
+            />
+            <YAxis 
+              stroke={colors.secondary} 
+              tick={chartAxisStyle} 
+              axisLine={{ stroke: colors.border }} 
+              tickLine={{ stroke: colors.border }}
+              tickFormatter={(value) => formatCurrency(value)}
+              label={{ value: 'Amount', angle: -90, position: 'insideLeft' }}
+            />
+            <RechartsTooltip
+              contentStyle={chartTooltipStyle}
+              itemStyle={chartTooltipItemStyle}
+              labelStyle={chartTooltipLabelStyle}
+              formatter={(value) => formatCurrency(value as number)}
+            />
             <Legend wrapperStyle={chartLegendStyle} />
-            <Line type="monotone" dataKey="investment" name="Investment" stroke={colors.accent.primary} strokeWidth={2} dot={{ fill: colors.accent.primary, strokeWidth: 2 }} />
-            <Line type="monotone" dataKey="value" name="Maturity Value" stroke={colors.accent.secondary} strokeWidth={2} dot={{ fill: colors.accent.secondary, strokeWidth: 2 }} />
+            <Line
+              type="monotone"
+              dataKey="investment"
+              name="Investment"
+              stroke={colors.accent.primary}
+              strokeWidth={2}
+              dot={{ fill: colors.accent.primary, strokeWidth: 2 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="value"
+              name="Value"
+              stroke={colors.accent.secondary}
+              strokeWidth={2}
+              dot={{ fill: colors.accent.secondary, strokeWidth: 2 }}
+            />
             {considerInflation && (
               <Line
                 type="monotone"
                 dataKey="inflationAdjusted"
-                name="Inflation Adjusted Value"
-                stroke="#e57373"
+                name="Inflation Adjusted"
+                stroke={colors.accent.purple}
                 strokeWidth={2}
-                dot={{ fill: '#e57373', strokeWidth: 2 }}
-                strokeDasharray="6 3"
-                isAnimationActive={false}
+                dot={{ fill: colors.accent.purple, strokeWidth: 2 }}
               />
             )}
           </LineChart>
@@ -333,35 +350,24 @@ const RdCalculator: React.FC = () => {
     </Box>
   );
 
+  const tableColumns = [
+    { label: 'Year', key: 'year' },
+    { label: 'Investment', key: 'investment' },
+    { label: 'Interest', key: 'interest' },
+    { label: 'Value', key: 'value' },
+    ...(considerInflation ? [{ label: 'Inflation Adjusted', key: 'inflationAdjusted' }] : []),
+  ];
+
+  const tableRows = results.chartData.filter(row => row.year > 0).map((row) => ({
+    year: row.year,
+    investment: formatCurrency(row.investment),
+    interest: formatCurrency(row.value - row.investment),
+    value: formatCurrency(row.value),
+    ...(considerInflation ? { inflationAdjusted: formatCurrency(row.inflationAdjusted ?? 0) } : {}),
+  }));
+
   const tableSection = (
-    <StyledTableContainer>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: typography.fontFamily, fontSize: '0.9rem', color: colors.secondary }}>
-        <thead>
-          <tr>
-            <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>Year</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Investment</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Interest</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Value</th>
-            {considerInflation && (
-              <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Inflation Adjusted</th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {results.chartData.filter(row => row.year > 0).map((row) => (
-            <tr key={row.year}>
-              <td style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>{row.year}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.investment)}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.value - row.investment)}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.value)}</td>
-              {considerInflation && (
-                <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.inflationAdjusted ?? 0)}</td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </StyledTableContainer>
+    <CalculatorTable columns={tableColumns} rows={tableRows} />
   );
 
   return (

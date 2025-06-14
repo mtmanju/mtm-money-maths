@@ -27,10 +27,8 @@ import {
 import { CalculatorTemplate } from '../components/CalculatorTemplate';
 import {
   StyledPaper,
-  ResultCard,
   StyledSlider,
   ChartContainer,
-
   colors,
   typography,
   CalculatorHeading,
@@ -45,6 +43,7 @@ import {
   chartLegendStyle,
 } from '../components/calculatorStyles';
 import { CustomNumberField } from '../components/CustomNumberField';
+import { ResultCard } from '../components/ResultCard';
 
 const CompactSummary = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -298,41 +297,13 @@ const EmiCalculator: React.FC = () => {
     </StyledPaper>
   );
 
-  const inputDetailsCard = (
-    <ResultCard bgcolor="#f8f9fc" sx={{ p: 2, mb: 2, display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, gap: 0.5 }}>
-        <span className="label">Loan Amount</span>
-        <span className="value">{formatCurrency(loanAmount)}</span>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, gap: 0.5 }}>
-        <span className="label">Interest Rate</span>
-        <span className="value">{interestRate}%</span>
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, gap: 0.5 }}>
-        <span className="label">Loan Term</span>
-        <span className="value">{loanTerm} years</span>
-      </Box>
-    </ResultCard>
-  );
-
   const resultSection = (
     <Box>
-      {inputDetailsCard}
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-        <ResultCard bgcolor="#eafafd">
-          <span className="label">Monthly EMI</span>
-          <span className="value">{formatCurrency(monthlyEmi)}</span>
-        </ResultCard>
-        <ResultCard bgcolor="#fbeeee">
-          <span className="label">Total Interest</span>
-          <span className="value">{formatCurrency(totalInterest)}</span>
-        </ResultCard>
-        <ResultCard bgcolor="#f3f1fa">
-          <span className="label">Total Payment</span>
-          <span className="value">{formatCurrency(totalPayment)}</span>
-        </ResultCard>
+        <ResultCard title="Monthly EMI" value={formatCurrency(monthlyEmi)} variant="primary" />
+        <ResultCard title="Total Interest" value={formatCurrency(totalInterest)} variant="secondary" />
+        <ResultCard title="Total Payment" value={formatCurrency(totalPayment)} variant="purple" />
       </Box>
-
       <ChartContainer>
         <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
           Amortization Schedule

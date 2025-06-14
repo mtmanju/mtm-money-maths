@@ -1,11 +1,12 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { ResultCard, colors, typography } from './calculatorStyles';
+import { colors, typography } from './calculatorStyles';
+import { ResultCard } from './ResultCard';
 
 export interface ResultCardItem {
   label: string;
   value: string | number;
-  bgcolor?: string;
+  variant?: 'primary' | 'secondary' | 'purple' | 'pink' | 'green';
 }
 
 export const CalculatorResultCards: React.FC<{
@@ -22,10 +23,12 @@ export const CalculatorResultCards: React.FC<{
     )}
     <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
       {items.map((item, idx) => (
-        <ResultCard key={idx} bgcolor={item.bgcolor}>
-          <span className="label">{item.label}</span>
-          <span className="value">{item.value}</span>
-        </ResultCard>
+        <ResultCard
+          key={idx}
+          title={item.label}
+          value={String(item.value)}
+          variant={item.variant || 'primary'}
+        />
       ))}
     </Box>
   </>

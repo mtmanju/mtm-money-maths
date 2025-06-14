@@ -14,103 +14,74 @@ import {
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 
-const GradientBackground = styled(Box)(({ theme }) => ({
-  position: 'relative',
+const NotFoundBackground = styled(Box)(() => ({
   minHeight: '100vh',
+  background: '#fff',
   display: 'flex',
   alignItems: 'center',
-  background: 'linear-gradient(180deg, #FFFFFF 0%, #F8F9FF 100%)',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: '100%',
-    background: `
-      radial-gradient(circle at 20% 20%, ${theme.palette.primary.light}15, transparent 40%),
-      radial-gradient(circle at 80% 80%, ${theme.palette.secondary.light}15, transparent 40%),
-      radial-gradient(circle at 50% 50%, ${theme.palette.primary.light}10, transparent 60%)
-    `,
-    zIndex: 0,
+  justifyContent: 'center',
+}));
+
+const NotFoundCtaButton = styled(Button)(() => ({
+  background: '#1A1F36',
+  color: '#fff',
+  borderRadius: '999px',
+  fontWeight: 600,
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '1.1rem',
+  textTransform: 'none',
+  padding: '16px 40px',
+  minWidth: 0,
+  boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
+  transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
+  '&:hover': {
+    background: '#009ca3',
+    color: '#fff',
+    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
+    transform: 'translateY(-2px) scale(1.04)',
   },
 }));
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  padding: theme.spacing(1.75, 4),
-  borderRadius: '12px',
-  textTransform: 'none',
+const NotFoundOutlinedButton = styled(Button)(() => ({
+  background: '#fff',
+  color: '#00bfc6',
+  borderRadius: '999px',
   fontWeight: 600,
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   fontSize: '1.1rem',
-  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-  position: 'relative',
-  overflow: 'hidden',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0))',
-    opacity: 0,
-    transition: 'opacity 0.4s ease',
-  },
+  textTransform: 'none',
+  padding: '16px 40px',
+  minWidth: 0,
+  boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
+  border: '2px solid #00bfc6',
+  transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
   '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: '0 12px 24px rgba(0, 0, 0, 0.15)',
-    '&::before': {
-      opacity: 1,
-    },
+    background: '#00bfc6',
+    color: '#fff',
+    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
+    transform: 'translateY(-2px) scale(1.04)',
+    border: '2px solid #00bfc6',
   },
-  '&:active': {
-    transform: 'translateY(-2px)',
-  },
-})) as typeof Button;
-
-const PrimaryButton = styled(StyledButton)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-  color: '#FFFFFF',
-  border: 'none',
-  boxShadow: `0 8px 16px ${theme.palette.primary.main}30`,
-  '&:hover': {
-    background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
-    boxShadow: `0 12px 28px ${theme.palette.primary.main}40`,
-  },
-})) as typeof StyledButton;
-
-const SecondaryButton = styled(StyledButton)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.1)',
-  backdropFilter: 'blur(10px)',
-  border: `1px solid ${theme.palette.primary.main}40`,
-  color: theme.palette.primary.main,
-  boxShadow: `0 8px 16px ${theme.palette.primary.main}15`,
-  '&:hover': {
-    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-    borderColor: theme.palette.primary.main,
-    color: '#FFFFFF',
-    boxShadow: `0 12px 28px ${theme.palette.primary.main}30`,
-  },
-})) as typeof StyledButton;
+}));
 
 const NotFound: React.FC = () => {
   const theme = useTheme();
 
   return (
-    <GradientBackground>
+    <NotFoundBackground>
       <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
         <Box sx={{ textAlign: 'center', py: theme.spacing(8) }}>
           <Typography
             variant="h1"
             component="h1"
             sx={{
-              fontSize: { xs: '8rem', md: '12rem' },
-              fontWeight: 700,
-              background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              fontSize: { xs: '7rem', md: '10rem' },
+              fontWeight: 800,
+              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              color: '#00bfc6',
               mb: 2,
               lineHeight: 1,
+              letterSpacing: '-0.02em',
             }}
           >
             404
@@ -120,9 +91,11 @@ const NotFound: React.FC = () => {
             component="h2"
             sx={{
               mb: 3,
-              fontWeight: 700,
-              color: theme.palette.text.primary,
-              fontSize: { xs: '2rem', md: '3rem' },
+              fontWeight: 800,
+              color: '#1A1F36',
+              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: { xs: '2rem', md: '2.7rem' },
+              letterSpacing: '-0.02em',
             }}
           >
             Page Not Found
@@ -131,35 +104,77 @@ const NotFound: React.FC = () => {
             variant="h5"
             sx={{
               mb: 6,
-              color: theme.palette.text.secondary,
+              color: '#4E5D78',
               maxWidth: '600px',
               mx: 'auto',
               fontWeight: 400,
-              lineHeight: 1.5,
+              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.7rem' },
+              lineHeight: 1.4,
             }}
           >
             Oops! The page you're looking for doesn't exist or has been moved.
             Let's get you back on track.
           </Typography>
           <Box sx={{ display: 'flex', gap: theme.spacing(2), justifyContent: 'center' }}>
-            <PrimaryButton
+            <Button
               component={RouterLink}
               to="/"
               startIcon={<HomeIcon />}
+              sx={{
+                background: '#1A1F36',
+                color: '#fff',
+                borderRadius: '999px',
+                fontWeight: 600,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: '1.1rem',
+                textTransform: 'none',
+                padding: '16px 40px',
+                minWidth: 0,
+                boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
+                transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
+                '&:hover': {
+                  background: '#009ca3',
+                  color: '#fff',
+                  boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
+                  transform: 'translateY(-2px) scale(1.04)',
+                },
+              }}
             >
               Go Home
-            </PrimaryButton>
-            <SecondaryButton
+            </Button>
+            <Button
               component={RouterLink}
               to="/calculators"
               startIcon={<CalculateIcon />}
+              sx={{
+                background: '#fff',
+                color: '#00bfc6',
+                borderRadius: '999px',
+                fontWeight: 600,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: '1.1rem',
+                textTransform: 'none',
+                padding: '16px 40px',
+                minWidth: 0,
+                boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
+                border: '2px solid #00bfc6',
+                transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
+                '&:hover': {
+                  background: '#00bfc6',
+                  color: '#fff',
+                  boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
+                  transform: 'translateY(-2px) scale(1.04)',
+                  border: '2px solid #00bfc6',
+                },
+              }}
             >
               View Calculators
-            </SecondaryButton>
+            </Button>
           </Box>
         </Box>
       </Container>
-    </GradientBackground>
+    </NotFoundBackground>
   );
 };
 

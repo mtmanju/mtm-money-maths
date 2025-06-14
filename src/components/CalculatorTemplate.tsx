@@ -10,7 +10,6 @@ import {
 import {
   GradientBackground,
   StyledPaper,
-  ResultCard,
   StyledTextField,
   StyledSlider,
   ChartContainer,
@@ -18,6 +17,7 @@ import {
   colors,
   typography,
 } from './calculatorStyles';
+import { ResultCard } from './ResultCard';
 
 const CalculatorContainer = styled(Box)(({ theme }) => ({
   background: 'transparent',
@@ -34,6 +34,8 @@ interface CalculatorTemplateProps {
   formSection: React.ReactNode;
   resultSection: React.ReactNode;
   tableSection?: React.ReactNode;
+  onCalculate?: (data: any) => void;
+  results?: any;
 }
 
 export const CalculatorTemplate: React.FC<CalculatorTemplateProps> = ({
@@ -42,16 +44,36 @@ export const CalculatorTemplate: React.FC<CalculatorTemplateProps> = ({
   formSection,
   resultSection,
   tableSection,
+  onCalculate,
+  results,
 }) => {
   const theme = useTheme();
+
+  // Split the title into two parts
+  const [mainTitle, subTitle] = title.split(' ');
 
   return (
     <GradientBackground>
       <Container maxWidth="lg">
         <Box sx={{ mb: 4, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-          <CalculatorHeading variant="h1" sx={{ mb: 0 }}>
-            {title}
-          </CalculatorHeading>
+          <Typography
+            variant="h1"
+            sx={{
+              fontWeight: 600,
+              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontSize: { xs: '1.2rem', sm: '1.8rem', md: '2.2rem', lg: '2.8rem' },
+              lineHeight: 1.08,
+              letterSpacing: '-0.03em',
+              mb: 2,
+              color: '#1A1F36',
+              textAlign: 'left',
+            }}
+          >
+            {mainTitle}{' '}
+            <Box component="span" sx={{ color: '#00bfc6', fontWeight: 600 }}>
+              {subTitle}
+            </Box>
+          </Typography>
           <Typography
             component="span"
             sx={{
@@ -86,4 +108,4 @@ export const CalculatorTemplate: React.FC<CalculatorTemplateProps> = ({
   );
 };
 
-export { StyledPaper, ResultCard, StyledTextField, StyledSlider, ChartContainer }; 
+export { StyledPaper, StyledTextField, StyledSlider, ChartContainer }; 

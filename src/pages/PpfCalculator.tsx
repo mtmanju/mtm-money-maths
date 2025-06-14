@@ -16,9 +16,7 @@ import { CustomNumberField } from '../components/CustomNumberField';
 import { 
   StyledPaper, 
   StyledSlider, 
-  ResultCard, 
   ChartContainer, 
-  StyledTableContainer,
   chartAxisStyle,
   chartTooltipStyle,
   chartTooltipItemStyle,
@@ -27,6 +25,8 @@ import {
 } from '../components/calculatorStyles';
 import { colors, typography } from '../components/calculatorStyles';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+import { CalculatorResultCards } from '../components/CalculatorResultCards';
+import { CalculatorTable } from '../components/CalculatorTable';
 
 interface PpfResults {
   maturityValue: number;
@@ -241,66 +241,69 @@ const PpfCalculator: React.FC = () => {
     </StyledPaper>
   );
 
+  const resultCards = [
+    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), variant: 'primary' as const },
+    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), variant: 'secondary' as const },
+    { label: 'Total Interest', value: formatCurrency(results.totalInterest), variant: 'purple' as const },
+  ];
+
+  const inflationCards = considerInflation
+    ? [
+        { label: 'Inflation Adjusted Value', value: formatCurrency(results.chartData[results.chartData.length - 1]?.inflationAdjusted ?? 0), bgcolor: '#eafafd' },
+        { label: 'Inflation Adjusted Returns', value: formatCurrency((results.chartData[results.chartData.length - 1]?.inflationAdjusted ?? 0) - results.totalInvestment), bgcolor: '#fbeeee' },
+      ]
+    : [];
+
   const resultSection = (
     <Box>
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-        <ResultCard bgcolor="#eafafd">
-          <span className="label">Maturity Value</span>
-          <span className="value">{formatCurrency(results.maturityValue)}</span>
-        </ResultCard>
-        <ResultCard bgcolor="#fbeeee">
-          <span className="label">Total Investment</span>
-          <span className="value">{formatCurrency(results.totalInvestment)}</span>
-        </ResultCard>
-        <ResultCard bgcolor="#f3f1fa">
-          <span className="label">Total Interest</span>
-          <span className="value">{formatCurrency(results.totalInterest)}</span>
-        </ResultCard>
-      </Box>
-
+      <CalculatorResultCards items={resultCards} />
+      {considerInflation && <CalculatorResultCards items={inflationCards} sectionTitle="Inflation Adjusted" />}
+      
       <ChartContainer>
         <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
           Investment Growth
         </Typography>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={results.chartData} style={{ fontFamily: typography.fontFamily }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" />
-            <XAxis
-              dataKey="year"
-              stroke={colors.secondary}
-              tick={chartAxisStyle}
-              axisLine={{ stroke: colors.border }}
+            <CartesianGrid strokeDasharray="3 3" stroke={colors.border} />
+            <XAxis 
+              dataKey="year" 
+              stroke={colors.secondary} 
+              tick={chartAxisStyle} 
+              axisLine={{ stroke: colors.border }} 
               tickLine={{ stroke: colors.border }}
+              label={{ value: 'Years', position: 'insideBottom', offset: -5 }}
             />
-            <YAxis
-              stroke={colors.secondary}
-              tick={chartAxisStyle}
-              axisLine={{ stroke: colors.border }}
+            <YAxis 
+              stroke={colors.secondary} 
+              tick={chartAxisStyle} 
+              axisLine={{ stroke: colors.border }} 
               tickLine={{ stroke: colors.border }}
-              tickFormatter={(value) => value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              tickFormatter={(value) => formatCurrency(value)}
+              label={{ value: 'Amount', angle: -90, position: 'insideLeft' }}
             />
             <RechartsTooltip
               contentStyle={chartTooltipStyle}
               itemStyle={chartTooltipItemStyle}
               labelStyle={chartTooltipLabelStyle}
-              formatter={(value) => value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              formatter={(value) => formatCurrency(value as number)}
             />
             <Legend wrapperStyle={chartLegendStyle} />
             <Line
               type="monotone"
               dataKey="investment"
               name="Investment"
-              stroke={colors.accent.secondary}
+              stroke={colors.accent.primary}
               strokeWidth={2}
-              dot={{ fill: colors.accent.secondary, strokeWidth: 2 }}
+              dot={{ fill: colors.accent.primary, strokeWidth: 2 }}
             />
             <Line
               type="monotone"
               dataKey="interest"
               name="Interest"
-              stroke={colors.accent.primary}
+              stroke={colors.accent.secondary}
               strokeWidth={2}
-              dot={{ fill: colors.accent.primary, strokeWidth: 2 }}
+              dot={{ fill: colors.accent.secondary, strokeWidth: 2 }}
             />
             {considerInflation && (
               <Line
@@ -318,37 +321,24 @@ const PpfCalculator: React.FC = () => {
     </Box>
   );
 
+  const tableColumns = [
+    { label: 'Year', key: 'year' },
+    { label: 'Investment', key: 'investment' },
+    { label: 'Interest', key: 'interest' },
+    { label: 'Value', key: 'value' },
+    ...(considerInflation ? [{ label: 'Inflation Adjusted', key: 'inflationAdjusted' }] : []),
+  ];
+
+  const tableRows = results.chartData.filter(row => row.year > 0).map((row) => ({
+    year: row.year,
+    investment: formatCurrency(row.investment),
+    interest: formatCurrency(row.interest),
+    value: formatCurrency(row.value),
+    ...(considerInflation ? { inflationAdjusted: formatCurrency(row.inflationAdjusted ?? 0) } : {}),
+  }));
+
   const tableSection = (
-    <StyledTableContainer>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: typography.fontFamily, fontSize: '0.9rem', color: colors.secondary }}>
-        <thead>
-          <tr>
-            <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>Year</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Investment</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Interest</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Value</th>
-            {considerInflation && (
-              <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Inflation Adjusted</th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {results.chartData.filter(row => row.year > 0).map((row) => (
-            <tr key={row.year}>
-              <td style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>{row.year}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.investment)}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.interest)}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.value)}</td>
-              {considerInflation && (
-                <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>
-                  {formatCurrency(row.inflationAdjusted || 0)}
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </StyledTableContainer>
+    <CalculatorTable columns={tableColumns} rows={tableRows} />
   );
 
   return (

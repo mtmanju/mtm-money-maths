@@ -3,9 +3,24 @@ import { Box, Container, Grid, Typography, IconButton, Link, Button } from '@mui
 import { styled } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import TwitterIcon from '@mui/icons-material/Twitter';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import InstagramIcon from '@mui/icons-material/Instagram';
+
+// Custom X (Twitter) icon component
+const XIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+      fill="currentColor"
+    />
+  </svg>
+);
 
 const FooterRoot = styled('footer')(() => ({
   background: '#5ee2e6',
@@ -17,9 +32,9 @@ const FooterRoot = styled('footer')(() => ({
 }));
 
 const NewsletterInput = styled('input')(() => ({
-  border: 'none',
-  borderRadius: '18px',
-  padding: '12px 20px',
+  border: '1.5px solid #eafafd',
+  borderRadius: '999px',
+  padding: '12px 24px',
   fontSize: '1rem',
   width: 260,
   marginRight: '1rem',
@@ -27,23 +42,39 @@ const NewsletterInput = styled('input')(() => ({
   color: '#1A1F36',
   boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
   outline: 'none',
+  transition: 'all 0.2s',
+  height: '48px',
+  lineHeight: '48px',
+  '&:focus': {
+    borderColor: '#00bfc6',
+    boxShadow: '0 4px 20px 0 rgba(0, 191, 198, 0.15)',
+  },
+  '&::placeholder': {
+    color: '#4E5D78',
+    opacity: 0.7,
+  },
 }));
 
 const NewsletterButton = styled(Button)(() => ({
   background: '#1A1F36',
   color: '#fff',
-  borderRadius: '18px',
+  borderRadius: '999px',
   padding: '12px 32px',
   fontSize: '1rem',
   fontWeight: 600,
   textTransform: 'none',
-  boxShadow: 'none',
+  boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
+  transition: 'all 0.2s',
+  height: '48px',
   '&:hover': {
     background: '#009ca3',
+    color: '#fff',
+    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
+    transform: 'translateY(-2px)',
   },
 }));
 
-const FooterLink = styled(Link)(() => ({
+const FooterLink = styled(RouterLink)(() => ({
   color: '#1A1F36',
   fontWeight: 500,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -52,28 +83,54 @@ const FooterLink = styled(Link)(() => ({
   display: 'block',
   textDecoration: 'none',
   transition: 'color 0.2s',
+  outline: 'none',
+  boxShadow: 'none',
   '&:hover': {
     color: '#009ca3',
   },
+  '&:focus': {
+    outline: 'none',
+    boxShadow: 'none',
+  },
+  '&:focus-visible': {
+    outline: 'none',
+    boxShadow: 'none',
+  },
 }));
 
-const SocialStack = styled(Box)(() => ({
+const FooterNavBox = styled(Box)(() => ({
+  outline: 'none',
+  boxShadow: 'none',
+  '&:focus': {
+    outline: 'none',
+    boxShadow: 'none',
+  },
+  '&:focus-visible': {
+    outline: 'none',
+    boxShadow: 'none',
+  },
+}));
+
+const SocialStack = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: '1rem',
-  alignItems: 'flex-end',
+  alignItems: 'flex-start',
+  width: '100%',
+  [theme.breakpoints.up('md')]: {
+    justifyContent: 'flex-end',
+  },
 }));
 
 const SocialIcon = styled(IconButton)(() => ({
-  background: '#1A1F36',
-  color: '#fff',
+  color: '#1A1F36',
   borderRadius: '12px',
   width: 44,
   height: 44,
-  transition: 'background 0.2s, color 0.2s',
+  transition: 'all 0.2s',
   '&:hover': {
-    background: '#009ca3',
-    color: '#fff',
+    color: '#009ca3',
+    transform: 'translateY(-2px)',
   },
 }));
 
@@ -86,93 +143,117 @@ const LegalDivider = styled('div')(() => ({
 
 const calculatorLinks1 = [
   { title: 'Home', path: '/' },
-  { title: 'EMI Calculator', path: '/emi-calculator' },
-  { title: 'SIP Calculator', path: '/sip-calculator' },
-  { title: 'FD Calculator', path: '/fd-calculator' },
-  { title: 'RD Calculator', path: '/rd-calculator' },
-  { title: 'PPF Calculator', path: '/ppf-calculator' },
+  { title: 'EMI Calculator', path: '/emi' },
+  { title: 'SIP Calculator', path: '/sip' },
+  { title: 'FD Calculator', path: '/fd' },
+  { title: 'RD Calculator', path: '/rd' },
+  { title: 'PPF Calculator', path: '/ppf' },
 ];
 const calculatorLinks2 = [
-  { title: 'NPS Calculator', path: '/nps-calculator' },
-  { title: 'Gratuity Calculator', path: '/gratuity-calculator' },
-  { title: 'HRA Calculator', path: '/hra-calculator' },
-  { title: 'Income Tax Calculator', path: '/income-tax-calculator' },
-  { title: 'GST Calculator', path: '/gst-calculator' },
+  { title: 'NPS Calculator', path: '/nps' },
+  { title: 'Gratuity Calculator', path: '/gratuity' },
+  { title: 'HRA Calculator', path: '/hra' },
+  { title: 'Income Tax Calculator', path: '/income-tax' },
+  { title: 'GST Calculator', path: '/gst' },
   { title: 'About', path: '/about' },
 ];
 
 const Footer = () => {
   return (
     <FooterRoot>
-      <Box sx={{ pt: 2, pb: 2, px: { xs: 3, sm: 6 }, maxWidth: '100%' }}>
-        <Grid container spacing={6}>
+      <Box sx={{ 
+        pt: { xs: 4, md: 6 }, 
+        pb: { xs: 4, md: 6 }, 
+        px: { xs: 3, sm: 4, md: 6, lg: 8 }, 
+        maxWidth: '100%' 
+      }}>
+        <Grid container spacing={{ xs: 4, md: 6 }}>
           {/* Newsletter & Acknowledgement */}
           <Grid item xs={12} md={6}>
-            <Typography variant="h4" sx={{ fontWeight: 700, fontSize: '2.2rem', mb: 2, letterSpacing: '-0.02em' }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, fontSize: '2.2rem', mb: 3, letterSpacing: '-0.02em' }}>
               Join our newsletter<br />
               <span style={{ color: '#009ca3', fontWeight: 400 }}>to stay up to date</span>
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              mb: 3,
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: { xs: 2, sm: 0 }
+            }}>
               <NewsletterInput placeholder="Enter your email" type="email" />
               <NewsletterButton disableElevation>Subscribe</NewsletterButton>
             </Box>
-            <Typography sx={{ color: '#1A1F36', fontSize: '0.95rem', mb: 3 }}>
+            <Typography sx={{ color: '#1A1F36', fontSize: '0.95rem', mb: 4 }}>
               By subscribing, you agree to our <Link href="#" underline="always" sx={{ color: '#1A1F36', fontWeight: 500 }}>Privacy Policy</Link>.
             </Typography>
-            <Typography sx={{ color: '#1A1F36', fontSize: '1rem', maxWidth: 600, mb: 2 }}>
-              MTM Money Maths is your trusted companion for financial calculations and planning. Make informed decisions with our comprehensive suite of financial calculators.
-            </Typography>
-            <Typography sx={{ color: '#1A1F36', fontSize: '1rem', maxWidth: 600, mb: 2 }}>
-              We acknowledge the Traditional Owners of the land where we work and live, and pay our respects to Elders past, present, and emerging. We celebrate the stories, culture and traditions of all communities who also work and live on this land.
+            <Typography sx={{ color: '#1A1F36', fontSize: '1rem', maxWidth: 600, mb: 3 }}>
+              Money Maths is your trusted companion for financial calculations and planning. Make informed decisions with our comprehensive suite of financial calculators.
             </Typography>
           </Grid>
           {/* Links & Social */}
           <Grid item xs={12} md={3}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0, mb: { xs: 4, md: 0 } }}>
               {calculatorLinks1.map(link => (
-                <Box key={link.title} component={RouterLink} to={link.path} sx={{ textDecoration: 'none' }}>
-                  <FooterLink>{link.title}</FooterLink>
-                </Box>
+                <FooterLink key={link.title} to={link.path} tabIndex={0}>
+                  {link.title}
+                </FooterLink>
               ))}
             </Box>
           </Grid>
           <Grid item xs={12} md={2}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0, mb: { xs: 4, md: 0 } }}>
               {calculatorLinks2.map(link => (
-                <Box key={link.title} component={RouterLink} to={link.path} sx={{ textDecoration: 'none' }}>
-                  <FooterLink>{link.title}</FooterLink>
-                </Box>
+                <FooterLink key={link.title} to={link.path} tabIndex={0}>
+                  {link.title}
+                </FooterLink>
               ))}
             </Box>
           </Grid>
-          <Grid item xs={12} md={1} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
-            <SocialStack>
-              <Box component="a" href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                <SocialIcon aria-label="Facebook"><FacebookIcon /></SocialIcon>
-              </Box>
-              <Box component="a" href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                <SocialIcon aria-label="Instagram"><InstagramIcon /></SocialIcon>
-              </Box>
-              <Box component="a" href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                <SocialIcon aria-label="Twitter"><TwitterIcon /></SocialIcon>
-              </Box>
-              <Box component="a" href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                <SocialIcon aria-label="LinkedIn"><LinkedInIcon /></SocialIcon>
-              </Box>
-            </SocialStack>
+          <Grid item xs={12} md={1}>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column',
+              alignItems: { xs: 'flex-start', md: 'flex-end' },
+              mb: { xs: 4, md: 0 }
+            }}>
+              <Typography sx={{ 
+                color: '#1A1F36', 
+                fontSize: '1rem', 
+                fontWeight: 600, 
+                mb: 2,
+                display: { xs: 'block', md: 'none' }
+              }}>
+                Follow Us
+              </Typography>
+              <SocialStack>
+                <Box component="a" href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                  <SocialIcon aria-label="Facebook"><FacebookIcon /></SocialIcon>
+                </Box>
+                <Box component="a" href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                  <SocialIcon aria-label="Instagram"><InstagramIcon /></SocialIcon>
+                </Box>
+                <Box component="a" href="https://x.com" target="_blank" rel="noopener noreferrer">
+                  <SocialIcon aria-label="X"><XIcon /></SocialIcon>
+                </Box>
+                <Box component="a" href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+                  <SocialIcon aria-label="LinkedIn"><LinkedInIcon /></SocialIcon>
+                </Box>
+              </SocialStack>
+            </Box>
           </Grid>
         </Grid>
         <LegalDivider />
-        <Grid container alignItems="center" justifyContent="space-between" sx={{ pb: 2 }}>
+        <Grid container alignItems="center" justifyContent="space-between" sx={{ pt: 2 }}>
           <Grid item xs={12} md={6}>
-            <Box sx={{ display: 'flex', gap: 3, mb: { xs: 1, md: 0 } }}>
+            <Box sx={{ display: 'flex', gap: 3, mb: { xs: 2, md: 0 } }}>
               <Link href="#" className="footer-link" underline="always">Terms of Service</Link>
               <Link href="#" className="footer-link" underline="always">Privacy Policy</Link>
             </Box>
           </Grid>
           <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'left', md: 'right' } }}>
             <Typography sx={{ color: '#1A1F36', fontSize: '0.95rem' }}>
-              © {new Date().getFullYear()} MTM Money Maths. All rights reserved.
+              © {new Date().getFullYear()} Money Maths. All rights reserved.
             </Typography>
           </Grid>
         </Grid>

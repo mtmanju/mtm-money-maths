@@ -1,83 +1,173 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  InputAdornment,
   Typography,
+  useTheme,
+  styled,
+  InputAdornment,
   FormControlLabel,
   Switch,
 } from '@mui/material';
 import {
-  CalendarMonth as CalendarMonthIcon,
-  Percent as PercentIcon,
   AccountBalance as AccountBalanceIcon,
+  Percent as PercentIcon,
+  CalendarMonth as CalendarMonthIcon,
   TrendingUp as TrendingUpIcon,
+  CalendarToday as CalendarTodayIcon,
+  AttachMoney as AttachMoneyIcon,
   Payments as PaymentsIcon,
-  AccountBalanceWallet as AccountBalanceWalletIcon,
 } from '@mui/icons-material';
 import { CalculatorTemplate } from '../components/CalculatorTemplate';
 import { CustomNumberField } from '../components/CustomNumberField';
-import { StyledPaper, StyledSlider, ChartContainer, StyledTableContainer } from '../components/calculatorStyles';
-import { colors, typography } from '../components/calculatorStyles';
+import {
+  StyledPaper,
+  StyledSlider,
+  ChartContainer,
+  colors,
+  typography,
+} from '../components/calculatorStyles';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
-import { CalculatorResultCards } from '../components/CalculatorResultCards';
 import { CalculatorTable } from '../components/CalculatorTable';
 import { ResultCard } from '../components/ResultCard';
 
-interface FDResults {
+const CompactSummary = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  background: colors.background,
+  borderRadius: '24px',
+  boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
+  border: `1.5px solid ${colors.border}`,
+  padding: theme.spacing(3, 4),
+  marginBottom: theme.spacing(3),
+  transition: 'box-shadow 0.2s, transform 0.2s',
+  '&:hover': {
+    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.12)',
+    transform: 'translateY(-4px) scale(1.02)',
+  },
+}));
+
+const SummaryItem = styled(Box)(({ theme }) => ({
+  flex: 1,
+  textAlign: 'center',
+  '& .label': {
+    color: colors.secondary,
+    fontSize: typography.label.fontSize,
+    fontWeight: typography.label.fontWeight,
+    marginBottom: 2,
+    display: 'block',
+  },
+  '& .value': {
+    color: colors.primary,
+    fontWeight: typography.value.fontWeight,
+    fontSize: typography.value.fontSize,
+    fontFamily: typography.fontFamily,
+  },
+}));
+
+const StatBar = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: theme.spacing(2),
+  marginBottom: theme.spacing(3),
+  justifyContent: 'space-between',
+}));
+
+const StatCard = styled(Box)(({ theme }) => ({
+  flex: '1 1 180px',
+  minWidth: 150,
+  background: colors.background,
+  borderRadius: '24px',
+  boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
+  border: `1.5px solid ${colors.border}`,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  padding: theme.spacing(2.5, 2),
+  textAlign: 'center',
+  transition: 'box-shadow 0.2s, transform 0.2s',
+  '&:hover': {
+    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.12)',
+    transform: 'translateY(-4px) scale(1.02)',
+  },
+}));
+
+const StatIcon = styled(Box)(({ theme }) => ({
+  fontSize: 28,
+  marginBottom: theme.spacing(1),
+  color: colors.accent.primary,
+}));
+
+interface CompoundResults {
   maturityValue: number;
   totalInterest: number;
   totalInvestment: number;
-  interestRate: number;
-  inflationAdjustedMaturity?: number;
-  inflationAdjustedReturns?: number;
   chartData: Array<{
     year: number;
     investment: number;
     interest: number;
     total: number;
-    inflationAdjusted?: number;
+  }>;
+  yearlyBreakdown: Array<{
+    year: number;
+    investment: number;
+    interest: number;
+    total: number;
   }>;
 }
 
-const FdCalculator: React.FC = () => {
+const CompoundCalculator: React.FC = () => {
+  const theme = useTheme();
   const [principal, setPrincipal] = useState<number>(100000);
-  const [interestRate, setInterestRate] = useState<number>(7);
+  const [interestRate, setInterestRate] = useState<number>(8);
   const [timePeriod, setTimePeriod] = useState<number>(5);
-  const [considerInflation, setConsiderInflation] = useState<boolean>(false);
-  const [inflationRate, setInflationRate] = useState<number>(6);
-  const [results, setResults] = useState<FDResults>({
+  const [compoundingFrequency, setCompoundingFrequency] = useState<number>(12); // Monthly by default
+  const [results, setResults] = useState<CompoundResults>({
     maturityValue: 0,
     totalInterest: 0,
     totalInvestment: 0,
-    interestRate: 0,
     chartData: [],
+    yearlyBreakdown: [],
   });
 
   useEffect(() => {
-    calculateFD();
-  }, [principal, interestRate, timePeriod, considerInflation, inflationRate]);
+    calculateCompoundInterest();
+  }, [principal, interestRate, timePeriod, compoundingFrequency]);
 
-  const calculateFD = () => {
-    const monthlyInterestRate = interestRate / 100 / 12;
-    const totalMonths = timePeriod * 12;
-    const maturityValue = principal * Math.pow(1 + monthlyInterestRate, totalMonths);
+  const calculateCompoundInterest = () => {
+    const ratePerPeriod = interestRate / 100 / compoundingFrequency;
+    const numberOfPeriods = timePeriod * compoundingFrequency;
+    const maturityValue = principal * Math.pow(1 + ratePerPeriod, numberOfPeriods);
     const totalInterest = maturityValue - principal;
 
     // Generate chart data
     const chartData = Array.from({ length: timePeriod + 1 }, (_, i) => {
       const year = i;
-      const value = principal * Math.pow(1 + monthlyInterestRate, year * 12);
+      const periods = year * compoundingFrequency;
+      const value = principal * Math.pow(1 + ratePerPeriod, periods);
       const interest = value - principal;
-      const inflationAdjusted = considerInflation
-        ? value / Math.pow(1 + inflationRate / 100, year)
-        : undefined;
 
       return {
         year,
         investment: principal,
         interest,
         total: value,
-        inflationAdjusted,
+      };
+    });
+
+    // Generate yearly breakdown
+    const yearlyBreakdown = Array.from({ length: timePeriod }, (_, i) => {
+      const year = i + 1;
+      const periodsInYear = compoundingFrequency;
+      const investment = principal + (principal * year * periodsInYear * ratePerPeriod);
+      const total = principal * Math.pow(1 + ratePerPeriod, year * periodsInYear);
+      const interest = total - investment;
+
+      return {
+        year,
+        investment,
+        interest,
+        total,
       };
     });
 
@@ -85,14 +175,8 @@ const FdCalculator: React.FC = () => {
       maturityValue,
       totalInterest,
       totalInvestment: principal,
-      interestRate,
-      inflationAdjustedMaturity: considerInflation
-        ? maturityValue / Math.pow(1 + inflationRate / 100, timePeriod)
-        : undefined,
-      inflationAdjustedReturns: considerInflation
-        ? (maturityValue / Math.pow(1 + inflationRate / 100, timePeriod)) - principal
-        : undefined,
       chartData,
+      yearlyBreakdown,
     });
   };
 
@@ -100,8 +184,13 @@ const FdCalculator: React.FC = () => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
+      minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);
+  };
+
+  const formatPercentage = (value: number) => {
+    return `${value.toFixed(2)}%`;
   };
 
   const chartAxisStyle = {
@@ -172,18 +261,16 @@ const FdCalculator: React.FC = () => {
       <Box>
         <CustomNumberField
           fullWidth
-          label="Interest Rate (%)"
+          label="Interest Rate"
           value={interestRate}
           onChange={(value) => setInterestRate(typeof value === 'number' ? value : 0)}
           min={1}
-          max={20}
+          max={30}
           step={0.1}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Typography sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }}>
-                  %
-                </Typography>
+                <PercentIcon sx={{ color: '#00bfc6', fontWeight: 400 }} />
               </InputAdornment>
             ),
           }}
@@ -192,7 +279,7 @@ const FdCalculator: React.FC = () => {
           value={interestRate}
           onChange={(_, newValue) => setInterestRate(newValue as number)}
           min={1}
-          max={20}
+          max={30}
           step={0.1}
           valueLabelDisplay="auto"
           valueLabelFormat={(v) => `${v}%`}
@@ -206,14 +293,12 @@ const FdCalculator: React.FC = () => {
           value={timePeriod}
           onChange={(value) => setTimePeriod(typeof value === 'number' ? value : 0)}
           min={1}
-          max={20}
+          max={30}
           step={1}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Typography sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }}>
-                  Y
-                </Typography>
+                <CalendarMonthIcon sx={{ color: '#00bfc6', fontWeight: 400 }} />
               </InputAdornment>
             ),
           }}
@@ -222,90 +307,55 @@ const FdCalculator: React.FC = () => {
           value={timePeriod}
           onChange={(_, newValue) => setTimePeriod(newValue as number)}
           min={1}
-          max={20}
+          max={30}
           step={1}
           valueLabelDisplay="auto"
           valueLabelFormat={(v) => `${v} yrs`}
         />
       </Box>
 
-      <FormControlLabel
-        control={
-          <Switch
-            checked={considerInflation}
-            onChange={(_, checked) => setConsiderInflation(checked)}
-            color="primary"
-          />
-        }
-        label="Consider Inflation"
-        sx={{ mt: 2, mb: 1, ml: 0.5, fontWeight: 600 }}
-      />
-      {considerInflation && (
-        <Box>
-          <CustomNumberField
-            fullWidth
-            label="Expected Inflation Rate (p.a.)"
-            value={inflationRate}
-            onChange={(value) => setInflationRate(typeof value === 'number' ? value : 0)}
-            min={0}
-            max={15}
-            step={0.1}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PercentIcon sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }} />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <StyledSlider
-            value={inflationRate}
-            onChange={(_, newValue) => setInflationRate(newValue as number)}
-            min={0}
-            max={15}
-            step={0.1}
-            valueLabelDisplay="auto"
-            valueLabelFormat={(v) => `${v}%`}
-          />
-        </Box>
-      )}
+      <Box>
+        <CustomNumberField
+          fullWidth
+          label="Compounding Frequency (per year)"
+          value={compoundingFrequency}
+          onChange={(value) => setCompoundingFrequency(typeof value === 'number' ? value : 0)}
+          min={1}
+          max={365}
+          step={1}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <TrendingUpIcon sx={{ color: '#00bfc6', fontWeight: 400 }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <StyledSlider
+          value={compoundingFrequency}
+          onChange={(_, newValue) => setCompoundingFrequency(newValue as number)}
+          min={1}
+          max={365}
+          step={1}
+          valueLabelDisplay="auto"
+          valueLabelFormat={(v) => `${v}x`}
+        />
+      </Box>
     </StyledPaper>
   );
 
   const resultCards = [
-    {
-      label: 'Total Investment',
-      value: formatCurrency(principal),
-      icon: <AccountBalanceWalletIcon />,
-      variant: 'primary' as const
-    },
-    {
-      label: 'Total Interest',
-      value: formatCurrency(results.totalInterest),
-      icon: <TrendingUpIcon />,
-      variant: 'secondary' as const
-    },
-    {
-      label: 'Maturity Amount',
-      value: formatCurrency(results.maturityValue),
-      icon: <AccountBalanceWalletIcon />,
-      variant: 'purple' as const
-    }
+    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), bgcolor: '#eafafd' },
+    { label: 'Total Interest', value: formatCurrency(results.totalInterest), bgcolor: '#fbeeee' },
+    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), bgcolor: '#f3f1fa' },
   ];
-
-  const inflationCards = considerInflation
-    ? [
-        { label: 'Inflation Adjusted Value', value: formatCurrency(results.inflationAdjustedMaturity ?? 0), bgcolor: '#eafafd' },
-        { label: 'Inflation Adjusted Returns', value: formatCurrency(results.inflationAdjustedReturns ?? 0), bgcolor: '#fbeeee' },
-      ]
-    : [];
 
   const resultSection = (
     <Box>
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
         <ResultCard
-          title="Total Investment"
-          value={formatCurrency(principal)}
+          title="Maturity Value"
+          value={formatCurrency(results.maturityValue)}
           variant="primary"
         />
         <ResultCard
@@ -314,11 +364,12 @@ const FdCalculator: React.FC = () => {
           variant="secondary"
         />
         <ResultCard
-          title="Maturity Amount"
-          value={formatCurrency(results.maturityValue)}
+          title="Total Investment"
+          value={formatCurrency(results.totalInvestment)}
           variant="purple"
         />
       </Box>
+      
       <ChartContainer>
         <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
           Investment Growth
@@ -373,57 +424,34 @@ const FdCalculator: React.FC = () => {
               strokeWidth={2}
               dot={{ fill: colors.accent.purple, strokeWidth: 2 }}
             />
-            {considerInflation && (
-              <Line
-                type="monotone"
-                dataKey="inflationAdjusted"
-                name="Inflation Adjusted"
-                stroke={colors.accent.pink}
-                strokeWidth={2}
-                dot={{ fill: colors.accent.pink, strokeWidth: 2 }}
-              />
-            )}
           </LineChart>
         </ResponsiveContainer>
       </ChartContainer>
     </Box>
   );
 
+  const tableColumns = [
+    { label: 'Year', key: 'year' },
+    { label: 'Investment', key: 'investment' },
+    { label: 'Interest', key: 'interest' },
+    { label: 'Total Value', key: 'total' },
+  ];
+
+  const tableRows = results.chartData.map((row) => ({
+    year: row.year + 1,
+    investment: formatCurrency(row.investment),
+    interest: formatCurrency(row.interest),
+    total: formatCurrency(row.total),
+  }));
+
   const tableSection = (
-    <StyledTableContainer>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: typography.fontFamily, fontSize: '0.9rem', color: colors.secondary }}>
-        <thead>
-          <tr>
-            <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>Year</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Investment</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Interest</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Value</th>
-            {considerInflation && (
-              <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Inflation Adjusted</th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {results.chartData.filter(row => row.year > 0).map((row) => (
-            <tr key={row.year}>
-              <td style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>{row.year}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.investment)}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.interest)}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.total)}</td>
-              {considerInflation && (
-                <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.inflationAdjusted ?? 0)}</td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </StyledTableContainer>
+    <CalculatorTable columns={tableColumns} rows={tableRows} />
   );
 
   return (
     <CalculatorTemplate
-      title="FD Calculator"
-      description="Calculate returns on your Fixed Deposits and plan your investments with our comprehensive calculator."
+      title="Compound Interest Calculator"
+      description="Calculate compound interest and analyze investment growth over time."
       formSection={formSection}
       resultSection={resultSection}
       tableSection={tableSection}
@@ -431,4 +459,4 @@ const FdCalculator: React.FC = () => {
   );
 };
 
-export default FdCalculator; 
+export default CompoundCalculator; 

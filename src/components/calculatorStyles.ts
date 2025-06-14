@@ -1,5 +1,6 @@
 import { styled } from '@mui/material/styles';
 import { Box, Paper, TextField, Slider, Button, Typography } from '@mui/material';
+import { SxProps, Theme } from '@mui/material/styles';
 
 // Color palette matching Home page
 export const colors = {
@@ -226,149 +227,90 @@ export const GradientButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-// Result card
-export const ResultCard = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'bgcolor',
-})<{
-  bgcolor?: string;
-}>(({ theme, bgcolor }) => ({
-  background: bgcolor || '#fff',
-  borderRadius: '16px',
-  boxShadow: '0 2px 12px 0 rgba(30, 34, 90, 0.07)',
-  border: `1.2px solid ${colors.border}`,
-  padding: theme.spacing(2.5, 2),
-  textAlign: 'center',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  minHeight: '72px',
-  marginBottom: theme.spacing(1.5),
-  color: colors.primary,
-  gap: theme.spacing(0.5),
-  '& .label': {
-    fontWeight: 700, // Make result card titles bold
-  },
-}));
-
 // Chart container
 export const ChartContainer = styled(Box)(({ theme }) => ({
-  background: colors.cardBackground,
-  borderRadius: borderRadius.card,
-  boxShadow: shadows.card,
+  background: colors.background,
+  borderRadius: '24px',
+  boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
   border: `1.5px solid ${colors.border}`,
-  padding: theme.spacing(4),
-  marginTop: theme.spacing(4),
-  color: colors.primary,
-}));
-
-// Gradient text
-// GradientText removed; use CalculatorHeading or Typography instead
-
-// Stat label/value
-export const StatLabel = styled('span')(({ theme }) => ({
-  fontSize: typography.label.fontSize,
-  color: colors.secondary,
-  fontWeight: 400,
-  marginBottom: 4,
-  fontFamily: typography.fontFamily,
-}));
-
-export const StatValue = styled('span')(({ theme }) => ({
-  fontWeight: typography.value.fontWeight,
-  fontSize: typography.value.fontSize,
-  color: colors.primary,
-  fontFamily: typography.fontFamily,
-}));
-
-// Calculator heading style for pages
-export const CalculatorHeading = styled(Typography)(({ theme }) => ({
-  color: colors.primary,
-  fontWeight: 700,
-  fontFamily: typography.fontFamily,
-  fontSize: '2rem',
-  letterSpacing: typography.h1.letterSpacing,
-  marginBottom: theme.spacing(2.5),
-  textAlign: 'left',
-  marginTop: theme.spacing(1),
-  lineHeight: 1.1,
-  '& .accent': {
-    color: colors.accent.primary,
-    fontWeight: 700,
+  padding: theme.spacing(3),
+  marginBottom: theme.spacing(3),
+  transition: 'box-shadow 0.2s, transform 0.2s',
+  '&:hover': {
+    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.12)',
+    transform: 'translateY(-4px) scale(1.02)',
   },
 }));
 
-// Shared styled table container for amortization and results tables
+// Calculator heading
+export const CalculatorHeading = styled(Typography)(({ theme }) => ({
+  color: colors.primary,
+  fontWeight: 600,
+  fontSize: typography.h2.fontSize,
+  marginBottom: theme.spacing(2),
+}));
+
+// Table styles
+export const tableStyles = {
+  width: '100%',
+  borderCollapse: 'collapse' as const,
+};
+
+export const tableHeaderCell = {
+  padding: '12px',
+  textAlign: 'left' as const,
+  borderBottom: `1px solid ${colors.border}`,
+  color: colors.secondary,
+};
+
+export const tableCell = {
+  padding: '12px',
+  textAlign: 'right' as const,
+  borderBottom: `1px solid ${colors.border}`,
+  color: colors.primary,
+};
+
+// Chart styles
+export const chartAxisStyle = {
+  fill: colors.secondary,
+  fontSize: 12,
+  fontFamily: typography.fontFamily,
+};
+
+export const chartTooltipStyle = {
+  backgroundColor: '#fff',
+  border: '1px solid #E0E0E0',
+  borderRadius: '8px',
+  padding: '12px',
+  fontFamily: typography.fontFamily,
+};
+
+export const chartTooltipItemStyle = {
+  color: colors.secondary,
+  fontSize: '0.9rem',
+  fontFamily: typography.fontFamily,
+};
+
+export const chartTooltipLabelStyle = {
+  color: colors.primary,
+  fontSize: '0.9rem',
+  fontWeight: 600,
+  fontFamily: typography.fontFamily,
+  marginBottom: '4px',
+};
+
+export const chartLegendStyle = {
+  paddingTop: '20px',
+  fontFamily: typography.fontFamily,
+};
+
 export const StyledTableContainer = styled(Box)(({ theme }) => ({
   background: '#f8f9fc',
   borderRadius: '16px',
   boxShadow: '0 2px 12px 0 rgba(30,34,90,0.07)',
-  border: `1.2px solid ${colors.border}`,
+  border: `1.2px solid #e0e7ef`,
   padding: theme.spacing(2),
   overflowX: 'auto',
-  marginBottom: theme.spacing(2),
   width: '100%',
   maxWidth: '100%',
-}));
-
-export const tableStyles = {
-  width: '100%',
-  borderCollapse: 'collapse',
-  fontFamily: typography.fontFamily,
-  fontSize: '0.98rem',
-  color: colors.primary,
-};
-
-export const tableHeaderCell = {
-  padding: '8px',
-  fontWeight: 700,
-  borderBottom: `1.2px solid ${colors.border}`,
-  background: colors.buttonBackground,
-};
-
-export const tableCell = {
-  padding: '8px',
-  textAlign: 'center',
-  borderBottom: `1px solid ${colors.border}`,
-};
-
-// Shared chart style objects
-export const chartAxisStyle = {
-  fontFamily: typography.fontFamily,
-  fontWeight: 600,
-  fontSize: 13,
-  fill: colors.secondary,
-};
-
-export const chartTooltipStyle = {
-  background: '#f8f9fc',
-  border: `1.2px solid ${colors.border}`,
-  borderRadius: '16px',
-  boxShadow: '0 2px 12px 0 rgba(30,34,90,0.07)',
-  fontFamily: typography.fontFamily,
-  color: colors.primary,
-  fontWeight: 600,
-  fontSize: 14,
-  padding: 12,
-};
-
-export const chartTooltipItemStyle = {
-  color: colors.primary,
-  fontWeight: 700,
-  fontFamily: typography.fontFamily,
-  fontSize: 14,
-};
-
-export const chartTooltipLabelStyle = {
-  color: colors.secondary,
-  fontWeight: 600,
-  fontFamily: typography.fontFamily,
-  fontSize: 13,
-};
-
-export const chartLegendStyle = {
-  fontFamily: typography.fontFamily,
-  color: colors.secondary,
-  fontWeight: 600,
-  fontSize: 14,
-  paddingTop: 8,
-}; 
+})); 

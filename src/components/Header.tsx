@@ -25,7 +25,23 @@ const Logo = styled(Typography)(() => ({
   },
 }));
 
-const NavButton = styled(Button)(({ theme }) => ({
+const LogoLink = styled(RouterLink)({
+  textDecoration: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  outline: 'none',
+  boxShadow: 'none',
+  '&:focus': {
+    outline: 'none',
+    boxShadow: 'none',
+  },
+  '&:focus-visible': {
+    outline: 'none',
+    boxShadow: 'none',
+  },
+});
+
+const NavLink = styled(RouterLink)(({ theme }) => ({
   color: '#1A1F36',
   fontWeight: 600,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -35,10 +51,21 @@ const NavButton = styled(Button)(({ theme }) => ({
   padding: '8px 18px',
   background: 'transparent',
   boxShadow: 'none',
-  transition: 'all 0.2s',
+  outline: 'none',
+  transition: 'color 0.2s, transform 0.2s',
+  textDecoration: 'none',
   '&:hover': {
-    background: 'rgba(94,226,230,0.25)',
     color: '#009ca3',
+    background: 'transparent',
+    transform: 'translateY(-2px)',
+  },
+  '&:focus': {
+    outline: 'none',
+    boxShadow: 'none',
+  },
+  '&:focus-visible': {
+    outline: 'none',
+    boxShadow: 'none',
   },
 }));
 
@@ -79,9 +106,9 @@ const Header: React.FC = () => {
   return (
     <StyledAppBar position="sticky" elevation={0}>
       <Toolbar sx={{ justifyContent: 'space-between', minHeight: 80, px: { xs: 3, sm: 6 } }}>
-        <Box component={RouterLink} to="/" sx={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+        <LogoLink to="/" tabIndex={0}>
           <Logo>Money Maths</Logo>
-        </Box>
+        </LogoLink>
         {isMobile ? (
           <>
             <IconButton 
@@ -139,29 +166,14 @@ const Header: React.FC = () => {
                     </ListItem>
                   ))}
                 </List>
-                <CtaButton fullWidth sx={{ mt: 2 }}>Get Started</CtaButton>
               </Box>
             </Drawer>
           </>
         ) : (
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             {navLinks.map((item) => (
-              <Box key={item.label} component={RouterLink} to={item.path} sx={{ textDecoration: 'none' }}>
-                <NavButton
-                  sx={{
-                    color: location.pathname === item.path ? '#009ca3' : '#1A1F36',
-                    background: location.pathname === item.path ? 'rgba(94,226,230,0.15)' : 'transparent',
-                    '&:hover': {
-                      background: 'rgba(94,226,230,0.25)',
-                      color: '#009ca3',
-                    },
-                  }}
-                >
-                  {item.label}
-                </NavButton>
-              </Box>
+              <NavLink key={item.label} to={item.path} style={{ color: location.pathname === item.path ? '#009ca3' : '#1A1F36' }}>{item.label}</NavLink>
             ))}
-            <CtaButton>Get Started</CtaButton>
           </Box>
         )}
       </Toolbar>

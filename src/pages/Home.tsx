@@ -57,7 +57,7 @@ const HeroSection = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'flex-start',
   justifyContent: 'flex-start',
-  minHeight: '48vh',
+  minHeight: '85vh',
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -283,38 +283,65 @@ const Home: React.FC = () => {
   return (
     <GradientBackground>
       <HeroSection>
-        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, textAlign: 'left', px: { xs: 2, md: 6, lg: 10 } }}>
-          <Typography
-            variant="h1"
-            sx={{
-              fontWeight: 600,
-              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5.2rem', lg: '6rem' },
-              lineHeight: 1.08,
-              letterSpacing: '-0.03em',
-              mb: 2,
-              color: '#1A1F36',
-              textAlign: 'left',
-            }}
-          >
-            Experience <Box component="span" sx={{ display: 'block', color: '#00bfc6', fontWeight: 600, fontSize: { xs: '2.7rem', sm: '4rem', md: '6.2rem', lg: '7rem' } }}>Money Maths today.</Box>
-          </Typography>
-          <Typography
-            variant="h5"
-            sx={{
-              color: '#4E5D78',
-              fontWeight: 400,
-              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.7rem' },
-              maxWidth: 700,
-              mb: 4,
-              textAlign: 'left',
-            }}
-          >
-            Transform your financial planning with fast, accurate, and private calculators—free for everyone.
-          </Typography>
-          <Box component={RouterLink} to="/calculators" sx={{ display: 'inline-block', textDecoration: 'none', textAlign: 'left' }}>
+        <Container maxWidth="xl" sx={{ 
+          position: 'relative', 
+          zIndex: 1, 
+          textAlign: 'left', 
+          px: { xs: 2, md: 6, lg: 10 },
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          minHeight: '85vh',
+          width: '100%'
+        }}>
+          <Box sx={{ 
+            maxWidth: '1400px',
+            width: '100%',
+            mx: 'auto'
+          }}>
+            <Typography
+              variant="h1"
+              sx={{
+                fontWeight: 600,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5.2rem', lg: '6rem' },
+                lineHeight: 1.08,
+                letterSpacing: '-0.03em',
+                mb: 3,
+                color: '#1A1F36',
+                textAlign: 'left',
+                maxWidth: '1200px'
+              }}
+            >
+              Experience{' '}
+              <Box component="span" sx={{ 
+                display: 'block', 
+                color: '#00bfc6', 
+                fontWeight: 600, 
+                fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5.2rem', lg: '6rem' },
+                mt: 1
+              }}>
+                Money Maths today.
+              </Box>
+            </Typography>
+            <Typography
+              variant="h5"
+              sx={{
+                color: '#4E5D78',
+                fontWeight: 400,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.7rem' },
+                maxWidth: '900px',
+                mb: 6,
+                textAlign: 'left',
+                lineHeight: 1.4,
+              }}
+            >
+              Transform your financial planning with fast, accurate, and private calculators—free for everyone.
+            </Typography>
             <Button
+              component={RouterLink}
+              to="/calculators"
               variant="contained"
               size="large"
               endIcon={<ArrowForwardIcon sx={{ fontSize: 28 }} />}
@@ -328,7 +355,7 @@ const Home: React.FC = () => {
                 px: 5,
                 py: 2,
                 boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
-                border: 'none',
+                border: '2px solid #00bfc6',
                 textTransform: 'none',
                 transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
                 '&:hover': {
@@ -336,6 +363,7 @@ const Home: React.FC = () => {
                   color: '#fff',
                   boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
                   transform: 'translateY(-2px) scale(1.04)',
+                  border: '2px solid #00bfc6',
                 },
               }}
             >

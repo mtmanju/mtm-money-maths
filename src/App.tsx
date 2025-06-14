@@ -10,8 +10,22 @@ import EmiCalculator from './pages/EmiCalculator';
 import FdCalculator from './pages/FdCalculator';
 import RdCalculator from './pages/RdCalculator';
 import PpfCalculator from './pages/PpfCalculator';
+import NpsCalculator from './pages/NpsCalculator';
+import GratuityCalculator from './pages/GratuityCalculator';
+import HraCalculator from './pages/HraCalculator';
+import IncomeTaxCalculator from './pages/IncomeTaxCalculator';
+import GstCalculator from './pages/GstCalculator';
+import MutualFundCalculator from './pages/MutualFundCalculator';
+import InvestmentCalculator from './pages/InvestmentCalculator';
+import LoanComparisonCalculator from './pages/LoanComparisonCalculator';
+import RetirementCalculator from './pages/RetirementCalculator';
+import RoiCalculator from './pages/RoiCalculator';
+import CagrCalculator from './pages/CagrCalculator';
+import CompoundCalculator from './pages/CompoundCalculator';
 import NotFound from './pages/NotFound';
 import Calculators from './pages/Calculators';
+import ScrollToTop from './components/ScrollToTop';
+import About from './pages/About';
 import './styles/global.css';
 
 function App() {
@@ -55,6 +69,7 @@ function App() {
         },
       }} />
       <BrowserRouter>
+        <ScrollToTop />
         <div className="app-container">
           <Header />
           <main className="main-content">
@@ -66,18 +81,19 @@ function App() {
               <Route path="/fd" element={<FdCalculator />} />
               <Route path="/rd" element={<RdCalculator />} />
               <Route path="/ppf" element={<PpfCalculator />} />
-              <Route path="/nps" element={<NotFound />} />
-              <Route path="/gratuity" element={<NotFound />} />
-              <Route path="/hra" element={<NotFound />} />
-              <Route path="/income-tax" element={<NotFound />} />
-              <Route path="/gst" element={<NotFound />} />
-              <Route path="/mutual-fund" element={<NotFound />} />
-              <Route path="/investment" element={<NotFound />} />
-              <Route path="/loan-comparison" element={<NotFound />} />
-              <Route path="/retirement" element={<NotFound />} />
-              <Route path="/roi" element={<NotFound />} />
-              <Route path="/cagr" element={<NotFound />} />
-              <Route path="/compound" element={<NotFound />} />
+              <Route path="/nps" element={<NpsCalculator />} />
+              <Route path="/gratuity" element={<GratuityCalculator />} />
+              <Route path="/hra" element={<HraCalculator />} />
+              <Route path="/income-tax" element={<IncomeTaxCalculator />} />
+              <Route path="/gst" element={<GstCalculator />} />
+              <Route path="/mutual-fund" element={<MutualFundCalculator />} />
+              <Route path="/investment" element={<InvestmentCalculator />} />
+              <Route path="/loan-comparison" element={<LoanComparisonCalculator />} />
+              <Route path="/retirement" element={<RetirementCalculator />} />
+              <Route path="/roi" element={<RoiCalculator />} />
+              <Route path="/cagr" element={<CagrCalculator />} />
+              <Route path="/compound" element={<CompoundCalculator />} />
+              <Route path="/about" element={<About />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
