@@ -40,9 +40,27 @@ const GradientBackground = styled(Box)(({ theme }) => ({
     height: '100%',
     background: `
       radial-gradient(circle at 20% 20%, rgba(90, 107, 255, 0.05), transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(0, 245, 255, 0.05), transparent 50%)
+      radial-gradient(circle at 80% 80%, rgba(0, 245, 255, 0.05), transparent 50%),
+      linear-gradient(45deg, rgba(0, 191, 198, 0.02) 25%, transparent 25%, transparent 75%, rgba(90, 107, 255, 0.02) 75%, rgba(90, 107, 255, 0.02)),
+      linear-gradient(45deg, rgba(0, 191, 198, 0.02) 25%, transparent 25%, transparent 75%, rgba(90, 107, 255, 0.02) 75%, rgba(90, 107, 255, 0.02)),
+      repeating-linear-gradient(45deg, rgba(0, 191, 198, 0.01) 0px, rgba(0, 191, 198, 0.01) 1px, transparent 1px, transparent 10px),
+      repeating-linear-gradient(-45deg, rgba(90, 107, 255, 0.01) 0px, rgba(90, 107, 255, 0.01) 1px, transparent 1px, transparent 10px)
     `,
+    backgroundSize: '100% 100%, 100% 100%, 60px 60px, 60px 60px, 20px 20px, 20px 20px',
+    backgroundPosition: '0 0, 0 0, 0 0, 30px 30px, 0 0, 0 0',
     zIndex: 0,
+    animation: 'gradientMove 15s ease infinite',
+  },
+  '@keyframes gradientMove': {
+    '0%': {
+      backgroundPosition: '0% 0%, 0% 0%, 0% 0%, 30px 30px, 0% 0%, 0% 0%',
+    },
+    '50%': {
+      backgroundPosition: '100% 100%, 100% 100%, 30px 30px, 0% 0%, 10px 10px, 10px 10px',
+    },
+    '100%': {
+      backgroundPosition: '0% 0%, 0% 0%, 0% 0%, 30px 30px, 0% 0%, 0% 0%',
+    },
   },
 }));
 
@@ -55,6 +73,44 @@ const HeroSection = styled(Box)(({ theme }) => ({
   alignItems: 'flex-start',
   justifyContent: 'flex-start',
   minHeight: '85vh',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: '-50%',
+    right: '-20%',
+    width: '80%',
+    height: '200%',
+    background: `
+      radial-gradient(circle at center, rgba(0, 191, 198, 0.03) 0%, transparent 70%),
+      repeating-linear-gradient(45deg, rgba(0, 191, 198, 0.01) 0px, rgba(0, 191, 198, 0.01) 1px, transparent 1px, transparent 10px),
+      repeating-radial-gradient(circle at center, rgba(0, 191, 198, 0.01) 0px, rgba(0, 191, 198, 0.01) 1px, transparent 1px, transparent 10px)
+    `,
+    transform: 'rotate(-15deg)',
+    animation: 'rotateGradient 20s linear infinite',
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    bottom: '-50%',
+    left: '-20%',
+    width: '80%',
+    height: '200%',
+    background: `
+      radial-gradient(circle at center, rgba(90, 107, 255, 0.03) 0%, transparent 70%),
+      repeating-linear-gradient(-45deg, rgba(90, 107, 255, 0.01) 0px, rgba(90, 107, 255, 0.01) 1px, transparent 1px, transparent 10px),
+      repeating-radial-gradient(circle at center, rgba(90, 107, 255, 0.01) 0px, rgba(90, 107, 255, 0.01) 1px, transparent 1px, transparent 10px)
+    `,
+    transform: 'rotate(15deg)',
+    animation: 'rotateGradient 20s linear infinite reverse',
+  },
+  '@keyframes rotateGradient': {
+    '0%': {
+      transform: 'rotate(-15deg)',
+    },
+    '100%': {
+      transform: 'rotate(345deg)',
+    },
+  },
 }));
 
 const HeroAccent = styled('span')(() => ({
@@ -127,7 +183,7 @@ const CardDesc = styled(Typography)(() => ({
   margin: '1rem 0 1.5rem 0',
 }));
 
-const LearnMoreButton = styled(Button)(() => ({
+const LearnMoreButton = styled(Button)({
   border: '1.5px solid #1A1F36',
   color: '#1A1F36',
   borderRadius: '999px',
@@ -145,7 +201,7 @@ const LearnMoreButton = styled(Button)(() => ({
     borderColor: '#009ca3',
     color: '#009ca3',
   },
-}));
+});
 
 const FeatureCard = styled(Box)(({ theme }) => ({
   borderRadius: '24px',
@@ -181,6 +237,48 @@ const FeatureDesc = styled(Typography)(() => ({
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   fontSize: '1.05rem',
   lineHeight: 1.5,
+}));
+
+const AnimatedTitle = styled(Typography)(() => ({
+  animation: 'slideUp 0.8s ease-out',
+  '@keyframes slideUp': {
+    from: {
+      opacity: 0,
+      transform: 'translateY(30px)',
+    },
+    to: {
+      opacity: 1,
+      transform: 'translateY(0)',
+    },
+  },
+}));
+
+const AnimatedSubtitle = styled(Typography)(() => ({
+  animation: 'slideUp 0.8s ease-out 0.2s both',
+  '@keyframes slideUp': {
+    from: {
+      opacity: 0,
+      transform: 'translateY(30px)',
+    },
+    to: {
+      opacity: 1,
+      transform: 'translateY(0)',
+    },
+  },
+}));
+
+const AnimatedButton = styled(Button)(() => ({
+  animation: 'slideUp 0.8s ease-out 0.4s both',
+  '@keyframes slideUp': {
+    from: {
+      opacity: 0,
+      transform: 'translateY(30px)',
+    },
+    to: {
+      opacity: 1,
+      transform: 'translateY(0)',
+    },
+  },
 }));
 
 const Home: React.FC = () => {
@@ -274,7 +372,7 @@ const Home: React.FC = () => {
             width: '100%',
             mx: 'auto'
           }}>
-            <Typography
+            <AnimatedTitle
               variant="h1"
               sx={{
                 fontWeight: 600,
@@ -298,8 +396,8 @@ const Home: React.FC = () => {
               }}>
                 Money Maths
               </Box>
-            </Typography>
-            <Typography
+            </AnimatedTitle>
+            <AnimatedSubtitle
               variant="h5"
               sx={{
                 color: '#4E5D78',
@@ -313,36 +411,12 @@ const Home: React.FC = () => {
               }}
             >
               Transform your financial planning with fast, accurate, and private calculators free for everyone.
-            </Typography>
-            <Button
-              component={RouterLink}
-              to="/calculators"
-              variant="contained"
-              size="large"
-              endIcon={<ArrowForwardIcon sx={{ fontSize: 28 }} />}
-              sx={{
-                background: '#fff',
-                color: '#00bfc6',
-                borderRadius: '999px',
-                fontWeight: 600,
-                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: '1.35rem',
-                px: 5,
-                py: 2,
-                boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
-                border: '2px solid #00bfc6',
-                textTransform: 'none',
-                transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
-                '&:hover': {
-                  background: '#00bfc6',
-                  color: '#fff',
-                  boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
-                  transform: 'translateY(-2px) scale(1.04)',
-                },
-              }}
-            >
-              Get Started
-            </Button>
+            </AnimatedSubtitle>
+            <Box component={RouterLink} to="/calculators" sx={{ textDecoration: 'none', display: 'inline-block' }}>
+              <LearnMoreButton>
+                Get Started
+              </LearnMoreButton>
+            </Box>
           </Box>
         </Container>
       </HeroSection>
