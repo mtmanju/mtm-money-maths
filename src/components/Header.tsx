@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Box, IconButton, Drawer, List, ListItem, ListItemText, useTheme, useMediaQuery, Button } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import CalculateIcon from '@mui/icons-material/Calculate';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 
@@ -9,6 +10,70 @@ const StyledAppBar = styled(AppBar)(() => ({
   borderBottom: '1.5px solid #eafafd',
   boxShadow: '0 1px 2px rgba(30, 34, 90, 0.04)',
   zIndex: 1200,
+  borderRadius: 0,
+  '& .MuiToolbar-root': {
+    borderRadius: 0,
+  },
+}));
+
+const LogoContainer = styled(Box)(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.75rem',
+  borderRadius: 0,
+}));
+
+const LogoIcon = styled(CalculateIcon)(() => ({
+  color: '#00bfc6',
+  fontSize: '2.2rem',
+  transition: 'all 0.3s ease',
+}));
+
+const LogoText = styled(Box)(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.25rem',
+  position: 'relative',
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    bottom: '-4px',
+    left: 0,
+    width: '100%',
+    height: '2px',
+    background: 'linear-gradient(90deg, #1A1F36 50%, #00bfc6 50%)',
+    transform: 'scaleX(0)',
+    transformOrigin: 'right',
+    transition: 'transform 0.3s ease',
+  },
+  '&:hover::after': {
+    transform: 'scaleX(1)',
+    transformOrigin: 'left',
+  },
+}));
+
+const MoneyText = styled(Typography)(() => ({
+  color: '#1A1F36',
+  fontWeight: 800,
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '2rem',
+  letterSpacing: '-0.02em',
+  background: 'linear-gradient(180deg, #1A1F36 0%, #2A2F46 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  transition: 'all 0.3s ease',
+}));
+
+const MathsText = styled(Typography)(() => ({
+  color: '#00bfc6',
+  fontWeight: 800,
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '2rem',
+  letterSpacing: '-0.02em',
+  background: 'linear-gradient(180deg, #00bfc6 0%, #00a8af 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  transition: 'all 0.3s ease',
 }));
 
 const Logo = styled(Typography)(() => ({
@@ -19,9 +84,14 @@ const Logo = styled(Typography)(() => ({
   letterSpacing: '-0.02em',
   textDecoration: 'none',
   transition: 'all 0.3s ease',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
   '&:hover': {
-    color: '#009ca3',
     transform: 'translateY(-2px)',
+    '& .logo-icon': {
+      transform: 'rotate(-10deg)',
+    },
   },
 }));
 
@@ -69,6 +139,26 @@ const NavLink = styled(RouterLink)(({ theme }) => ({
   },
 }));
 
+const CalculatorsButton = styled(RouterLink)(() => ({
+  background: '#1A1F36',
+  color: '#fff',
+  fontWeight: 600,
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '1rem',
+  borderRadius: '999px',
+  padding: '10px 24px',
+  textTransform: 'none',
+  textDecoration: 'none',
+  transition: 'all 0.2s',
+  boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
+  '&:hover': {
+    background: '#009ca3',
+    color: '#fff',
+    transform: 'translateY(-2px)',
+    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
+  },
+}));
+
 const CtaButton = styled(Button)(() => ({
   border: '1.5px solid #1A1F36',
   color: '#1A1F36',
@@ -90,8 +180,8 @@ const CtaButton = styled(Button)(() => ({
 }));
 
 const navLinks = [
-  { label: 'Calculators', path: '/calculators' },
   { label: 'About', path: '/about' },
+  { label: 'FAQ', path: '/faq' },
   { label: 'Contact', path: '/contact' },
 ];
 
@@ -107,7 +197,13 @@ const Header: React.FC = () => {
     <StyledAppBar position="sticky" elevation={0}>
       <Toolbar sx={{ justifyContent: 'space-between', minHeight: 80, px: { xs: 3, sm: 6 } }}>
         <LogoLink to="/" tabIndex={0}>
-          <Logo>Money Maths</Logo>
+          <LogoContainer>
+            <LogoIcon className="logo-icon" />
+            <LogoText>
+              <MoneyText>Money</MoneyText>
+              <MathsText>Maths</MathsText>
+            </LogoText>
+          </LogoContainer>
         </LogoLink>
         {isMobile ? (
           <>
@@ -165,6 +261,29 @@ const Header: React.FC = () => {
                       />
                     </ListItem>
                   ))}
+                  <ListItem 
+                    button 
+                    component={RouterLink} 
+                    to="/calculators" 
+                    onClick={handleDrawerToggle}
+                    sx={{
+                      borderRadius: 18,
+                      mb: 1,
+                      transition: 'all 0.2s',
+                      background: '#1A1F36',
+                      '&:hover': {
+                        background: '#009ca3',
+                      },
+                    }}
+                  >
+                    <ListItemText 
+                      primary="Calculators" 
+                      primaryTypographyProps={{
+                        fontWeight: 600,
+                        color: '#fff',
+                      }}
+                    />
+                  </ListItem>
                 </List>
               </Box>
             </Drawer>
@@ -174,6 +293,9 @@ const Header: React.FC = () => {
             {navLinks.map((item) => (
               <NavLink key={item.label} to={item.path} style={{ color: location.pathname === item.path ? '#009ca3' : '#1A1F36' }}>{item.label}</NavLink>
             ))}
+            <CalculatorsButton to="/calculators" style={{ color: '#fff' }}>
+              Calculators
+            </CalculatorsButton>
           </Box>
         )}
       </Toolbar>

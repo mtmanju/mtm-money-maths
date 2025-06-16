@@ -26,6 +26,7 @@ import NotFound from './pages/NotFound';
 import Calculators from './pages/Calculators';
 import ScrollToTop from './components/ScrollToTop';
 import About from './pages/About';
+import FAQ from './pages/FAQ';
 import './styles/global.css';
 
 function App() {
@@ -94,6 +95,7 @@ function App() {
               <Route path="/cagr" element={<CagrCalculator />} />
               <Route path="/compound" element={<CompoundCalculator />} />
               <Route path="/about" element={<About />} />
+              <Route path="/faq" element={<FAQ />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

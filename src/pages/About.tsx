@@ -55,7 +55,7 @@ const About: React.FC = () => {
             textAlign: 'left',
           }}
         >
-          About <HeroAccent>Money Maths Today</HeroAccent>
+          About <HeroAccent>Money Maths</HeroAccent>
         </Typography>
         <Typography
           sx={{

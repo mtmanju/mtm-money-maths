@@ -141,21 +141,12 @@ const LegalDivider = styled('div')(() => ({
   margin: '2.5rem 0 1.5rem 0',
 }));
 
-const calculatorLinks1 = [
+const footerLinks = [
   { title: 'Home', path: '/' },
-  { title: 'EMI Calculator', path: '/emi' },
-  { title: 'SIP Calculator', path: '/sip' },
-  { title: 'FD Calculator', path: '/fd' },
-  { title: 'RD Calculator', path: '/rd' },
-  { title: 'PPF Calculator', path: '/ppf' },
-];
-const calculatorLinks2 = [
-  { title: 'NPS Calculator', path: '/nps' },
-  { title: 'Gratuity Calculator', path: '/gratuity' },
-  { title: 'HRA Calculator', path: '/hra' },
-  { title: 'Income Tax Calculator', path: '/income-tax' },
-  { title: 'GST Calculator', path: '/gst' },
+  { title: 'Calculators', path: '/calculators' },
   { title: 'About', path: '/about' },
+  { title: 'FAQ', path: '/faq' },
+  { title: 'Contact', path: '/contact' },
 ];
 
 const Footer = () => {
@@ -194,7 +185,7 @@ const Footer = () => {
           {/* Links & Social */}
           <Grid item xs={12} md={3}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0, mb: { xs: 4, md: 0 } }}>
-              {calculatorLinks1.map(link => (
+              {footerLinks.map(link => (
                 <FooterLink key={link.title} to={link.path} tabIndex={0}>
                   {link.title}
                 </FooterLink>
@@ -202,15 +193,6 @@ const Footer = () => {
             </Box>
           </Grid>
           <Grid item xs={12} md={2}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0, mb: { xs: 4, md: 0 } }}>
-              {calculatorLinks2.map(link => (
-                <FooterLink key={link.title} to={link.path} tabIndex={0}>
-                  {link.title}
-                </FooterLink>
-              ))}
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={1}>
             <Box sx={{ 
               display: 'flex', 
               flexDirection: 'column',
