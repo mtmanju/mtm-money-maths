@@ -345,9 +345,9 @@ const CompoundCalculator: React.FC = () => {
   );
 
   const resultCards = [
-    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), bgcolor: '#eafafd' },
     { label: 'Total Interest', value: formatCurrency(results.totalInterest), bgcolor: '#fbeeee' },
     { label: 'Total Investment', value: formatCurrency(results.totalInvestment), bgcolor: '#f3f1fa' },
+    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), bgcolor: '#eafafd' },
   ];
 
   const resultSection = (

@@ -220,8 +220,8 @@ const RoiCalculator: React.FC = () => {
   );
 
   const resultCards = [
-    { label: 'ROI', value: formatPercentage(results.roi), bgcolor: '#eafafd' },
     { label: 'Absolute Returns', value: formatCurrency(results.absoluteReturns), bgcolor: '#fbeeee' },
+    { label: 'ROI', value: formatPercentage(results.roi), bgcolor: '#eafafd' },
     { label: 'Total Value', value: formatCurrency(results.totalValue), bgcolor: '#f3f1fa' },
   ];
 

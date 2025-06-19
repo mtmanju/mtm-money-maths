@@ -302,16 +302,16 @@ const FdCalculator: React.FC = () => {
 
   const resultCards = [
     {
-      label: 'Total Investment',
-      value: formatCurrency(principal),
-      icon: <AccountBalanceWalletIcon />,
-      variant: 'primary' as const
-    },
-    {
       label: 'Total Interest',
       value: formatCurrency(results.totalInterest),
       icon: <TrendingUpIcon />,
       variant: 'secondary' as const
+    },
+    {
+      label: 'Total Investment',
+      value: formatCurrency(principal),
+      icon: <AccountBalanceWalletIcon />,
+      variant: 'primary' as const
     },
     {
       label: 'Maturity Amount',
@@ -332,14 +332,14 @@ const FdCalculator: React.FC = () => {
     <Box>
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
         <ResultCard
-          title="Total Investment"
-          value={formatCurrency(principal)}
-          variant="primary"
-        />
-        <ResultCard
           title="Total Interest"
           value={formatCurrency(results.totalInterest)}
           variant="secondary"
+        />
+        <ResultCard
+          title="Total Investment"
+          value={formatCurrency(principal)}
+          variant="primary"
         />
         <ResultCard
           title="Maturity Amount"

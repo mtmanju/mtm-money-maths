@@ -59,6 +59,7 @@ export function CustomNumberField({
   const [showArrows, setShowArrows] = React.useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
 
   // Update input value when external value changes
   useEffect(() => {
@@ -72,6 +73,12 @@ export function CustomNumberField({
       // Fix floating point precision and round to 2 decimal places
       const newValue = Math.round((currentValue + step) * 100) / 100;
       onChange(newValue);
+      // Ensure input maintains focus after increment
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 0);
     }
   };
   
@@ -81,11 +88,18 @@ export function CustomNumberField({
       // Fix floating point precision and round to 2 decimal places
       const newValue = Math.round((currentValue - step) * 100) / 100;
       onChange(newValue);
+      // Ensure input maintains focus after decrement
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 0);
     }
   };
 
   const handleFocus = () => {
     setIsEditing(true);
+    setIsFocused(true);
     setShowArrows(true);
     // Set the formatted value for editing to maintain commas
     const formattedValue = value === '' ? '' : formatNumberWithCommas(String(value));
@@ -94,6 +108,7 @@ export function CustomNumberField({
 
   const handleBlur = () => {
     setIsEditing(false);
+    setIsFocused(false);
     setShowArrows(false);
     
     // Clean the input value by removing commas
@@ -159,7 +174,11 @@ export function CustomNumberField({
     <Box
       sx={{ position: 'relative', width: fullWidth ? '100%' : undefined }}
       onMouseEnter={() => setShowArrows(true)}
-      onMouseLeave={() => setShowArrows(false)}
+      onMouseLeave={() => {
+        if (!isFocused) {
+          setShowArrows(false);
+        }
+      }}
     >
       <StyledTextField
         {...props}
@@ -193,6 +212,12 @@ export function CustomNumberField({
                 transition: 'opacity 0.2s',
                 zIndex: 2,
               }}
+              onMouseEnter={() => setShowArrows(true)}
+              onMouseLeave={() => {
+                if (!isFocused) {
+                  setShowArrows(false);
+                }
+              }}
             >
               <IconButton 
                 size="small" 
@@ -201,8 +226,22 @@ export function CustomNumberField({
                   e.stopPropagation();
                   handleIncrement();
                 }} 
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
                 tabIndex={-1} 
-                sx={{ p: 0.5, height: 20, width: 28 }}
+                sx={{ 
+                  p: 0.5, 
+                  height: 20, 
+                  width: 28,
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 191, 198, 0.1)',
+                  },
+                  '&:active': {
+                    backgroundColor: 'rgba(0, 191, 198, 0.2)',
+                  }
+                }}
               >
                 <ArrowDropUpIcon sx={{ fontSize: 20 }} />
               </IconButton>
@@ -213,8 +252,22 @@ export function CustomNumberField({
                   e.stopPropagation();
                   handleDecrement();
                 }} 
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
                 tabIndex={-1} 
-                sx={{ p: 0.5, height: 20, width: 28 }}
+                sx={{ 
+                  p: 0.5, 
+                  height: 20, 
+                  width: 28,
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 191, 198, 0.1)',
+                  },
+                  '&:active': {
+                    backgroundColor: 'rgba(0, 191, 198, 0.2)',
+                  }
+                }}
               >
                 <ArrowDropDownIcon sx={{ fontSize: 20 }} />
               </IconButton>

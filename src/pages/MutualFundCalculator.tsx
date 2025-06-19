@@ -196,9 +196,9 @@ const MutualFundCalculator: React.FC = () => {
   );
 
   const resultCards = [
-    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), variant: 'primary' as const },
-    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), variant: 'secondary' as const },
     { label: 'Total Returns', value: formatCurrency(results.totalReturns), variant: 'purple' as const },
+    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), variant: 'secondary' as const },
+    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), variant: 'primary' as const },
   ];
 
   const statsCards = [

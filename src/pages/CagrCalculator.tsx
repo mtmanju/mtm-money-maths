@@ -206,8 +206,8 @@ const CagrCalculator: React.FC = () => {
   );
 
   const resultCards = [
-    { label: 'CAGR', value: formatPercentage(results.cagr), bgcolor: '#eafafd' },
     { label: 'Absolute Returns', value: formatCurrency(results.absoluteReturns), bgcolor: '#fbeeee' },
+    { label: 'CAGR', value: formatPercentage(results.cagr), bgcolor: '#eafafd' },
     { label: 'Total Value', value: formatCurrency(results.totalValue), bgcolor: '#f3f1fa' },
   ];
 

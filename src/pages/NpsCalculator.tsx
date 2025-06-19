@@ -234,8 +234,8 @@ const NpsCalculator: React.FC = () => {
   ];
 
   const statsCards = [
-    { label: 'Total Investment', value: formatCurrency(results.totalContribution), variant: 'primary' as const },
     { label: 'Total Returns', value: formatCurrency(results.totalInterest), variant: 'secondary' as const },
+    { label: 'Total Investment', value: formatCurrency(results.totalContribution), variant: 'primary' as const },
     { label: 'Maturity Value', value: formatCurrency(results.corpusAtRetirement), variant: 'purple' as const },
   ];
 

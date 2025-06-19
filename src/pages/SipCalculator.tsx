@@ -363,9 +363,9 @@ const SipCalculator: React.FC = () => {
   const resultSection = (
     <Box>
       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-        <ResultCard title="Maturity Value" value={formatCurrency(results.maturityValue)} variant="primary" />
-        <ResultCard title="Total Investment" value={formatCurrency(results.totalInvestment)} variant="secondary" />
         <ResultCard title="Total Returns" value={formatCurrency(results.totalReturns)} variant="purple" />
+        <ResultCard title="Total Investment" value={formatCurrency(results.totalInvestment)} variant="secondary" />
+        <ResultCard title="Maturity Value" value={formatCurrency(results.maturityValue)} variant="primary" />
       </Box>
       {considerInflation && (
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>

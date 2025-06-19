@@ -311,10 +311,10 @@ const RetirementCalculator: React.FC = () => {
   );
 
   const resultCards = [
-    { label: 'Corpus Needed', value: formatCurrency(results.corpusNeeded), bgcolor: '#eafafd' },
-    { label: 'Monthly Investment', value: formatCurrency(results.monthlyInvestment), bgcolor: '#fbeeee' },
-    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), bgcolor: '#f3f1fa' },
     { label: 'Total Returns', value: formatCurrency(results.totalReturns), bgcolor: '#eafafd' },
+    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), bgcolor: '#f3f1fa' },
+    { label: 'Monthly Investment', value: formatCurrency(results.monthlyInvestment), bgcolor: '#fbeeee' },
+    { label: 'Corpus Needed', value: formatCurrency(results.corpusNeeded), bgcolor: '#eafafd' },
   ];
 
   const resultSection = (

@@ -242,9 +242,9 @@ const PpfCalculator: React.FC = () => {
   );
 
   const resultCards = [
-    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), variant: 'primary' as const },
-    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), variant: 'secondary' as const },
     { label: 'Total Interest', value: formatCurrency(results.totalInterest), variant: 'purple' as const },
+    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), variant: 'secondary' as const },
+    { label: 'Maturity Value', value: formatCurrency(results.maturityValue), variant: 'primary' as const },
   ];
 
   const inflationCards = considerInflation
