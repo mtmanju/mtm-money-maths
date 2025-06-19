@@ -152,7 +152,7 @@ const NpsCalculator: React.FC = () => {
           onChange={(value) => setExpectedReturn(typeof value === 'number' ? value : 0)}
           min={1}
           max={30}
-          step={0.1}
+          step={0.05}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -166,7 +166,7 @@ const NpsCalculator: React.FC = () => {
           onChange={(_, newValue) => setExpectedReturn(newValue as number)}
           min={1}
           max={30}
-          step={0.1}
+          step={0.05}
           valueLabelDisplay="auto"
         />
       </Box>
@@ -206,7 +206,7 @@ const NpsCalculator: React.FC = () => {
           onChange={(value) => setAnnuityReturn(typeof value === 'number' ? value : 0)}
           min={1}
           max={30}
-          step={0.1}
+          step={0.05}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -220,7 +220,7 @@ const NpsCalculator: React.FC = () => {
           onChange={(_, newValue) => setAnnuityReturn(newValue as number)}
           min={1}
           max={30}
-          step={0.1}
+          step={0.05}
           valueLabelDisplay="auto"
         />
       </Box>

@@ -239,18 +239,16 @@ const EmiCalculator: React.FC = () => {
       <Box>
         <CustomNumberField
           fullWidth
-          label="Interest Rate (%)"
+          label="Interest Rate (p.a.)"
           value={interestRate}
-          onChange={handleInterestRateChange}
+          onChange={(value) => setInterestRate(typeof value === 'number' ? value : 0)}
           min={1}
           max={30}
-          step={0.1}
+          step={0.05}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Typography sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }}>
-                  %
-                </Typography>
+                <PercentIcon sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }} />
               </InputAdornment>
             ),
           }}
@@ -260,7 +258,7 @@ const EmiCalculator: React.FC = () => {
           onChange={(_, newValue) => setInterestRate(newValue as number)}
           min={1}
           max={30}
-          step={0.1}
+          step={0.05}
           valueLabelDisplay="auto"
           valueLabelFormat={(v) => `${v}%`}
         />

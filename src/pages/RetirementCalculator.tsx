@@ -232,7 +232,7 @@ const RetirementCalculator: React.FC = () => {
           onChange={(value) => setInflationRate(typeof value === 'number' ? value : 0)}
           min={1}
           max={12}
-          step={0.1}
+          step={0.05}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -246,7 +246,7 @@ const RetirementCalculator: React.FC = () => {
           onChange={(_, newValue) => setInflationRate(newValue as number)}
           min={1}
           max={12}
-          step={0.1}
+          step={0.05}
           valueLabelDisplay="auto"
           valueLabelFormat={(v) => `${v}%`}
         />
@@ -260,7 +260,7 @@ const RetirementCalculator: React.FC = () => {
           onChange={(value) => setExpectedReturn(typeof value === 'number' ? value : 0)}
           min={1}
           max={20}
-          step={0.1}
+          step={0.05}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -274,7 +274,7 @@ const RetirementCalculator: React.FC = () => {
           onChange={(_, newValue) => setExpectedReturn(newValue as number)}
           min={1}
           max={20}
-          step={0.1}
+          step={0.05}
           valueLabelDisplay="auto"
           valueLabelFormat={(v) => `${v}%`}
         />

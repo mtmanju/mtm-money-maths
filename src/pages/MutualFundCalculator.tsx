@@ -68,14 +68,16 @@ const MutualFundCalculator: React.FC = () => {
     const chartData: ChartDataPoint[] = [];
     
     for (let year = 1; year <= timePeriod; year++) {
-      const yearInvestment = monthlyInvestment * 12;
-      const yearReturns = maturityValue * (expectedReturn / 100);
-      maturityValue = (maturityValue + yearInvestment) * (1 + expectedReturn / 100);
+      let yearInvestment = 0;
+      for (let m = 1; m <= 12; m++) {
+        maturityValue = (maturityValue + monthlyInvestment) * (1 + monthlyRate);
+        yearInvestment += monthlyInvestment;
+      }
       
       chartData.push({
         year,
         investment: yearInvestment,
-        returns: yearReturns,
+        returns: maturityValue - (yearInvestment + (year - 1) * monthlyInvestment * 12),
         total: maturityValue
       });
     }
@@ -143,7 +145,7 @@ const MutualFundCalculator: React.FC = () => {
           onChange={(value) => setExpectedReturn(typeof value === 'number' ? value : 0)}
           min={1}
           max={30}
-          step={0.1}
+          step={0.05}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -157,7 +159,7 @@ const MutualFundCalculator: React.FC = () => {
           onChange={(_, newValue) => setExpectedReturn(newValue as number)}
           min={1}
           max={30}
-          step={0.1}
+          step={0.05}
           valueLabelDisplay="auto"
           valueLabelFormat={(v) => `${v}%`}
         />

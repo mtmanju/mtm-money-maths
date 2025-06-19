@@ -218,7 +218,7 @@ const LoanComparisonCalculator: React.FC = () => {
           onChange={(value) => setLoan1Rate(typeof value === 'number' ? value : 0)}
           min={1}
           max={20}
-          step={0.1}
+          step={0.05}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -232,7 +232,7 @@ const LoanComparisonCalculator: React.FC = () => {
           onChange={(_, newValue) => setLoan1Rate(newValue as number)}
           min={1}
           max={20}
-          step={0.1}
+          step={0.05}
           valueLabelDisplay="auto"
           valueLabelFormat={(v) => `${v}%`}
         />
@@ -307,7 +307,7 @@ const LoanComparisonCalculator: React.FC = () => {
           onChange={(value) => setLoan2Rate(typeof value === 'number' ? value : 0)}
           min={1}
           max={20}
-          step={0.1}
+          step={0.05}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -321,7 +321,7 @@ const LoanComparisonCalculator: React.FC = () => {
           onChange={(_, newValue) => setLoan2Rate(newValue as number)}
           min={1}
           max={20}
-          step={0.1}
+          step={0.05}
           valueLabelDisplay="auto"
           valueLabelFormat={(v) => `${v}%`}
         />
