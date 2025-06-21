@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, GlobalStyles } from '@mui/material';
 import theme from './theme';
 import Header from './components/Header';
+import MobileHeader from './components/MobileHeader';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import SipCalculator from './pages/SipCalculator';
@@ -28,6 +29,7 @@ import ScrollToTop from './components/ScrollToTop';
 import About from './pages/About';
 import FAQ from './pages/FAQ';
 import './styles/global.css';
+import './styles/mobile.css';
 
 function App() {
   return (
@@ -73,6 +75,7 @@ function App() {
         <ScrollToTop />
         <div className="app-container">
           <Header />
+          <MobileHeader />
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
