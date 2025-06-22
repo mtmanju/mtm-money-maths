@@ -431,53 +431,53 @@ const Calculators: React.FC = () => {
             
             return (
               <Grid item xs={6} sm={6} md={4} lg={2} key={calc.title}>
-              <StyledCard
-                  cardColor={cardColor}
-                sx={{
-                    animation: `fadeInUp 0.4s ease-out`,
-                    '@keyframes fadeInUp': {
-                      '0%': {
-                        opacity: 0,
-                        transform: 'translateY(10px)',
+                <Box component={RouterLink} to={calc.path} sx={{ textDecoration: 'none' }}>
+                  <StyledCard
+                    cardColor={cardColor}
+                    sx={{
+                      animation: `fadeInUp 0.4s ease-out`,
+                      '@keyframes fadeInUp': {
+                        '0%': {
+                          opacity: 0,
+                          transform: 'translateY(10px)',
+                        },
+                        '100%': {
+                          opacity: 1,
+                          transform: 'translateY(0)',
+                        },
                       },
-                      '100%': {
-                        opacity: 1,
-                        transform: 'translateY(0)',
-                      },
-                    },
-                    height: { xs: '220px', sm: '240px', md: '280px' },
-                    maxWidth: { xs: 'none', md: '200px' },
-                    margin: 0,
-                }}
-              >
-                <CardContentWrapper>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '8px' }}>
-                      <Box sx={{ 
-                        fontSize: { xs: '20px', sm: '22px', md: '24px' },
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        {calc.icon}
+                      height: { xs: '220px', sm: '240px', md: '280px' },
+                      maxWidth: { xs: 'none', md: '200px' },
+                      margin: 0,
+                    }}
+                  >
+                    <CardContentWrapper>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '8px' }}>
+                        <Box sx={{ 
+                          fontSize: { xs: '20px', sm: '22px', md: '24px' },
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          {calc.icon}
+                        </Box>
+                        <CardTitle sx={{ marginLeft: '8px', marginBottom: 0, display: 'flex', alignItems: 'center' }}>{calc.title}</CardTitle>
                       </Box>
-                      <CardTitle sx={{ marginLeft: '8px', marginBottom: 0, display: 'flex', alignItems: 'center' }}>{calc.title}</CardTitle>
-                    </Box>
-                    <CardDesc>{calc.description}</CardDesc>
-                    
-                    <Box sx={{ 
-                      display: 'flex', 
-                      justifyContent: 'flex-end',
-                      marginTop: 'auto'
-                    }}>
-                      <Box component={RouterLink} to={calc.path} sx={{ textDecoration: 'none' }}>
+                      <CardDesc>{calc.description}</CardDesc>
+                      
+                      <Box sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'flex-end',
+                        marginTop: 'auto'
+                      }}>
                         <ActionButton>
                           Calculate <ArrowForwardIcon sx={{ fontSize: '0.8rem' }} />
                         </ActionButton>
                       </Box>
-                    </Box>
-                </CardContentWrapper>
-              </StyledCard>
-            </Grid>
+                    </CardContentWrapper>
+                  </StyledCard>
+                </Box>
+              </Grid>
             );
           })}
         </Grid>

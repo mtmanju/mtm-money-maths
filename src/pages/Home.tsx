@@ -407,43 +407,43 @@ const Home: React.FC = () => {
               
               return (
                 <Grid item xs={6} sm={6} md={4} lg={2} key={calc.title}>
-                  <StyledCard
-                    cardColor={cardColor}
-                    sx={{
-                      height: { xs: 'auto', sm: '240px', md: '280px' },
-                      minHeight: { xs: '200px', sm: '220px' },
-                      maxWidth: { xs: '100%', md: 'none' },
-                      width: '100%',
-                      margin: 0,
-                    }}
-                  >
-                    <CardContentWrapper>
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '12px' }}>
-                        <Box sx={{ 
-                          fontSize: { xs: '22px', sm: '24px' },
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>
-                          {calc.icon}
+                  <Box component={RouterLink} to={calc.path} sx={{ textDecoration: 'none' }}>
+                    <StyledCard
+                      cardColor={cardColor}
+                      sx={{
+                        height: { xs: 'auto', sm: '240px', md: '280px' },
+                        minHeight: { xs: '200px', sm: '220px' },
+                        maxWidth: { xs: '100%', md: 'none' },
+                        width: '100%',
+                        margin: 0,
+                      }}
+                    >
+                      <CardContentWrapper>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '12px' }}>
+                          <Box sx={{ 
+                            fontSize: { xs: '22px', sm: '24px' },
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            {calc.icon}
+                          </Box>
+                          <CardTitle sx={{ marginLeft: '8px', marginBottom: 0, display: 'flex', alignItems: 'center' }}>{calc.title}</CardTitle>
                         </Box>
-                        <CardTitle sx={{ marginLeft: '8px', marginBottom: 0, display: 'flex', alignItems: 'center' }}>{calc.title}</CardTitle>
-                      </Box>
-                      <CardDesc>{calc.description}</CardDesc>
-                      
-                      <Box sx={{ 
-                        display: 'flex', 
-                        justifyContent: 'flex-end',
-                        marginTop: 'auto'
-                      }}>
-                        <Box component={RouterLink} to={calc.path} sx={{ textDecoration: 'none', width: '100%' }}>
+                        <CardDesc>{calc.description}</CardDesc>
+                        
+                        <Box sx={{ 
+                          display: 'flex', 
+                          justifyContent: 'flex-end',
+                          marginTop: 'auto'
+                        }}>
                           <ActionButton sx={{ width: '100%', justifyContent: 'center' }}>
                             Calculate <ArrowForwardIcon sx={{ fontSize: '0.9rem' }} />
                           </ActionButton>
                         </Box>
-                      </Box>
-                    </CardContentWrapper>
-                  </StyledCard>
+                      </CardContentWrapper>
+                    </StyledCard>
+                  </Box>
                 </Grid>
               );
             })}
