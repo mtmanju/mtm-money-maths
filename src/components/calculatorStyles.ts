@@ -68,9 +68,9 @@ export const shadows = {
 
 // Border radius
 export const borderRadius = {
-  card: '24px',
+  card: '10px',
   button: '999px',
-  input: '16px',
+  input: '10px',
 };
 
 // Background
@@ -96,6 +96,11 @@ export const StyledPaper = styled(Paper)(({ theme }) => ({
   flexDirection: 'column',
   gap: theme.spacing(4),
   color: colors.primary,
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(2),
+    gap: theme.spacing(2),
+    boxShadow: 'none',
+  },
 }));
 
 // Modern input
@@ -109,6 +114,9 @@ export const StyledTextField = styled(TextField)(({ theme }) => ({
     padding: '0 4px',
     zIndex: 1,
     left: '8px',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '0.9rem',
+    },
   },
   '& .MuiOutlinedInput-root': {
     borderRadius: borderRadius.input,
@@ -128,12 +136,20 @@ export const StyledTextField = styled(TextField)(({ theme }) => ({
     },
     minHeight: 50,
     maxHeight: 56,
+    [theme.breakpoints.down('sm')]: {
+      minHeight: 48,
+      maxHeight: 52,
+    },
   },
   '& .MuiInputBase-input': {
     fontWeight: 500,
     color: colors.primary,
     fontSize: '1.08rem',
     padding: '16px 14px',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '0.9rem',
+      padding: '12px 14px',
+    },
   },
   // Remove all browser and custom number input arrows
   '& input[type=number]::-webkit-inner-spin-button, & input[type=number]::-webkit-outer-spin-button': {

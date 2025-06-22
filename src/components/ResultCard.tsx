@@ -51,7 +51,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({
       sx={{
         p: 3,
         flex: 1,
-        borderRadius: borderRadius.card,
+        borderRadius: '10px',
         border: `1.5px solid ${variantStyle.borderColor}`,
         background: variantStyle.background,
         boxShadow: shadows.card,
@@ -64,11 +64,11 @@ export const ResultCard: React.FC<ResultCardProps> = ({
     >
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
         {icon && <Box sx={{ mr: 1, color: variantStyle.iconColor }}>{icon}</Box>}
-        <Typography variant="body1" sx={{ color: colors.secondary, fontWeight: 500, fontFamily: typography.fontFamily }}>
+        <Typography variant="body1" sx={{ color: colors.secondary, fontWeight: 500, fontFamily: typography.fontFamily, fontSize: '0.95rem' }}>
           {title}
         </Typography>
       </Box>
-      <Typography variant="subtitle1" sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily }}>
+      <Typography variant="subtitle1" sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, fontSize: '1.08rem' }}>
         {value}
       </Typography>
     </Paper>

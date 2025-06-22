@@ -38,7 +38,7 @@ const PIE_COLORS = ['#3F51B5', '#7986CB', '#9E9E9E', '#CFD8DC'];
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
-  borderRadius: 20,
+  borderRadius: '10px',
   background: theme.palette.background.paper,
   boxShadow: theme.shadows[1],
   border: `1px solid ${theme.palette.grey[200]}`,
@@ -47,7 +47,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 
 const SummaryCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
-  borderRadius: 20,
+  borderRadius: '10px',
   background: theme.palette.background.paper,
   color: theme.palette.text.primary,
   textAlign: 'center',

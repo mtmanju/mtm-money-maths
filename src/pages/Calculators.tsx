@@ -176,18 +176,18 @@ const calculators = [
 const StyledCard = styled(Box)<{ cardColor?: { bg: string } }>(({ cardColor }) => ({
   position: 'relative',
   borderRadius: '10px',
-  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
   padding: 0,
   height: '280px',
   width: '100%',
   maxWidth: '200px',
   display: 'flex',
   flexDirection: 'column',
-  border: '1px solid rgba(255, 255, 255, 0.2)',
+  border: '1px solid rgba(255, 255, 255, 0.3)',
   overflow: 'hidden',
   transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
   cursor: 'pointer',
-  background: cardColor?.bg || 'rgba(255, 255, 255, 0.7)',
+  background: cardColor?.bg || 'rgba(255, 255, 255, 0.8)',
   backdropFilter: 'blur(16px) saturate(180%)',
   transform: 'translateY(0) scale(1)',
   '&::before': {
@@ -216,17 +216,17 @@ const StyledCard = styled(Box)<{ cardColor?: { bg: string } }>(({ cardColor }) =
     transition: 'all 0.4s ease-in-out',
   },
   '&:hover': {
-    transform: 'translateY(-12px) scale(1.03)',
-    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1)',
+    transform: 'translateY(-6px) scale(1.015)',
+    boxShadow: '0 12px 24px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.08)',
     background: cardColor?.bg ? `${cardColor.bg.replace('0.8', '1.0').replace('0.9', '1.0')}` : 'rgba(255, 255, 255, 0.95)',
-    border: '1px solid rgba(255, 255, 255, 0.6)',
+    border: '1px solid rgba(255, 255, 255, 0.4)',
     '&::before': {
-      opacity: 1.4,
-      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.1) 100%)',
+      opacity: 1.0,
+      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 100%)',
     },
     '&::after': {
-      opacity: 1.2,
-      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 100%)',
+      opacity: 0.8,
+      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%)',
     },
   },
   '@media (max-width: 899px)': {
@@ -291,7 +291,7 @@ const CardDesc = styled(Typography)({
   color: '#6B7280',
   fontWeight: 400,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '0.8rem',
+  fontSize: '0.85rem',
   lineHeight: 1.4,
   marginBottom: '12px',
   flexGrow: 1,
@@ -434,13 +434,11 @@ const Calculators: React.FC = () => {
               <StyledCard
                   cardColor={cardColor}
                 sx={{
-                    transform: `translateY(${scrollY * 0.05}px)`,
-                    transition: 'transform 0.1s ease-out',
-                    animation: `fadeInUp 0.6s ease-out ${idx * 0.05}s both`,
+                    animation: `fadeInUp 0.4s ease-out`,
                     '@keyframes fadeInUp': {
                       '0%': {
                         opacity: 0,
-                        transform: 'translateY(20px)',
+                        transform: 'translateY(10px)',
                       },
                       '100%': {
                         opacity: 1,

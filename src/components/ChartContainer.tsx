@@ -13,9 +13,10 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({ children }) => {
       sx={{
         width: '100%',
         p: 3,
-        borderRadius: 2,
+        borderRadius: '10px',
         border: `1px solid ${colors.border}`,
-        backgroundColor: colors.background
+        backgroundColor: colors.background,
+        fontSize: '0.95rem',
       }}
     >
       {children}
