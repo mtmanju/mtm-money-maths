@@ -1,17 +1,17 @@
-import React from 'react';
-import { AppBar, Toolbar, Typography, Box, useTheme, useMediaQuery, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { AppBar, Toolbar, Typography, Box, useTheme, useMediaQuery, Button, Container } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 
 const StyledAppBar = styled(AppBar)(() => ({
-  background: '#fff',
-  borderBottom: '1.5px solid #eafafd',
-  boxShadow: '0 1px 2px rgba(30, 34, 90, 0.04)',
+  background: 'rgba(255, 255, 255, 0.95)',
+  backdropFilter: 'blur(20px)',
+  borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
   zIndex: 1200,
   borderRadius: 0,
-  '& .MuiToolbar-root': {
-    borderRadius: 0,
-  },
+  transition: 'all 0.2s ease',
+  width: '100%',
 }));
 
 const LogoContainer = styled(Box)(() => ({
@@ -19,6 +19,7 @@ const LogoContainer = styled(Box)(() => ({
   alignItems: 'center',
   gap: '0.75rem',
   borderRadius: 0,
+  flexShrink: 0,
 }));
 
 const LogoText = styled(Box)(() => ({
@@ -26,62 +27,56 @@ const LogoText = styled(Box)(() => ({
   alignItems: 'center',
   gap: '0.25rem',
   position: 'relative',
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    bottom: '-4px',
-    left: 0,
-    width: '100%',
-    height: '2px',
-    background: 'linear-gradient(90deg, #1A1F36 50%, #00bfc6 50%)',
-    transform: 'scaleX(0)',
-    transformOrigin: 'right',
-    transition: 'transform 0.3s ease',
-  },
-  '&:hover::after': {
-    transform: 'scaleX(1)',
-    transformOrigin: 'left',
+  transition: 'transform 0.2s ease',
+  flexShrink: 0,
+  '&:hover': {
+    transform: 'translateY(-1px)',
   },
 }));
 
 const MoneyText = styled(Typography)(() => ({
   color: '#1A1F36',
-  fontWeight: 800,
+  fontWeight: 700,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '2rem',
+  fontSize: '1.8rem',
   letterSpacing: '-0.02em',
-  background: 'linear-gradient(180deg, #1A1F36 0%, #2A2F46 100%)',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  transition: 'all 0.3s ease',
+  transition: 'color 0.2s ease',
+  flexShrink: 0,
+  '@media (max-width: 1200px)': {
+    fontSize: '1.6rem',
+  },
+  '@media (max-width: 1000px)': {
+    fontSize: '1.4rem',
+  },
 }));
 
 const MathsText = styled(Typography)(() => ({
   color: '#00bfc6',
-  fontWeight: 800,
+  fontWeight: 700,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '2rem',
+  fontSize: '1.8rem',
   letterSpacing: '-0.02em',
-  background: 'linear-gradient(180deg, #00bfc6 0%, #00a8af 100%)',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  transition: 'all 0.3s ease',
+  transition: 'color 0.2s ease',
+  flexShrink: 0,
+  '@media (max-width: 1200px)': {
+    fontSize: '1.6rem',
+  },
+  '@media (max-width: 1000px)': {
+    fontSize: '1.4rem',
+  },
 }));
 
 const Logo = styled(Typography)(() => ({
   color: '#1A1F36',
-  fontWeight: 800,
+  fontWeight: 700,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '2rem',
+  fontSize: '1.8rem',
   letterSpacing: '-0.02em',
   textDecoration: 'none',
-  transition: 'all 0.3s ease',
+  transition: 'all 0.2s ease',
   display: 'flex',
   alignItems: 'center',
   gap: '0.5rem',
-  '&:hover': {
-    transform: 'translateY(-2px)',
-  },
 }));
 
 const LogoLink = styled(RouterLink)({
@@ -106,21 +101,29 @@ const LogoLink = styled(RouterLink)({
 
 const NavLink = styled(RouterLink)(({ theme }) => ({
   color: '#1A1F36',
-  fontWeight: 600,
+  fontWeight: 500,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '1rem',
-  borderRadius: 18,
+  fontSize: '0.95rem',
   textTransform: 'none',
-  padding: '8px 18px',
+  padding: '8px 12px',
   background: 'transparent',
-  boxShadow: 'none',
   outline: 'none',
-  transition: 'color 0.2s, transform 0.2s',
+  transition: 'color 0.2s ease',
   textDecoration: 'none',
+  borderRadius: '8px',
+  whiteSpace: 'nowrap',
+  flexShrink: 0,
+  '@media (max-width: 1200px)': {
+    fontSize: '0.9rem',
+    padding: '8px 10px',
+  },
+  '@media (max-width: 1000px)': {
+    fontSize: '0.85rem',
+    padding: '6px 8px',
+  },
   '&:hover': {
-    color: '#009ca3',
-    background: 'transparent',
-    transform: 'translateY(-2px)',
+    color: '#00bfc6',
+    background: 'rgba(0, 191, 198, 0.04)',
   },
   '&:focus': {
     outline: 'none',
@@ -137,38 +140,48 @@ const CalculatorsButton = styled(RouterLink)(() => ({
   color: '#fff',
   fontWeight: 600,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '1rem',
+  fontSize: '0.95rem',
   borderRadius: '999px',
-  padding: '10px 24px',
+  padding: '10px 18px',
   textTransform: 'none',
   textDecoration: 'none',
-  transition: 'all 0.2s',
-  boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
+  transition: 'all 0.2s ease',
+  boxShadow: '0 2px 8px rgba(26, 31, 54, 0.15)',
+  whiteSpace: 'nowrap',
+  flexShrink: 0,
+  '@media (max-width: 1200px)': {
+    fontSize: '0.9rem',
+    padding: '9px 16px',
+  },
+  '@media (max-width: 1000px)': {
+    fontSize: '0.85rem',
+    padding: '8px 14px',
+  },
   '&:hover': {
-    background: '#009ca3',
+    background: '#00bfc6',
     color: '#fff',
-    transform: 'translateY(-2px)',
-    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(0, 191, 198, 0.25)',
   },
 }));
 
 const CtaButton = styled(Button)(() => ({
-  border: '1.5px solid #1A1F36',
+  border: '1px solid #1A1F36',
   color: '#1A1F36',
-  borderRadius: '999px',
+  borderRadius: '8px',
   fontWeight: 500,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '1rem',
+  fontSize: '0.95rem',
   textTransform: 'none',
   background: 'transparent',
   boxShadow: 'none',
-  padding: '8px 22px',
+  padding: '9px 18px',
   minWidth: 0,
-  transition: 'background 0.2s, color 0.2s, border 0.2s',
+  transition: 'all 0.2s ease',
   '&:hover': {
-    background: '#eafafd',
-    borderColor: '#009ca3',
-    color: '#009ca3',
+    background: '#1A1F36',
+    color: '#fff',
+    borderColor: '#1A1F36',
   },
 }));
 
@@ -190,23 +203,45 @@ const Header: React.FC = () => {
 
   return (
     <StyledAppBar position="sticky" elevation={0}>
-      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 80, px: { xs: 3, sm: 6 } }}>
-        <LogoLink to="/" tabIndex={0}>
-          <LogoContainer>
-            <LogoText>
-              <MoneyText>Money</MoneyText>
-              <MathsText>Maths</MathsText>
-            </LogoText>
-          </LogoContainer>
-        </LogoLink>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-          {navLinks.map((item) => (
-            <NavLink key={item.label} to={item.path} style={{ color: location.pathname === item.path ? '#009ca3' : '#1A1F36' }}>{item.label}</NavLink>
-          ))}
-          <CalculatorsButton to="/calculators" style={{ color: '#fff' }}>
-            Calculators
-          </CalculatorsButton>
-        </Box>
+      <Toolbar sx={{ 
+        minHeight: 70,
+        px: '0 !important',
+      }}>
+        <Container maxWidth="xl" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <LogoLink to="/" tabIndex={0}>
+            <LogoContainer>
+              <LogoText>
+                <MoneyText>Money</MoneyText>
+                <MathsText>Maths</MathsText>
+              </LogoText>
+            </LogoContainer>
+          </LogoLink>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: { xs: 0.5, sm: 1 }, 
+            alignItems: 'center',
+            flexShrink: 0,
+          }}>
+            {navLinks.map((item) => (
+              <NavLink 
+                key={item.label} 
+                to={item.path} 
+                style={{ 
+                  color: location.pathname === item.path ? '#00bfc6' : '#1A1F36',
+                  background: location.pathname === item.path 
+                    ? 'rgba(0, 191, 198, 0.08)' 
+                    : 'transparent',
+                  fontWeight: location.pathname === item.path ? 600 : 500,
+                }}
+              >
+                {item.label}
+              </NavLink>
+            ))}
+            <CalculatorsButton to="/calculators" style={{ color: '#fff' }}>
+              Calculators
+            </CalculatorsButton>
+          </Box>
+        </Container>
       </Toolbar>
     </StyledAppBar>
   );

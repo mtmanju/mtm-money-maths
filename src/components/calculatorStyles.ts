@@ -76,11 +76,13 @@ export const borderRadius = {
 // Background
 export const GradientBackground = styled(Box)(({ theme }) => ({
   minHeight: '100vh',
-  width: '100vw',
-  background: colors.background,
+  width: '100%',
+  overflowX: 'hidden',
+  background: 'transparent',
   fontFamily: typography.fontFamily,
   paddingTop: theme.spacing(4),
   paddingBottom: theme.spacing(8),
+  position: 'relative',
 }));
 
 // Card for forms

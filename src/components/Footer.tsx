@@ -33,20 +33,18 @@ const FooterRoot = styled('footer')(() => ({
 
 const NewsletterInput = styled('input')(({ theme }) => ({
   border: '1.5px solid #eafafd',
-  borderRadius: '999px',
-  padding: '12px 24px',
-  fontSize: '1rem',
+  borderRadius: '999px 0 0 999px',
+  padding: '10px 20px',
+  fontSize: '0.9rem',
   background: '#fff',
   color: '#1A1F36',
   boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
   outline: 'none',
   transition: 'all 0.2s',
-  height: '48px',
-  lineHeight: '48px',
-  width: '200px',
-  [theme.breakpoints.up('sm')]: {
-    width: '260px',
-  },
+  height: '40px',
+  lineHeight: '40px',
+  width: '75%',
+  borderRight: 'none',
   '&:focus': {
     borderColor: '#00bfc6',
     boxShadow: '0 4px 20px 0 rgba(0, 191, 198, 0.15)',
@@ -60,15 +58,17 @@ const NewsletterInput = styled('input')(({ theme }) => ({
 const NewsletterButton = styled(Button)(() => ({
   background: '#1A1F36',
   color: '#fff',
-  borderRadius: '999px',
-  padding: '12px 24px',
-  fontSize: '1rem',
+  borderRadius: '0 999px 999px 0',
+  padding: '10px 20px',
+  fontSize: '0.9rem',
   fontWeight: 600,
   textTransform: 'none',
   boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
   transition: 'all 0.2s',
-  height: '48px',
+  height: '40px',
+  width: '25%',
   whiteSpace: 'nowrap',
+  borderLeft: 'none',
   '&:hover': {
     background: '#009ca3',
     color: '#fff',
@@ -129,9 +129,9 @@ const SocialStack = styled(Box)(({ theme }) => ({
 
 const SocialIcon = styled(IconButton)(() => ({
   color: '#1A1F36',
-  borderRadius: '12px',
-  width: 40,
-  height: 40,
+  borderRadius: '10px',
+  width: 36,
+  height: 36,
   transition: 'all 0.2s',
   '&:hover': {
     color: '#009ca3',
@@ -158,18 +158,18 @@ const Footer = () => {
   return (
     <FooterRoot>
       <Box sx={{ 
-        pt: { xs: 3, md: 6 }, 
-        pb: { xs: 3, md: 6 }, 
+        pt: { xs: 2, md: 4 }, 
+        pb: { xs: 2, md: 4 }, 
         px: { xs: 2, sm: 4, md: 6, lg: 8 }, 
         maxWidth: '100%' 
       }}>
-        <Grid container spacing={{ xs: 3, md: 6 }}>
+        <Grid container spacing={{ xs: 2, md: 4 }}>
           {/* Newsletter & Acknowledgement */}
           <Grid item xs={12} md={6}>
             <Typography variant="h4" sx={{ 
               fontWeight: 700, 
-              fontSize: { xs: '1.75rem', md: '2.2rem' }, 
-              mb: 2, 
+              fontSize: { xs: '1.5rem', md: '1.8rem' }, 
+              mb: 1.5, 
               letterSpacing: '-0.02em' 
             }}>
               Join our newsletter<br />
@@ -178,25 +178,27 @@ const Footer = () => {
             <Box sx={{ 
               display: 'flex', 
               alignItems: 'center', 
-              mb: 2,
+              mb: 1.5,
               flexDirection: 'row',
-              gap: 1
+              gap: 0,
+              width: '100%',
+              maxWidth: '400px'
             }}>
               <NewsletterInput placeholder="Enter your email" type="email" />
               <NewsletterButton disableElevation>Subscribe</NewsletterButton>
             </Box>
             <Typography sx={{ 
               color: '#1A1F36', 
-              fontSize: { xs: '0.875rem', md: '0.95rem' }, 
-              mb: 3 
+              fontSize: { xs: '0.8rem', md: '0.85rem' }, 
+              mb: 2 
             }}>
               By subscribing, you agree to our <Link href="#" underline="always" sx={{ color: '#1A1F36', fontWeight: 500 }}>Privacy Policy</Link>.
             </Typography>
             <Typography sx={{ 
               color: '#1A1F36', 
-              fontSize: { xs: '0.875rem', md: '1rem' }, 
+              fontSize: { xs: '0.8rem', md: '0.9rem' }, 
               maxWidth: 600, 
-              mb: 2 
+              mb: 1.5 
             }}>
               Money Maths is your trusted companion for financial calculations and planning. Make informed decisions with our comprehensive suite of financial calculators.
             </Typography>
@@ -207,10 +209,10 @@ const Footer = () => {
               display: 'flex', 
               flexDirection: 'column', 
               gap: 0, 
-              mb: { xs: 2, md: 0 },
+              mb: { xs: 1.5, md: 0 },
               '& .footer-link': {
-                fontSize: '0.875rem',
-                marginBottom: '0.75rem',
+                fontSize: '0.8rem',
+                marginBottom: '0.5rem',
               }
             }}>
               {footerLinks.map(link => (
@@ -225,13 +227,13 @@ const Footer = () => {
               display: 'flex', 
               flexDirection: 'column',
               alignItems: { xs: 'flex-start', md: 'flex-end' },
-              mb: { xs: 3, md: 0 }
+              mb: { xs: 2, md: 0 }
             }}>
               <Typography sx={{ 
                 color: '#1A1F36', 
-                fontSize: '1rem', 
+                fontSize: '0.9rem', 
                 fontWeight: 600, 
-                mb: 2,
+                mb: 1.5,
                 display: { xs: 'block', md: 'none' }
               }}>
                 Follow Us
@@ -254,13 +256,13 @@ const Footer = () => {
           </Grid>
         </Grid>
         <LegalDivider />
-        <Grid container alignItems="center" justifyContent="space-between" sx={{ pt: 1 }}>
+        <Grid container alignItems="center" justifyContent="space-between" sx={{ pt: 0.5 }}>
           <Grid item xs={12} md={6}>
             <Box sx={{ 
               display: 'flex', 
               flexDirection: { xs: 'column', sm: 'row' },
-              gap: { xs: 1, sm: 3 }, 
-              mb: { xs: 2, md: 0 } 
+              gap: { xs: 0.5, sm: 2 }, 
+              mb: { xs: 1.5, md: 0 } 
             }}>
               <Link href="#" className="footer-link" underline="always">Terms of Service</Link>
               <Link href="#" className="footer-link" underline="always">Privacy Policy</Link>
@@ -269,7 +271,7 @@ const Footer = () => {
           <Grid item xs={12} md={6} sx={{ textAlign: { xs: 'left', md: 'right' } }}>
             <Typography sx={{ 
               color: '#1A1F36', 
-              fontSize: { xs: '0.875rem', md: '0.95rem' } 
+              fontSize: { xs: '0.8rem', md: '0.85rem' } 
             }}>
               © {new Date().getFullYear()} Money Maths. All rights reserved.
             </Typography>

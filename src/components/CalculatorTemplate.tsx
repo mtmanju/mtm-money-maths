@@ -54,19 +54,19 @@ export const CalculatorTemplate: React.FC<CalculatorTemplateProps> = ({
 
   return (
     <GradientBackground>
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <Box sx={{ mb: 4, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
           <Typography
             variant="h1"
             sx={{
               fontWeight: 600,
               fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: { xs: '1.2rem', sm: '1.8rem', md: '2.2rem', lg: '2.8rem' },
+              fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2rem' },
               lineHeight: 1.08,
               letterSpacing: '-0.03em',
-              mb: 2,
+              mb: 1.5,
               color: '#1A1F36',
-              textAlign: 'left',
+              textAlign: 'center',
             }}
           >
             {mainTitle}{' '}
@@ -79,10 +79,12 @@ export const CalculatorTemplate: React.FC<CalculatorTemplateProps> = ({
             sx={{
               color: colors.secondary,
               fontWeight: 400,
-              fontSize: { xs: '0.92rem', md: '1rem' },
+              fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' },
               fontFamily: typography.fontFamily,
               mb: 0,
-              lineHeight: 1.2,
+              lineHeight: 1.4,
+              maxWidth: '700px',
+              mx: 'auto',
             }}
           >
             {description}

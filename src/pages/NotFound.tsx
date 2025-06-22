@@ -13,14 +13,7 @@ import {
   Calculate as CalculateIcon,
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
-
-const NotFoundBackground = styled(Box)(() => ({
-  minHeight: '100vh',
-  background: '#fff',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
+import { GradientBackground } from '../components/calculatorStyles';
 
 const NotFoundCtaButton = styled(Button)(() => ({
   background: '#1A1F36',
@@ -68,7 +61,7 @@ const NotFound: React.FC = () => {
   const theme = useTheme();
 
   return (
-    <NotFoundBackground>
+    <GradientBackground>
       <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
         <Box sx={{ textAlign: 'center', py: theme.spacing(8) }}>
           <Typography
@@ -174,7 +167,7 @@ const NotFound: React.FC = () => {
           </Box>
         </Box>
       </Container>
-    </NotFoundBackground>
+    </GradientBackground>
   );
 };
 

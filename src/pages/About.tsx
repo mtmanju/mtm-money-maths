@@ -1,161 +1,187 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, useTheme, styled } from '@mui/material';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import LockIcon from '@mui/icons-material/Lock';
-import CalculateIcon from '@mui/icons-material/Calculate';
-import PeopleIcon from '@mui/icons-material/People';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { GradientBackground } from '../components/calculatorStyles';
 
-const HeroSection = styled(Box)(({ theme }) => ({
-  background: '#fff',
-  padding: theme.spacing(10, 0, 6, 0),
-  textAlign: 'left',
-  [theme.breakpoints.down('sm')]: {
-    textAlign: 'center',
-    padding: theme.spacing(7, 0, 4, 0),
-  },
+const AboutSection = styled(Box)(({ theme }) => ({
+  background: 'transparent',
+  padding: theme.spacing(3, 0),
+  minHeight: '100vh',
 }));
 
-const HeroAccent = styled('span')(() => ({
-  color: '#00bfc6',
-  fontWeight: 700,
-  letterSpacing: '-0.02em',
+const AboutContainer = styled(Container)(({ theme }) => ({
+  maxWidth: '1400px',
+  width: '100%',
+  margin: '0 auto',
+  position: 'relative',
+  zIndex: 1,
 }));
 
 const FeatureCard = styled(Box)(({ theme }) => ({
-  background: '#eafafd',
-  borderRadius: '20px',
+  background: '#fff',
+  borderRadius: '24px',
+  padding: theme.spacing(4),
   boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
-  padding: theme.spacing(4, 3),
+  border: '1.5px solid #e0e7ef',
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'flex-start',
-  minHeight: 180,
-  transition: 'box-shadow 0.2s, transform 0.2s',
+  transition: 'all 0.3s ease',
   '&:hover': {
+    transform: 'translateY(-4px)',
     boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.12)',
-    transform: 'translateY(-4px) scale(1.02)',
   },
+}));
+
+const FeatureTitle = styled(Typography)(() => ({
+  color: '#1A1F36',
+  fontWeight: 700,
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '1.1rem',
+  letterSpacing: '-0.01em',
+  marginBottom: '1rem',
+}));
+
+const FeatureDesc = styled(Typography)(() => ({
+  color: '#4E5D78',
+  fontWeight: 400,
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '1rem',
+  lineHeight: 1.6,
 }));
 
 const About: React.FC = () => {
   const theme = useTheme();
+
+  const features = [
+    {
+      icon: <CheckCircleIcon sx={{ fontSize: 36, color: '#e57373' }} />,
+      title: 'Accurate Results',
+      description: 'All our calculators use industry-standard formulas and are tested for accuracy, so you can trust your results every time.',
+      bgColor: '#fbeeee'
+    },
+    {
+      icon: <CheckCircleIcon sx={{ fontSize: 36, color: '#9575cd' }} />,
+      title: 'Privacy First',
+      description: 'We never store your data. All calculations happen instantly in your browser for complete privacy and security.',
+      bgColor: '#f3f1fa'
+    },
+    {
+      icon: <CheckCircleIcon sx={{ fontSize: 36, color: '#81c784' }} />,
+      title: 'Free & Fast',
+      description: 'All tools are 100% free, require no sign-up, and deliver instant results so you can make decisions quickly.',
+      bgColor: '#f6faef'
+    },
+    {
+      icon: <CheckCircleIcon sx={{ fontSize: 36, color: '#64b5f6' }} />,
+      title: 'Comprehensive Tools',
+      description: 'A wide range of calculators for loans, investments, taxes, and more to cover all your financial needs.',
+      bgColor: '#eafafd'
+    }
+  ];
+
   return (
-    <Box sx={{ background: '#fff', minHeight: '100vh', pb: 8, pt: { xs: 8, md: 10 } }}>
-      <Box sx={{ maxWidth: 1200, mx: 'auto', pl: { xs: 2, sm: 3, md: 6 }, pr: { xs: 2, sm: 3, md: 0 } }}>
-        {/* Hero Section */}
-        <Typography
-          variant="h2"
-          sx={{
-            fontWeight: 800,
-            fontSize: { xs: '2.2rem', md: '3.2rem' },
-            letterSpacing: '-0.02em',
-            color: '#1A1F36',
-            mb: 2,
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            textAlign: 'left',
-          }}
-        >
-          About <HeroAccent>Money Maths</HeroAccent>
-        </Typography>
-        <Typography
-          sx={{
-            color: '#4E5D78',
-            fontSize: { xs: '1.1rem', md: '1.35rem' },
-            mb: 6,
-            fontWeight: 400,
-            maxWidth: 1000,
-            lineHeight: 1.5,
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            textAlign: 'left',
-            mx: 0,
-          }}
-        >
-          Money Maths is your trusted companion for financial clarity. We empower users to make smart, confident decisions with fast, accurate, and private financial calculators—free for everyone.
-        </Typography>
+    <GradientBackground>
+      <AboutSection>
+        <AboutContainer maxWidth="xl" sx={{ px: { xs: 2, md: 4, lg: 6 } }}>
+          {/* Hero Section */}
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Typography
+              variant="h2"
+              sx={{
+                color: '#1A1F36',
+                fontWeight: 700,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2rem' },
+                letterSpacing: '-0.02em',
+                textAlign: 'center',
+                marginBottom: '1.5rem',
+              }}
+            >
+              About <Box component="span" sx={{ color: '#00bfc6', fontWeight: 700 }}>Money Maths</Box>
+            </Typography>
+            <Typography
+              sx={{
+                color: '#4E5D78',
+                fontWeight: 400,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
+                lineHeight: 1.4,
+                textAlign: 'center',
+                maxWidth: '700px',
+                margin: '0 auto 3rem auto',
+              }}
+            >
+              Money Maths is your trusted companion for financial clarity. We empower users to make smart, confident decisions with fast, accurate, and private financial calculators—free for everyone.
+            </Typography>
+          </Box>
 
-        {/* Mission Section */}
-        <Typography
-          variant="h4"
-          sx={{
-            color: '#1A1F36',
-            fontWeight: 700,
-            mb: 3,
-            fontSize: { xs: '1.5rem', md: '2rem' },
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            textAlign: 'left',
-          }}
-        >
-          Our Mission
-        </Typography>
-        <Typography
-          sx={{
-            color: '#4E5D78',
-            fontSize: { xs: '1.05rem', md: '1.2rem' },
-            mb: 6,
-            fontWeight: 400,
-            lineHeight: 1.6,
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            textAlign: 'left',
-            mx: 0,
-          }}
-        >
-          We believe everyone deserves access to powerful, easy-to-use financial tools. Our calculators are designed to be fast, accurate, and completely private—no sign-up, no data collection, just clear answers to your financial questions.
-        </Typography>
+          {/* Mission Section */}
+          <Box sx={{ mb: 5 }}>
+            <Typography
+              variant="h4"
+              sx={{
+                color: '#1A1F36',
+                fontWeight: 600,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: { xs: '1.2rem', sm: '1.4rem', md: '1.5rem' },
+                marginBottom: '2rem',
+                textAlign: 'left',
+              }}
+            >
+              Our Mission
+            </Typography>
+            <Typography
+              sx={{
+                color: '#4E5D78',
+                fontWeight: 400,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
+                lineHeight: 1.5,
+                marginBottom: '3rem',
+                textAlign: 'left',
+              }}
+            >
+              We believe everyone deserves access to powerful, easy-to-use financial tools. Our calculators are designed to be fast, accurate, and completely private—no sign-up, no data collection, just clear answers to your financial questions.
+            </Typography>
+          </Box>
 
-        {/* Features Section */}
-        <Typography
-          variant="h4"
-          sx={{
-            color: '#1A1F36',
-            fontWeight: 700,
-            mb: 4,
-            fontSize: { xs: '1.5rem', md: '2rem' },
-            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            textAlign: 'left',
-          }}
-        >
-          Why Choose Us?
-        </Typography>
-        <Grid container spacing={4} justifyContent={{ xs: 'center', md: 'flex-start' }} alignItems="flex-start">
-          <Grid item xs={12} sm={6} md={3}>
-            <FeatureCard>
-              <TrendingUpIcon sx={{ fontSize: 40, color: '#00bfc6', mb: 2 }} />
-              <Typography sx={{ fontWeight: 700, color: '#1A1F36', mb: 1, fontSize: '1.1rem', textAlign: 'left' }}>Accurate Results</Typography>
-              <Typography sx={{ color: '#4E5D78', fontSize: '1rem', textAlign: 'left' }}>
-                Industry-standard formulas and tested logic for trustworthy answers.
-              </Typography>
-            </FeatureCard>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FeatureCard>
-              <LockIcon sx={{ fontSize: 40, color: '#00bfc6', mb: 2 }} />
-              <Typography sx={{ fontWeight: 700, color: '#1A1F36', mb: 1, fontSize: '1.1rem', textAlign: 'left' }}>Privacy First</Typography>
-              <Typography sx={{ color: '#4E5D78', fontSize: '1rem', textAlign: 'left' }}>
-                No sign-up, no data collection. All calculations happen instantly in your browser.
-              </Typography>
-            </FeatureCard>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FeatureCard>
-              <CalculateIcon sx={{ fontSize: 40, color: '#00bfc6', mb: 2 }} />
-              <Typography sx={{ fontWeight: 700, color: '#1A1F36', mb: 1, fontSize: '1.1rem', textAlign: 'left' }}>Comprehensive Tools</Typography>
-              <Typography sx={{ color: '#4E5D78', fontSize: '1rem', textAlign: 'left' }}>
-                A wide range of calculators for loans, investments, taxes, and more.
-              </Typography>
-            </FeatureCard>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FeatureCard>
-              <PeopleIcon sx={{ fontSize: 40, color: '#00bfc6', mb: 2 }} />
-              <Typography sx={{ fontWeight: 700, color: '#1A1F36', mb: 1, fontSize: '1.1rem', textAlign: 'left' }}>Free for Everyone</Typography>
-              <Typography sx={{ color: '#4E5D78', fontSize: '1rem', textAlign: 'left' }}>
-                100% free to use, forever. No hidden fees or subscriptions.
-              </Typography>
-            </FeatureCard>
-          </Grid>
-        </Grid>
-      </Box>
-    </Box>
+          {/* Features Section */}
+          <Box>
+            <Typography
+              variant="h4"
+              sx={{
+                color: '#1A1F36',
+                fontWeight: 600,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: { xs: '1.2rem', sm: '1.4rem', md: '1.5rem' },
+                marginBottom: '2rem',
+                textAlign: 'left',
+              }}
+            >
+              Why Choose Us?
+            </Typography>
+            <Grid container spacing={4} justifyContent="flex-start" alignItems="stretch">
+              {features.map((feature, index) => (
+                <Grid item xs={12} sm={6} md={3} key={index}>
+                  <FeatureCard sx={{ background: feature.bgColor }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      {feature.icon}
+                      <FeatureTitle sx={{ marginBottom: 0, marginLeft: 1.5 }}>
+                        {feature.title}
+                      </FeatureTitle>
+                    </Box>
+                    <FeatureDesc>
+                      {feature.description}
+                    </FeatureDesc>
+                  </FeatureCard>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </AboutContainer>
+      </AboutSection>
+    </GradientBackground>
   );
 };
 

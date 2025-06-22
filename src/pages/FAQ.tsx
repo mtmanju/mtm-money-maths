@@ -11,11 +11,12 @@ import {
 import {
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
+import { GradientBackground } from '../components/calculatorStyles';
 
 const FAQ: React.FC = () => {
   return (
-    <Box sx={{ width: '100%', py: { xs: 7, md: 10 }, background: '#f4fafd' }}>
-      <Container maxWidth="xl" sx={{ px: { xs: 2, md: 6, lg: 10 }, textAlign: 'left' }}>
+    <GradientBackground>
+      <Container maxWidth="xl" sx={{ px: { xs: 2, md: 6, lg: 10 }, textAlign: 'left', position: 'relative', zIndex: 1, py: { xs: 7, md: 10 } }}>
         <Typography
           variant="h3"
           sx={{
@@ -100,7 +101,7 @@ const FAQ: React.FC = () => {
           See all FAQs
         </Button>
       </Container>
-    </Box>
+    </GradientBackground>
   );
 };
 

@@ -28,6 +28,7 @@ import Calculators from './pages/Calculators';
 import ScrollToTop from './components/ScrollToTop';
 import About from './pages/About';
 import FAQ from './pages/FAQ';
+import { globalStyles } from './styles/globalStyles';
 import './styles/global.css';
 import './styles/mobile.css';
 
@@ -35,42 +36,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <GlobalStyles styles={{
-        'input[type="number"]::-webkit-inner-spin-button': {
-          WebkitAppearance: 'none',
-          appearance: 'none',
-          margin: 0,
-          display: 'none',
-        },
-        'input[type="number"]::-webkit-outer-spin-button': {
-          WebkitAppearance: 'none',
-          appearance: 'none',
-          margin: 0,
-          display: 'none',
-        },
-        'input[type="number"]': {
-          MozAppearance: 'textfield',
-          appearance: 'textfield',
-        },
-        '.MuiOutlinedInput-root': {
-          '& fieldset': {
-            border: 'none !important',
-          },
-          '&:hover fieldset': {
-            border: 'none !important',
-          },
-          '&.Mui-focused fieldset': {
-            border: 'none !important',
-          },
-          border: '1px solid #e0e7ef !important',
-          '&:hover': {
-            border: '1px solid #00bfc6 !important',
-          },
-          '&.Mui-focused': {
-            border: '2px solid #00bfc6 !important',
-          },
-        },
-      }} />
+      <GlobalStyles styles={globalStyles(theme)} />
       <BrowserRouter>
         <ScrollToTop />
         <div className="app-container">

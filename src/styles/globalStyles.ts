@@ -1,6 +1,44 @@
 import { Theme } from '@mui/material/styles';
 
 export const globalStyles = (theme: Theme) => ({
+  // Hide number input arrows
+  'input[type="number"]::-webkit-inner-spin-button': {
+    WebkitAppearance: 'none',
+    appearance: 'none',
+    margin: 0,
+    display: 'none',
+  },
+  'input[type="number"]::-webkit-outer-spin-button': {
+    WebkitAppearance: 'none',
+    appearance: 'none',
+    margin: 0,
+    display: 'none',
+  },
+  'input[type="number"]': {
+    MozAppearance: 'textfield',
+    appearance: 'textfield',
+  },
+
+  // Custom OutlinedInput styles
+  '.MuiOutlinedInput-root': {
+    '& fieldset': {
+      border: 'none !important',
+    },
+    '&:hover fieldset': {
+      border: 'none !important',
+    },
+    '&.Mui-focused fieldset': {
+      border: 'none !important',
+    },
+    border: '1px solid #e0e7ef !important',
+    '&:hover': {
+      border: '1px solid #00bfc6 !important',
+    },
+    '&.Mui-focused': {
+      border: '2px solid #00bfc6 !important',
+    },
+  },
+
   // Button Styles
   primaryButton: {
     background: 'linear-gradient(135deg, #5A6BFF 0%, #A7BFFF 100%)',

@@ -8,353 +8,296 @@ import {
   useTheme,
   styled,
   Button,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
 } from '@mui/material';
 import {
   Calculate as CalculateIcon,
   TrendingUp as TrendingUpIcon,
-  AccountBalance as AccountBalanceIcon,
-  CreditCard as CreditCardIcon,
-  Savings as SavingsIcon,
-  ShowChart as ShowChartIcon,
-  AccountBalanceWallet as AccountBalanceWalletIcon,
-  CompareArrows as CompareArrowsIcon,
-  AttachMoney as AttachMoneyIcon,
-  ArrowForward as ArrowForwardIcon,
   CheckCircle as CheckCircleIcon,
   Input as InputIcon,
-  ExpandMore as ExpandMoreIcon,
+  ArrowForward as ArrowForwardIcon,
+  AccountBalance as AccountBalanceIcon,
+  Receipt as ReceiptIcon,
+  Payment as PaymentIcon,
+  TrendingUpOutlined as GrowthIcon,
+  SavingsOutlined as DepositIcon,
+  AssessmentOutlined as TaxIcon,
+  ShowChartOutlined as ChartIcon,
+  AccountBalanceOutlined as BankIcon,
 } from '@mui/icons-material';
+import { GradientBackground } from '../components/calculatorStyles';
 
-const GradientBackground = styled(Box)(({ theme }) => ({
+// Styled components from Calculators page
+const StyledCard = styled(Box)<{ cardColor?: { bg: string } }>(({ cardColor }) => ({
   position: 'relative',
-  background: '#FFFFFF',
+  borderRadius: '10px',
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
+  padding: 0,
+  height: '280px',
+  width: '100%',
+  maxWidth: '200px',
+  display: 'flex',
+  flexDirection: 'column',
+  border: '1px solid rgba(255, 255, 255, 0.2)',
+  overflow: 'hidden',
+  transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+  cursor: 'pointer',
+  background: cardColor?.bg || 'rgba(255, 255, 255, 0.7)',
+  backdropFilter: 'blur(16px) saturate(180%)',
+  transform: 'translateY(0) scale(1)',
   '&::before': {
     content: '""',
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: '100%',
-    background: `
-      radial-gradient(circle at 20% 20%, rgba(90, 107, 255, 0.05), transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(0, 245, 255, 0.05), transparent 50%),
-      linear-gradient(45deg, rgba(0, 191, 198, 0.02) 25%, transparent 25%, transparent 75%, rgba(90, 107, 255, 0.02) 75%, rgba(90, 107, 255, 0.02)),
-      linear-gradient(45deg, rgba(0, 191, 198, 0.02) 25%, transparent 25%, transparent 75%, rgba(90, 107, 255, 0.02) 75%, rgba(90, 107, 255, 0.02)),
-      repeating-linear-gradient(45deg, rgba(0, 191, 198, 0.01) 0px, rgba(0, 191, 198, 0.01) 1px, transparent 1px, transparent 10px),
-      repeating-linear-gradient(-45deg, rgba(90, 107, 255, 0.01) 0px, rgba(90, 107, 255, 0.01) 1px, transparent 1px, transparent 10px)
-    `,
-    backgroundSize: '100% 100%, 100% 100%, 60px 60px, 60px 60px, 20px 20px, 20px 20px',
-    backgroundPosition: '0 0, 0 0, 0 0, 30px 30px, 0 0, 0 0',
+    bottom: 0,
+    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.05) 100%)',
     zIndex: 0,
-    animation: 'gradientMove 15s ease infinite',
-  },
-  '@keyframes gradientMove': {
-    '0%': {
-      backgroundPosition: '0% 0%, 0% 0%, 0% 0%, 30px 30px, 0% 0%, 0% 0%',
-    },
-    '50%': {
-      backgroundPosition: '100% 100%, 100% 100%, 30px 30px, 0% 0%, 10px 10px, 10px 10px',
-    },
-    '100%': {
-      backgroundPosition: '0% 0%, 0% 0%, 0% 0%, 30px 30px, 0% 0%, 0% 0%',
-    },
-  },
-}));
-
-const HeroSection = styled(Box)(({ theme }) => ({
-  position: 'relative',
-  padding: theme.spacing(8, 0, 6, 0),
-  background: '#fff',
-  overflow: 'hidden',
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'flex-start',
-  minHeight: '85vh',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: '-50%',
-    right: '-20%',
-    width: '80%',
-    height: '200%',
-    background: `
-      radial-gradient(circle at center, rgba(0, 191, 198, 0.03) 0%, transparent 70%),
-      repeating-linear-gradient(45deg, rgba(0, 191, 198, 0.01) 0px, rgba(0, 191, 198, 0.01) 1px, transparent 1px, transparent 10px),
-      repeating-radial-gradient(circle at center, rgba(0, 191, 198, 0.01) 0px, rgba(0, 191, 198, 0.01) 1px, transparent 1px, transparent 10px)
-    `,
-    transform: 'rotate(-15deg)',
-    animation: 'rotateGradient 20s linear infinite',
+    opacity: 0.8,
+    transition: 'all 0.4s ease-in-out',
   },
   '&::after': {
     content: '""',
     position: 'absolute',
-    bottom: '-50%',
-    left: '-20%',
-    width: '80%',
-    height: '200%',
-    background: `
-      radial-gradient(circle at center, rgba(90, 107, 255, 0.03) 0%, transparent 70%),
-      repeating-linear-gradient(-45deg, rgba(90, 107, 255, 0.01) 0px, rgba(90, 107, 255, 0.01) 1px, transparent 1px, transparent 10px),
-      repeating-radial-gradient(circle at center, rgba(90, 107, 255, 0.01) 0px, rgba(90, 107, 255, 0.01) 1px, transparent 1px, transparent 10px)
-    `,
-    transform: 'rotate(15deg)',
-    animation: 'rotateGradient 20s linear infinite reverse',
+    top: '2px',
+    left: '2px',
+    right: '2px',
+    bottom: '2px',
+    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 100%)',
+    borderRadius: '8px',
+    zIndex: 1,
+    opacity: 0.6,
+    transition: 'all 0.4s ease-in-out',
   },
-  '@keyframes rotateGradient': {
-    '0%': {
-      transform: 'rotate(-15deg)',
+  '&:hover': {
+    transform: 'translateY(-12px) scale(1.03)',
+    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1)',
+    background: cardColor?.bg ? `${cardColor.bg.replace('0.8', '1.0').replace('0.9', '1.0')}` : 'rgba(255, 255, 255, 0.95)',
+    border: '1px solid rgba(255, 255, 255, 0.6)',
+    '&::before': {
+      opacity: 1.4,
+      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.1) 100%)',
     },
-    '100%': {
-      transform: 'rotate(345deg)',
+    '&::after': {
+      opacity: 1.2,
+      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 100%)',
+    },
+  },
+  '@media (max-width: 899px)': {
+    height: '240px',
+    maxWidth: 'none',
+    borderRadius: '10px',
+    boxShadow: '0 3px 15px rgba(0, 0, 0, 0.08), 0 1px 6px rgba(0, 0, 0, 0.04)',
+    '&:hover': {
+      transform: 'translateY(-8px) scale(1.02)',
+      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2), 0 12px 24px rgba(0, 0, 0, 0.15)',
+      border: '1px solid rgba(255, 255, 255, 0.6)',
+    },
+  },
+  '@media (max-width: 599px)': {
+    height: '220px',
+    borderRadius: '10px',
+    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)',
+    '&:hover': {
+      transform: 'translateY(-6px) scale(1.01)',
+      boxShadow: '0 16px 32px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.15)',
+      border: '1px solid rgba(255, 255, 255, 0.6)',
     },
   },
 }));
 
-const HeroAccent = styled('span')(() => ({
-  color: '#00bfc6',
-  fontWeight: 700,
-  letterSpacing: '-0.02em',
-}));
+const CardContentWrapper = styled(Box)({
+  position: 'relative',
+  zIndex: 2,
+  padding: '20px',
+  display: 'flex',
+  flexDirection: 'column',
+  flexGrow: 1,
+  background: 'transparent',
+  height: '100%',
+  justifyContent: 'space-between',
+  '@media (max-width: 899px)': {
+    padding: '16px',
+  },
+  '@media (max-width: 599px)': {
+    padding: '14px',
+  },
+});
 
-const HeroCtaButton = styled(Button)(() => ({
-  background: '#1A1F36',
-  color: '#fff',
-  borderRadius: '999px',
+const CardTitle = styled(Typography)({
+  color: '#1A1F36',
   fontWeight: 600,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '1.1rem',
-  textTransform: 'none',
-  padding: '16px 40px',
-  minWidth: 0,
-  boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
-  marginTop: '2.5rem',
-  transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
-  '&:hover': {
-    background: '#009ca3',
-    color: '#fff',
-    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
-    transform: 'translateY(-2px) scale(1.04)',
+  fontSize: '0.8rem',
+  lineHeight: 1.3,
+  marginBottom: '6px',
+  '@media (max-width: 899px)': {
+    fontSize: '0.75rem',
+    marginBottom: '4px',
   },
-}));
+  '@media (max-width: 599px)': {
+    fontSize: '0.7rem',
+    marginBottom: '3px',
+  },
+});
 
-const GradientText = styled(Typography)(({ theme }) => ({
-  background: 'linear-gradient(135deg, #5A6BFF 0%, #00F5FF 100%)',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  backgroundClip: 'text',
-  color: 'transparent',
-  fontWeight: 800,
-  fontFamily: theme.typography.fontFamily,
-  letterSpacing: '-0.02em',
-}));
-
-const pastelColors = [
-  '#fbeeee', // EMI - pink
-  '#eafafd', // SIP - cyan
-  '#fdfbe7', // FD - yellow
-  '#f3f1fa', // Mutual Fund - purple
-  '#f6faef', // Tax - green
-  '#f8f9fc', // Investment - light gray
-  '#fbeeee', // Loan Comparison - pink
-  '#f3f1fa', // Retirement - purple
-  '#eafafd', // ROI - cyan
-  '#fdfbe7', // CAGR - yellow
-  '#f6faef', // Compound Interest - green
-];
-
-const CardTitle = styled(Typography)(() => ({
-  color: '#1A1F36',
-  fontWeight: 700,
-  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '1.13rem',
-  letterSpacing: '-0.01em',
-  marginBottom: 0,
-}));
-
-const CardDesc = styled(Typography)(() => ({
-  color: '#4E5D78',
+const CardDesc = styled(Typography)({
+  color: '#6B7280',
   fontWeight: 400,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '0.98rem',
-  lineHeight: 1.5,
-  margin: '1rem 0 1.5rem 0',
-}));
+  fontSize: '0.8rem',
+  lineHeight: 1.4,
+  marginBottom: '12px',
+  flexGrow: 1,
+  '@media (max-width: 899px)': {
+    fontSize: '0.75rem',
+    marginBottom: '8px',
+    lineHeight: 1.3,
+  },
+  '@media (max-width: 599px)': {
+    fontSize: '0.7rem',
+    marginBottom: '6px',
+    lineHeight: 1.2,
+  },
+});
 
-const LearnMoreButton = styled(Button)({
+const ActionButton = styled(Button)({
   border: '1.5px solid #1A1F36',
   color: '#1A1F36',
   borderRadius: '999px',
   fontWeight: 500,
   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '1rem',
-  textTransform: 'none',
+  fontSize: '0.85rem',
+  textTransform: 'none' as const,
   background: 'transparent',
   boxShadow: 'none',
-  padding: '8px 22px',
+  padding: '6px 12px',
   minWidth: 0,
-  transition: 'background 0.2s, color 0.2s, border 0.2s',
+  transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '4px',
   '&:hover': {
-    background: '#eafafd',
+    background: 'linear-gradient(135deg, #eafafd 0%, #d1f2ff 100%)',
     borderColor: '#009ca3',
     color: '#009ca3',
+    transform: 'translateY(-1px)',
+    boxShadow: '0 4px 12px rgba(0, 156, 163, 0.2)',
+  },
+  '@media (max-width: 899px)': {
+    fontSize: '0.8rem',
+    padding: '5px 10px',
+  },
+  '@media (max-width: 599px)': {
+    fontSize: '0.75rem',
+    padding: '4px 8px',
+    gap: '3px',
   },
 });
 
-const FeatureCard = styled(Box)(({ theme }) => ({
-  borderRadius: '24px',
-  boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
-  padding: '2.5rem 2rem 2rem 2rem',
+const HeroSection = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  padding: theme.spacing(8, 0, 6, 0),
+  background: 'transparent',
+  overflow: 'hidden',
   display: 'flex',
-  flexDirection: 'column',
-  minHeight: 260,
-  transition: 'box-shadow 0.2s, transform 0.2s',
-  animation: 'fadeIn 0.7s ease',
-  '@keyframes fadeIn': {
-    from: { opacity: 0, transform: 'translateY(24px)' },
-    to: { opacity: 1, transform: 'translateY(0)' },
-  },
-  '&:hover': {
-    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.12)',
-    transform: 'translateY(-4px) scale(1.02)',
-  },
-}));
-
-const FeatureTitle = styled(Typography)(() => ({
-  color: '#1A1F36',
-  fontWeight: 700,
-  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '1.35rem',
-  letterSpacing: '-0.01em',
-  marginBottom: '0.5rem',
-}));
-
-const FeatureDesc = styled(Typography)(() => ({
-  color: '#4E5D78',
-  fontWeight: 400,
-  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '1.05rem',
-  lineHeight: 1.5,
-}));
-
-const AnimatedTitle = styled(Typography)(() => ({
-  animation: 'slideUp 0.8s ease-out',
-  '@keyframes slideUp': {
-    from: {
-      opacity: 0,
-      transform: 'translateY(30px)',
-    },
-    to: {
-      opacity: 1,
-      transform: 'translateY(0)',
-    },
-  },
-}));
-
-const AnimatedSubtitle = styled(Typography)(() => ({
-  animation: 'slideUp 0.8s ease-out 0.2s both',
-  '@keyframes slideUp': {
-    from: {
-      opacity: 0,
-      transform: 'translateY(30px)',
-    },
-    to: {
-      opacity: 1,
-      transform: 'translateY(0)',
-    },
-  },
-}));
-
-const AnimatedButton = styled(Button)(() => ({
-  animation: 'slideUp 0.8s ease-out 0.4s both',
-  '@keyframes slideUp': {
-    from: {
-      opacity: 0,
-      transform: 'translateY(30px)',
-    },
-    to: {
-      opacity: 1,
-      transform: 'translateY(0)',
-    },
-  },
+  alignItems: 'flex-start',
+  justifyContent: 'flex-start',
+  minHeight: '85vh',
+  zIndex: 1,
 }));
 
 const Home: React.FC = () => {
   const theme = useTheme();
 
-  const calculators = [
+  const features = [
+    {
+      icon: <CheckCircleIcon sx={{ fontSize: 36, color: '#e57373' }} />,
+      title: 'Accurate Results',
+      description: 'All our calculators use industry-standard formulas and are tested for accuracy, so you can trust your results every time.',
+    },
+    {
+      icon: <CheckCircleIcon sx={{ fontSize: 36, color: '#9575cd' }} />,
+      title: 'Privacy First',
+      description: 'We never store your data. All calculations happen instantly in your browser for complete privacy and security.',
+    },
+    {
+      icon: <CheckCircleIcon sx={{ fontSize: 36, color: '#81c784' }} />,
+      title: 'Free & Fast',
+      description: 'All tools are 100% free, require no sign-up, and deliver instant results so you can make decisions quickly.',
+    },
+  ];
+
+  const howItWorks = [
+    {
+      icon: <InputIcon sx={{ fontSize: 36, color: '#00bfc6' }} />,
+      title: 'Enter Your Data',
+      description: 'Fill in your numbers—like loan amount, interest rate, or investment details. No sign-up or personal info needed.',
+    },
+    {
+      icon: <CalculateIcon sx={{ fontSize: 36, color: '#9575cd' }} />,
+      title: 'Calculate Instantly',
+      description: 'Get instant, accurate results using industry-standard formulas—right in your browser, with no waiting.',
+    },
+    {
+      icon: <TrendingUpIcon sx={{ fontSize: 36, color: '#81c784' }} />,
+      title: 'Make Smart Moves',
+      description: 'Use your results to plan, compare, and make confident financial decisions—fast and free.',
+    },
+  ];
+
+  // Top 6 calculators with exact same data and styling from Calculators page
+  const topCalculators = [
     {
       title: 'EMI Calculator',
       description: 'Calculate your Equated Monthly Installments for loans and plan your repayments.',
-      icon: <CreditCardIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+      icon: <PaymentIcon sx={{ fontSize: 24, color: '#E53E3E' }} />,
       path: '/emi'
     },
     {
       title: 'SIP Calculator',
       description: 'Plan your Systematic Investment Plan and calculate potential returns over time.',
-      icon: <TrendingUpIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+      icon: <GrowthIcon sx={{ fontSize: 24, color: '#38A169' }} />,
       path: '/sip'
     },
     {
       title: 'FD Calculator',
       description: 'Calculate returns on your Fixed Deposits and plan your investments.',
-      icon: <SavingsIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+      icon: <DepositIcon sx={{ fontSize: 24, color: '#D69E2E' }} />,
       path: '/fd'
+    },
+    {
+      title: 'Income Tax Calculator',
+      description: 'Calculate your tax liability and plan your tax-saving investments effectively.',
+      icon: <TaxIcon sx={{ fontSize: 24, color: '#805AD5' }} />,
+      path: '/income-tax'
     },
     {
       title: 'Mutual Fund Calculator',
       description: 'Analyze your mutual fund investments and track their performance over time.',
-      icon: <AccountBalanceIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
+      icon: <ChartIcon sx={{ fontSize: 24, color: '#3182CE' }} />,
       path: '/mutual-fund'
     },
     {
-      title: 'Tax Calculator',
-      description: 'Calculate your tax liability and plan your tax-saving investments effectively.',
-      icon: <AccountBalanceIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
-      path: '/tax'
-    },
-    {
-      title: 'Investment Calculator',
-      description: 'Plan your investments and calculate potential returns with our comprehensive tool.',
-      icon: <CalculateIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
-      path: '/investment'
-    },
-    {
-      title: 'Loan Comparison',
-      description: 'Compare different loan options and find the best deal for your needs.',
-      icon: <CompareArrowsIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
-      path: '/loan-comparison'
-    },
-    {
-      title: 'Retirement Calculator',
-      description: 'Plan your retirement and calculate the corpus needed for a comfortable life.',
-      icon: <AccountBalanceWalletIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
-      path: '/retirement'
-    },
-    {
-      title: 'ROI Calculator',
-      description: 'Calculate Return on Investment and analyze the profitability of your investments.',
-      icon: <TrendingUpIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
-      path: '/roi'
-    },
-    {
-      title: 'CAGR Calculator',
-      description: 'Calculate Compound Annual Growth Rate for your investments and analyze returns.',
-      icon: <ShowChartIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
-      path: '/cagr'
-    },
-    {
-      title: 'Compound Interest Calculator',
-      description: 'Calculate compound interest and see how your money grows over time.',
-      icon: <AttachMoneyIcon sx={{ fontSize: 28, color: '#5A6BFF' }} />,
-      path: '/compound'
+      title: 'PPF Calculator',
+      description: 'Calculate returns on your Public Provident Fund investments and plan your tax savings.',
+      icon: <BankIcon sx={{ fontSize: 24, color: '#2F855A' }} />,
+      path: '/ppf'
     }
   ];
 
+  // Card colors matching Calculators page
+  const cardColors = [
+    { bg: 'linear-gradient(135deg, rgba(251, 238, 238, 0.8) 0%, rgba(251, 238, 238, 0.9) 100%)' }, // EMI - pink
+    { bg: 'linear-gradient(135deg, rgba(234, 250, 253, 0.8) 0%, rgba(234, 250, 253, 0.9) 100%)' }, // SIP - cyan
+    { bg: 'linear-gradient(135deg, rgba(253, 251, 231, 0.8) 0%, rgba(253, 251, 231, 0.9) 100%)' }, // FD - yellow
+    { bg: 'linear-gradient(135deg, rgba(243, 241, 250, 0.8) 0%, rgba(243, 241, 250, 0.9) 100%)' }, // Income Tax - purple
+    { bg: 'linear-gradient(135deg, rgba(246, 250, 239, 0.8) 0%, rgba(246, 250, 239, 0.9) 100%)' }, // Mutual Fund - green
+    { bg: 'linear-gradient(135deg, rgba(248, 249, 252, 0.8) 0%, rgba(248, 249, 252, 0.9) 100%)' }, // PPF - light gray
+  ];
+
   return (
-    <GradientBackground>
+    <GradientBackground sx={{ paddingBottom: 0, background: '#f8f9fa' }}>
       <HeroSection>
         <Container maxWidth="xl" sx={{ 
           position: 'relative', 
@@ -372,7 +315,7 @@ const Home: React.FC = () => {
             width: '100%',
             mx: 'auto'
           }}>
-            <AnimatedTitle
+            <Typography
               variant="h1"
               sx={{
                 fontWeight: 600,
@@ -396,80 +339,246 @@ const Home: React.FC = () => {
               }}>
                 Money Maths
               </Box>
-            </AnimatedTitle>
-            <AnimatedSubtitle
+            </Typography>
+            <Typography
               variant="h5"
               sx={{
                 color: '#4E5D78',
                 fontWeight: 400,
                 fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.7rem' },
-                maxWidth: '900px',
+                fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
+                maxWidth: '800px',
                 mb: 6,
                 textAlign: 'left',
                 lineHeight: 1.4,
               }}
             >
               Transform your financial planning with fast, accurate, and private calculators free for everyone.
-            </AnimatedSubtitle>
+            </Typography>
             <Box component={RouterLink} to="/calculators" sx={{ textDecoration: 'none', display: 'inline-block' }}>
-              <LearnMoreButton>
-                Get Started
-              </LearnMoreButton>
+              <Button
+                sx={{
+                  background: '#1A1F36',
+                  color: '#fff',
+                  borderRadius: '999px',
+                  fontWeight: 600,
+                  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                  fontSize: '1.1rem',
+                  textTransform: 'none',
+                  padding: '16px 40px',
+                  minWidth: 0,
+                  boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
+                  transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  '&:hover': {
+                    background: '#009ca3',
+                    color: '#fff',
+                    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
+                    transform: 'translateY(-2px) scale(1.04)',
+                  },
+                }}
+              >
+                Get Started <ArrowForwardIcon sx={{ fontSize: '1.2rem' }} />
+              </Button>
             </Box>
           </Box>
         </Container>
       </HeroSection>
-      <Box sx={{ width: '100vw', position: 'relative', left: '50%', right: '50%', ml: '-50vw', mr: '-50vw', py: { xs: 6, md: 8 }, background: '#f8f9fc' }}>
-        <Container maxWidth="xl" sx={{ px: { xs: 2, md: 6, lg: 10 }, textAlign: 'left' }}>
-          <Grid container spacing={4} justifyContent="flex-start" alignItems="stretch">
-            <Grid item xs={12} md={4}>
-              <FeatureCard sx={{ background: '#fbeeee' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <CheckCircleIcon sx={{ fontSize: 36, color: '#e57373', mr: 1.5 }} />
-                  <FeatureTitle>Accurate Results</FeatureTitle>
-                </Box>
-                <FeatureDesc>
-                  All our calculators use industry-standard formulas and are tested for accuracy, so you can trust your results every time.
-                </FeatureDesc>
-              </FeatureCard>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <FeatureCard sx={{ background: '#f3f1fa' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <CheckCircleIcon sx={{ fontSize: 36, color: '#9575cd', mr: 1.5 }} />
-                  <FeatureTitle>Privacy First</FeatureTitle>
-                </Box>
-                <FeatureDesc>
-                  We never store your data. All calculations happen instantly in your browser for complete privacy and security.
-                </FeatureDesc>
-              </FeatureCard>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <FeatureCard sx={{ background: '#f6faef' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <CheckCircleIcon sx={{ fontSize: 36, color: '#81c784', mr: 1.5 }} />
-                  <FeatureTitle>Free & Fast</FeatureTitle>
-                </Box>
-                <FeatureDesc>
-                  All tools are 100% free, require no sign-up, and deliver instant results so you can make decisions quickly.
-                </FeatureDesc>
-              </FeatureCard>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
 
-      {/* How It Works Section */}
-      <Box sx={{ width: '100vw', position: 'relative', left: '50%', right: '50%', ml: '-50vw', mr: '-50vw', py: { xs: 7, md: 10 }, background: '#f4fafd' }}>
-        <Container maxWidth="xl" sx={{ px: { xs: 2, md: 6, lg: 10 }, textAlign: 'left' }}>
+      <Box sx={{ 
+        py: { xs: 3, md: 4 }, 
+        background: 'rgba(255, 255, 255, 0.7)', 
+        backdropFilter: 'blur(10px)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+      }}>
+        <Container maxWidth="xl" sx={{ px: { xs: 2, md: 6, lg: 10 }, position: 'relative', zIndex: 1 }}>
           <Typography
             variant="h3"
             sx={{
               fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               fontWeight: 800,
-              fontSize: { xs: '2rem', md: '2.7rem' },
-              mb: 4,
+              fontSize: { xs: '1rem', md: '1.35rem' },
+              mb: 2,
+              letterSpacing: '-0.02em',
+              color: '#1A1F36',
+              textAlign: 'left',
+              pl: 0,
+            }}
+          >
+            Popular <Box component="span" sx={{ color: '#00bfc6', display: 'inline', fontWeight: 800 }}>Calculators</Box>
+          </Typography>
+          <Grid container spacing={1.5} justifyContent="center">
+            {topCalculators.map((calc, idx) => {
+              const cardColor = cardColors[idx];
+              
+              return (
+                <Grid item xs={6} sm={6} md={4} lg={2} key={calc.title}>
+                  <StyledCard
+                    cardColor={cardColor}
+                    sx={{
+                      height: { xs: '220px', sm: '240px', md: '280px' },
+                      maxWidth: { xs: 'none', md: '200px' },
+                      margin: { xs: '0.5rem', md: '0' },
+                    }}
+                  >
+                    <CardContentWrapper>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '8px' }}>
+                        <Box sx={{ 
+                          fontSize: { xs: '20px', sm: '22px', md: '24px' },
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          {calc.icon}
+                        </Box>
+                        <CardTitle sx={{ marginLeft: '8px', marginBottom: 0, display: 'flex', alignItems: 'center' }}>{calc.title}</CardTitle>
+                </Box>
+                      <CardDesc>{calc.description}</CardDesc>
+                      
+                      <Box sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'flex-end',
+                        marginTop: 'auto'
+                      }}>
+                        <Box component={RouterLink} to={calc.path} sx={{ textDecoration: 'none' }}>
+                          <ActionButton>
+                            Calculate <ArrowForwardIcon sx={{ fontSize: '0.8rem' }} />
+                          </ActionButton>
+                </Box>
+                </Box>
+                    </CardContentWrapper>
+                  </StyledCard>
+            </Grid>
+              );
+            })}
+          </Grid>
+          <Box sx={{ textAlign: 'center', mt: 3 }}>
+            <Button
+              component={RouterLink}
+              to="/calculators"
+              variant="contained"
+              sx={{ 
+                background: '#1A1F36',
+                color: '#fff',
+                borderRadius: '999px',
+                fontWeight: 600,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: '1rem',
+                textTransform: 'none',
+                padding: '12px 32px',
+                minWidth: 0,
+                boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
+                transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
+                '&:hover': {
+                  background: '#009ca3',
+                  color: '#fff',
+                  boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.18)',
+                  transform: 'translateY(-2px) scale(1.04)',
+                },
+              }}
+            >
+              View All Calculators <ArrowForwardIcon sx={{ fontSize: '1.1rem', ml: 1 }} />
+            </Button>
+          </Box>
+        </Container>
+      </Box>
+
+      <Box sx={{ 
+        py: { xs: 3, md: 4 }, 
+        background: 'rgba(255, 255, 255, 0.7)', 
+        backdropFilter: 'blur(10px)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+      }}>
+        <Container maxWidth="xl" sx={{ px: { xs: 2, md: 6, lg: 10 }, textAlign: 'left', position: 'relative', zIndex: 1 }}>
+          <Typography
+            variant="h3"
+            sx={{
+              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontWeight: 800,
+              fontSize: { xs: '1rem', md: '1.35rem' },
+              mb: 2,
+              letterSpacing: '-0.02em',
+              color: '#1A1F36',
+              textAlign: 'left',
+              pl: 0,
+            }}
+          >
+            Why Choose <Box component="span" sx={{ color: '#00bfc6', display: 'inline', fontWeight: 800 }}>Money Maths</Box>
+          </Typography>
+          <Grid container spacing={3} justifyContent="flex-start" alignItems="stretch">
+            {features.map((feature, index) => (
+              <Grid item xs={12} md={4} key={index}>
+                <Box sx={{
+                  borderRadius: '24px',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
+                  padding: '1.5rem 1.5rem 1.5rem 1.5rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: 200,
+                  transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  background: 'rgba(255, 255, 255, 0.8)',
+                  backdropFilter: 'blur(16px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  '&:hover': {
+                    transform: 'translateY(-8px) scale(1.02)',
+                    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15), 0 15px 30px rgba(0, 0, 0, 0.1)',
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    border: '1px solid rgba(255, 255, 255, 0.4)',
+                  },
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                    {feature.icon}
+                    <Typography
+                      sx={{
+                        color: '#1A1F36',
+                        fontWeight: 700,
+                        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                        fontSize: '1.1rem',
+                        letterSpacing: '-0.01em',
+                        marginBottom: 0,
+                        marginLeft: 1.5,
+                      }}
+                    >
+                      {feature.title}
+                    </Typography>
+                </Box>
+                  <Typography
+                    sx={{
+                      color: '#4E5D78',
+                      fontWeight: 400,
+                      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                      fontSize: '0.95rem',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {feature.description}
+                  </Typography>
+                </Box>
+            </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
+      <Box sx={{ 
+        py: { xs: 3, md: 4 }, 
+        background: 'rgba(255, 255, 255, 0.7)', 
+        backdropFilter: 'blur(10px)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+      }}>
+        <Container maxWidth="xl" sx={{ px: { xs: 2, md: 6, lg: 10 }, textAlign: 'left', position: 'relative', zIndex: 1 }}>
+          <Typography
+            variant="h3"
+            sx={{
+              fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+              fontWeight: 800,
+              fontSize: { xs: '1rem', md: '1.35rem' },
+              mb: 2,
               letterSpacing: '-0.02em',
               color: '#1A1F36',
               textAlign: 'left',
@@ -478,142 +587,58 @@ const Home: React.FC = () => {
           >
             How <Box component="span" sx={{ color: '#00bfc6', display: 'inline', fontWeight: 800 }}>Money Maths</Box> Works
           </Typography>
-          <Grid container spacing={4} justifyContent="flex-start" alignItems="stretch">
-            <Grid item xs={12} md={4}>
-              <FeatureCard sx={{ background: '#eaf7fa', minHeight: 200, animation: 'fadeInLeft 0.7s' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <InputIcon sx={{ fontSize: 36, color: '#00bfc6', mr: 1.5 }} />
-                  <FeatureTitle>Enter Your Data</FeatureTitle>
-                </Box>
-                <FeatureDesc>
-                  Fill in your numbers—like loan amount, interest rate, or investment details. No sign-up or personal info needed.
-                </FeatureDesc>
-              </FeatureCard>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <FeatureCard sx={{ background: '#f3f1fa', minHeight: 200, animation: 'fadeIn 0.7s' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <CalculateIcon sx={{ fontSize: 36, color: '#9575cd', mr: 1.5 }} />
-                  <FeatureTitle>Calculate Instantly</FeatureTitle>
-                </Box>
-                <FeatureDesc>
-                  Get instant, accurate results using industry-standard formulas—right in your browser, with no waiting.
-                </FeatureDesc>
-              </FeatureCard>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <FeatureCard sx={{ background: '#f6faef', minHeight: 200, animation: 'fadeInRight 0.7s' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <TrendingUpIcon sx={{ fontSize: 36, color: '#81c784', mr: 1.5 }} />
-                  <FeatureTitle>Make Smart Moves</FeatureTitle>
-                </Box>
-                <FeatureDesc>
-                  Use your results to plan, compare, and make confident financial decisions—fast and free.
-                </FeatureDesc>
-              </FeatureCard>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-
-      <Box sx={{ width: '100vw', position: 'relative', left: '50%', right: '50%', ml: '-50vw', mr: '-50vw', py: { xs: 7, md: 10 }, background: '#f8f9fc' }}>
-        <Container maxWidth="xl" sx={{ px: { xs: 2, md: 6, lg: 10 } }}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
-              alignItems: 'stretch',
-              borderRadius: '32px',
-              background: '#f4fafd',
-              boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
-              overflow: 'hidden',
-              animation: 'fadeIn 0.8s',
-            }}
-          >
-            <Box
-              sx={{
-                flex: 1,
-                minHeight: 280,
-                background: 'linear-gradient(135deg, #eaf7fa 60%, #f3f1fa 100%)',
+          <Grid container spacing={3} justifyContent="flex-start" alignItems="stretch">
+            {howItWorks.map((step, index) => (
+              <Grid item xs={12} md={4} key={index}>
+                <Box sx={{
+                  borderRadius: '24px',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
+                  padding: '1.5rem 1.5rem 1.5rem 1.5rem',
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Box
-                component="img"
-                src="/hero-image.svg"
-                alt="Calculator Illustration"
-                sx={{ width: '100%', height: '100%', minHeight: 180, maxHeight: { xs: 260, md: 360 }, objectFit: 'contain', borderRadius: { xs: '0', md: '24px 0 0 24px' }, background: 'none', p: 0 }}
-              />
-            </Box>
-            <Box sx={{ flex: 2, p: { xs: 3, md: 5 }, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <Box sx={{ mb: 1 }}>
-                <Box
-                  component="span"
-                  sx={{ 
-                    background: '#f3f1fa',
-                    color: '#9575cd',
-                    fontWeight: 600,
-                    fontSize: '0.95rem',
-                    borderRadius: '12px',
-                    px: 2,
-                    py: 0.5,
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  CASE STUDY
-                </Box>
-              </Box>
+                  flexDirection: 'column',
+                  minHeight: 160,
+                  transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                  background: 'rgba(255, 255, 255, 0.8)',
+                  backdropFilter: 'blur(16px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  '&:hover': {
+                    transform: 'translateY(-8px) scale(1.02)',
+                    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15), 0 15px 30px rgba(0, 0, 0, 0.1)',
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    border: '1px solid rgba(255, 255, 255, 0.4)',
+                  },
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                    {step.icon}
               <Typography 
-                variant="h4"
                 sx={{
+                        color: '#1A1F36',
+                        fontWeight: 700,
                   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                  fontWeight: 700,
-                  fontSize: { xs: '1.5rem', md: '2rem' },
-                  color: '#1A1F36',
-                  mb: 1.5,
-                }}
-              >
-                How Money Maths Helped Users Make Smarter Decisions
+                        fontSize: '1.1rem',
+                        letterSpacing: '-0.01em',
+                        marginBottom: 0,
+                        marginLeft: 1.5,
+                      }}
+                    >
+                      {step.title}
               </Typography>
+                  </Box>
               <Typography
                 sx={{ 
                   color: '#4E5D78',
-                  fontSize: '1.08rem',
-                  mb: 3,
+                      fontWeight: 400,
                   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                }}
-              >
-                "I used Money Maths to compare loan options and plan my investments. The instant results and privacy-first approach made it my go-to tool for all financial calculations."
-              </Typography>
-              <Button
-                variant="outlined"
-                sx={{ 
-                  borderRadius: '999px',
-                  fontWeight: 600,
-                  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                  borderColor: '#1A1F36',
-                  color: '#1A1F36',
-                  px: 3, 
-                  py: 1, 
-                  textTransform: 'none',
-                  width: 'fit-content',
-                  mb: 2,
-                  '&:hover': {
-                    background: '#eaf7fa',
-                    borderColor: '#00bfc6',
-                    color: '#00bfc6',
-                  },
-                }}
-              >
-                Read case study
-              </Button>
-              <Typography sx={{ color: '#00bfc6', fontWeight: 700, fontSize: '1.3rem', mt: 1 }}>
-                95% <span style={{ color: '#4E5D78', fontWeight: 400, fontSize: '1rem' }}>users found better financial clarity</span>
+                      fontSize: '0.95rem',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {step.description}
               </Typography>
             </Box>
-          </Box>
+              </Grid>
+            ))}
+          </Grid>
         </Container>
       </Box>
     </GradientBackground>
