@@ -375,28 +375,14 @@ const Calculators: React.FC = () => {
   ];
 
   return (
-    <GradientBackground sx={{ 
-      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e1 50%, #e2e8f0 75%, #f8fafc 100%)',
-      minHeight: '100vh',
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%)',
-        pointerEvents: 'none',
-      }
-    }}>
+    <GradientBackground>
       <Container maxWidth="xl" sx={{ 
+        position: 'relative', 
+        zIndex: 1, 
         pt: { xs: 1, md: 2 }, 
         pb: { xs: 2, md: 3 },
-        px: { xs: 2, md: 4, lg: 6 },
+        px: { xs: 1, sm: 2, md: 4, lg: 6 },
         textAlign: 'left',
-        position: 'relative',
-        zIndex: 1
       }}>
         <Box sx={{ 
           mb: { xs: 3, md: 4 }, 
@@ -439,7 +425,7 @@ const Calculators: React.FC = () => {
           </Typography>
         </Box>
 
-        <Grid container spacing={1.5} justifyContent="center">
+        <Grid container spacing={2} justifyContent="center">
           {calculators.map((calc, idx) => {
             const cardColor = cardColors[idx];
             
@@ -463,7 +449,7 @@ const Calculators: React.FC = () => {
                     },
                     height: { xs: '220px', sm: '240px', md: '280px' },
                     maxWidth: { xs: 'none', md: '200px' },
-                    margin: { xs: '0.5rem', md: '0' },
+                    margin: 0,
                 }}
               >
                 <CardContentWrapper>

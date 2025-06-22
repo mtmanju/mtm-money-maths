@@ -104,6 +104,7 @@ const StyledCard = styled(Box)<{ cardColor?: { bg: string } }>(({ cardColor }) =
       border: '1px solid rgba(255, 255, 255, 0.6)',
     },
   },
+  zIndex: 1,
 }));
 
 const CardContentWrapper = styled(Box)({
@@ -197,13 +198,13 @@ const ActionButton = styled(Button)({
 
 const HeroSection = styled(Box)(({ theme }) => ({
   position: 'relative',
-  padding: theme.spacing(8, 0, 6, 0),
-  background: 'transparent',
+  padding: theme.spacing(10, 2),
   overflow: 'hidden',
   display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'flex-start',
+  alignItems: 'center',
+  justifyContent: 'center',
   minHeight: '85vh',
+  textAlign: 'center',
   zIndex: 1,
 }));
 
@@ -297,81 +298,71 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <GradientBackground sx={{ paddingBottom: 0, background: '#f8f9fa' }}>
+    <GradientBackground sx={{ paddingBottom: 0 }}>
       <HeroSection>
-        <Container maxWidth="xl" sx={{ 
+        <Container maxWidth="lg" sx={{ 
           position: 'relative', 
-          zIndex: 1, 
-          textAlign: 'left', 
-          px: { xs: 2, md: 6, lg: 10 },
+          zIndex: 1,
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
-          minHeight: '85vh',
-          width: '100%'
+          alignItems: 'center',
+          justifyContent: 'center'
         }}>
-          <Box sx={{ 
-            maxWidth: '1400px',
-            width: '100%',
-            mx: 'auto'
-          }}>
+          <Box sx={{ maxWidth: '900px', width: '100%' }}>
             <Typography
               variant="h1"
               sx={{
-                fontWeight: 600,
+                fontWeight: 700,
                 fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5.2rem', lg: '6rem' },
-                lineHeight: 1.08,
+                fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem' },
+                lineHeight: 1.2,
                 letterSpacing: '-0.03em',
                 mb: 3,
                 color: '#1A1F36',
-                textAlign: 'left',
-                maxWidth: '1200px'
               }}
             >
-              Experience{' '}
+              Smarter Financial Decisions,
               <Box component="span" sx={{ 
                 display: 'block', 
                 color: '#00bfc6', 
-                fontWeight: 600, 
-                fontSize: { xs: '2.5rem', sm: '3.5rem', md: '5.2rem', lg: '6rem' },
-                mt: 1
+                fontWeight: 700, 
+                fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem' },
               }}>
-                Money Maths
+                Made Simple.
               </Box>
             </Typography>
             <Typography
               variant="h5"
               sx={{
-                color: '#4E5D78',
+                color: '#6B7280',
                 fontWeight: 400,
                 fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
-                maxWidth: '800px',
-                mb: 6,
-                textAlign: 'left',
-                lineHeight: 1.4,
+                fontSize: { xs: '1.1rem', sm: '1.2rem', md: '1.25rem' },
+                maxWidth: '600px',
+                mx: 'auto',
+                mb: 5,
+                lineHeight: 1.6,
               }}
             >
-              Transform your financial planning with fast, accurate, and private calculators free for everyone.
+              Your one-stop destination for fast, free, and accurate financial calculators. Plan your investments, loans, and taxes with confidence.
             </Typography>
-            <Box component={RouterLink} to="/calculators" sx={{ textDecoration: 'none', display: 'inline-block' }}>
+            <Box>
               <Button
+                component={RouterLink}
+                to="/calculators"
+                variant="contained"
                 sx={{
                   background: '#1A1F36',
                   color: '#fff',
                   borderRadius: '999px',
                   fontWeight: 600,
                   fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                  fontSize: '1.1rem',
+                  fontSize: '1rem',
                   textTransform: 'none',
-                  padding: '16px 40px',
+                  padding: '12px 32px',
                   minWidth: 0,
                   boxShadow: '0 4px 16px 0 rgba(30, 34, 90, 0.10)',
                   transition: 'background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
                   '&:hover': {
                     background: '#009ca3',
                     color: '#fff',
@@ -380,7 +371,7 @@ const Home: React.FC = () => {
                   },
                 }}
               >
-                Get Started <ArrowForwardIcon sx={{ fontSize: '1.2rem' }} />
+                Get Started <ArrowForwardIcon sx={{ fontSize: '1.1rem', ml: 1 }} />
               </Button>
             </Box>
           </Box>
@@ -410,7 +401,7 @@ const Home: React.FC = () => {
           >
             Popular <Box component="span" sx={{ color: '#00bfc6', display: 'inline', fontWeight: 800 }}>Calculators</Box>
           </Typography>
-          <Grid container spacing={1.5} justifyContent="center">
+          <Grid container spacing={2} justifyContent="center">
             {topCalculators.map((calc, idx) => {
               const cardColor = cardColors[idx];
               
@@ -419,15 +410,17 @@ const Home: React.FC = () => {
                   <StyledCard
                     cardColor={cardColor}
                     sx={{
-                      height: { xs: '220px', sm: '240px', md: '280px' },
-                      maxWidth: { xs: 'none', md: '200px' },
-                      margin: { xs: '0.5rem', md: '0' },
+                      height: { xs: 'auto', sm: '240px', md: '280px' },
+                      minHeight: { xs: '200px', sm: '220px' },
+                      maxWidth: { xs: '100%', md: 'none' },
+                      width: '100%',
+                      margin: 0,
                     }}
                   >
                     <CardContentWrapper>
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '8px' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '12px' }}>
                         <Box sx={{ 
-                          fontSize: { xs: '20px', sm: '22px', md: '24px' },
+                          fontSize: { xs: '22px', sm: '24px' },
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center'
@@ -435,7 +428,7 @@ const Home: React.FC = () => {
                           {calc.icon}
                         </Box>
                         <CardTitle sx={{ marginLeft: '8px', marginBottom: 0, display: 'flex', alignItems: 'center' }}>{calc.title}</CardTitle>
-                </Box>
+                      </Box>
                       <CardDesc>{calc.description}</CardDesc>
                       
                       <Box sx={{ 
@@ -443,15 +436,15 @@ const Home: React.FC = () => {
                         justifyContent: 'flex-end',
                         marginTop: 'auto'
                       }}>
-                        <Box component={RouterLink} to={calc.path} sx={{ textDecoration: 'none' }}>
-                          <ActionButton>
-                            Calculate <ArrowForwardIcon sx={{ fontSize: '0.8rem' }} />
+                        <Box component={RouterLink} to={calc.path} sx={{ textDecoration: 'none', width: '100%' }}>
+                          <ActionButton sx={{ width: '100%', justifyContent: 'center' }}>
+                            Calculate <ArrowForwardIcon sx={{ fontSize: '0.9rem' }} />
                           </ActionButton>
-                </Box>
-                </Box>
+                        </Box>
+                      </Box>
                     </CardContentWrapper>
                   </StyledCard>
-            </Grid>
+                </Grid>
               );
             })}
           </Grid>
@@ -509,56 +502,77 @@ const Home: React.FC = () => {
           >
             Why Choose <Box component="span" sx={{ color: '#00bfc6', display: 'inline', fontWeight: 800 }}>Money Maths</Box>
           </Typography>
-          <Grid container spacing={3} justifyContent="flex-start" alignItems="stretch">
+          <Grid container spacing={3} justifyContent="center" alignItems="stretch">
             {features.map((feature, index) => (
-              <Grid item xs={12} md={4} key={index}>
+              <Grid item xs={12} sm={6} md={4} key={index}>
                 <Box sx={{
-                  borderRadius: '24px',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
-                  padding: '1.5rem 1.5rem 1.5rem 1.5rem',
                   display: 'flex',
                   flexDirection: 'column',
-                  minHeight: 200,
-                  transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  backdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  '&:hover': {
-                    transform: 'translateY(-8px) scale(1.02)',
-                    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15), 0 15px 30px rgba(0, 0, 0, 0.1)',
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid rgba(255, 255, 255, 0.4)',
-                  },
+                  height: '100%',
                 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                    {feature.icon}
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    mb: 1.5,
+                    '@media (max-width: 899px)': {
+                      mb: 2,
+                    }
+                  }}>
+                    {React.cloneElement(feature.icon, { 
+                      sx: { 
+                        fontSize: 36, 
+                        color: '#e57373',
+                        '@media (max-width: 899px)': {
+                          fontSize: 28, 
+                          color: '#6750A4'
+                        }
+                      } 
+                    })}
                     <Typography
                       sx={{
+                        // Desktop styles
                         color: '#1A1F36',
                         fontWeight: 700,
                         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                         fontSize: '1.1rem',
                         letterSpacing: '-0.01em',
-                        marginBottom: 0,
                         marginLeft: 1.5,
+                        // Mobile styles
+                        '@media (max-width: 899px)': {
+                          color: '#1C1B1F',
+                          fontWeight: 500,
+                          fontFamily: 'Roboto, sans-serif',
+                          fontSize: '0.875rem',
+                          lineHeight: 1.5,
+                          letterSpacing: '0.15px',
+                          marginLeft: 2,
+                        },
                       }}
                     >
                       {feature.title}
                     </Typography>
-                </Box>
+                  </Box>
                   <Typography
                     sx={{
+                      // Desktop styles
                       color: '#4E5D78',
                       fontWeight: 400,
                       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                       fontSize: '0.95rem',
                       lineHeight: 1.5,
+                      // Mobile styles
+                      '@media (max-width: 899px)': {
+                        color: '#49454F',
+                        fontSize: '0.75rem',
+                        lineHeight: 1.43,
+                        letterSpacing: '0.25px',
+                      },
                     }}
                   >
                     {feature.description}
                   </Typography>
                 </Box>
-            </Grid>
+              </Grid>
             ))}
           </Grid>
         </Container>
@@ -566,10 +580,7 @@ const Home: React.FC = () => {
 
       <Box sx={{ 
         py: { xs: 3, md: 4 }, 
-        background: 'rgba(255, 255, 255, 0.7)', 
-        backdropFilter: 'blur(10px)',
-        borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+        background: 'transparent',
       }}>
         <Container maxWidth="xl" sx={{ px: { xs: 2, md: 6, lg: 10 }, textAlign: 'left', position: 'relative', zIndex: 1 }}>
           <Typography
@@ -587,55 +598,76 @@ const Home: React.FC = () => {
           >
             How <Box component="span" sx={{ color: '#00bfc6', display: 'inline', fontWeight: 800 }}>Money Maths</Box> Works
           </Typography>
-          <Grid container spacing={3} justifyContent="flex-start" alignItems="stretch">
+          <Grid container spacing={3} justifyContent="center" alignItems="stretch">
             {howItWorks.map((step, index) => (
-              <Grid item xs={12} md={4} key={index}>
+              <Grid item xs={12} sm={6} md={4} key={index}>
                 <Box sx={{
-                  borderRadius: '24px',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)',
-                  padding: '1.5rem 1.5rem 1.5rem 1.5rem',
-                display: 'flex',
+                  display: 'flex',
                   flexDirection: 'column',
-                  minHeight: 160,
-                  transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  backdropFilter: 'blur(16px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  '&:hover': {
-                    transform: 'translateY(-8px) scale(1.02)',
-                    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15), 0 15px 30px rgba(0, 0, 0, 0.1)',
-                    background: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid rgba(255, 255, 255, 0.4)',
-                  },
+                  height: '100%',
                 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                    {step.icon}
-              <Typography 
-                sx={{
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    mb: 1.5,
+                    '@media (max-width: 899px)': {
+                      mb: 2,
+                    }
+                  }}>
+                    {React.cloneElement(step.icon, { 
+                      sx: { 
+                        fontSize: 36, 
+                        color: '#00bfc6',
+                        '@media (max-width: 899px)': {
+                          fontSize: 28, 
+                          color: '#6750A4'
+                        }
+                      }
+                    })}
+                    <Typography
+                      sx={{
+                        // Desktop styles
                         color: '#1A1F36',
                         fontWeight: 700,
-                  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                         fontSize: '1.1rem',
                         letterSpacing: '-0.01em',
-                        marginBottom: 0,
                         marginLeft: 1.5,
+                        // Mobile styles
+                        '@media (max-width: 899px)': {
+                          color: '#1C1B1F',
+                          fontWeight: 500,
+                          fontFamily: 'Roboto, sans-serif',
+                          fontSize: '0.875rem',
+                          lineHeight: 1.5,
+                          letterSpacing: '0.15px',
+                          marginLeft: 2,
+                        },
                       }}
                     >
                       {step.title}
-              </Typography>
+                    </Typography>
                   </Box>
-              <Typography
-                sx={{ 
-                  color: '#4E5D78',
+                  <Typography
+                    sx={{
+                      // Desktop styles
+                      color: '#4E5D78',
                       fontWeight: 400,
-                  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                       fontSize: '0.95rem',
                       lineHeight: 1.5,
+                      // Mobile styles
+                      '@media (max-width: 899px)': {
+                        color: '#49454F',
+                        fontSize: '0.75rem',
+                        lineHeight: 1.43,
+                        letterSpacing: '0.25px',
+                      },
                     }}
                   >
                     {step.description}
-              </Typography>
-            </Box>
+                  </Typography>
+                </Box>
               </Grid>
             ))}
           </Grid>

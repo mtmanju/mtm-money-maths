@@ -31,8 +31,9 @@ import { styled } from '@mui/material/styles';
 // Mobile App Bar with desktop-consistent styling
 const MobileAppBar = styled(AppBar)(({ theme }) => ({
   background: '#fff',
-  borderBottom: '1.5px solid #eafafd',
-  boxShadow: '0 1px 2px rgba(30, 34, 90, 0.04)',
+  boxShadow: 'none',
+  borderBottom: 'none',
+  borderRadius: 0,
   '& .MuiToolbar-root': {
     minHeight: 64,
     paddingLeft: 16,

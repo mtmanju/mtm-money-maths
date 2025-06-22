@@ -14,7 +14,7 @@ export const colors = {
   },
   secondary: '#4E5D78', // Subtext (matches hero)
   border: '#e0e7ef',
-  background: '#fff', // White background (matches hero)
+  background: '#F3F4F6', // White background (matches hero)
   cardBackground: '#fff', // White for calculator cards
   buttonBackground: '#eafafd', // Light button backgrounds
   gradient: {
@@ -78,7 +78,7 @@ export const GradientBackground = styled(Box)(({ theme }) => ({
   minHeight: '100vh',
   width: '100%',
   overflowX: 'hidden',
-  background: 'transparent',
+  background: colors.background,
   fontFamily: typography.fontFamily,
   paddingTop: theme.spacing(4),
   paddingBottom: theme.spacing(8),
