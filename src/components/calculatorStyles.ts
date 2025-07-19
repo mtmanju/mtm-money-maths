@@ -78,7 +78,6 @@ export const GradientBackground = styled(Box)(({ theme }) => ({
   minHeight: '100vh',
   width: '100%',
   overflowX: 'hidden',
-  background: colors.background,
   fontFamily: typography.fontFamily,
   paddingTop: theme.spacing(4),
   paddingBottom: theme.spacing(8),
@@ -149,6 +148,9 @@ export const StyledTextField = styled(TextField)(({ theme }) => ({
     [theme.breakpoints.down('sm')]: {
       fontSize: '0.9rem',
       padding: '12px 14px',
+    },
+    '&:focus': {
+      color: colors.primary,
     },
   },
   // Remove all browser and custom number input arrows

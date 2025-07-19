@@ -24,6 +24,8 @@ import { CalculatorTable } from '../components/CalculatorTable';
 import { ResultCard } from '../components/ResultCard';
 import { CalculatorChart } from '../components/CalculatorChart';
 import { calculateInvestment, InvestmentCalculationParams, InvestmentCalculationResult } from '../utils/calculatorUtils';
+import FAQSection, { FAQItem } from '../components/common/FAQSection';
+import ParticularsSection from '../components/common/ParticularsSection';
 
 const InvestmentCalculator: React.FC = () => {
   const [investmentType, setInvestmentType] = useState<'lumpsum' | 'sip'>('lumpsum');
@@ -358,103 +360,26 @@ const InvestmentCalculator: React.FC = () => {
 
   // Modern particulars section (switches based on investmentType)
   const particularsSection = (
-    <Box sx={{ mt: 3, mb: 2 }}>
-      <Box sx={{ background: '#f4f7fa', borderRadius: 2, p: 2, mb: 2, display: 'flex', flexDirection: 'column', gap: 1, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-        <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem', mb: 0.5 }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Formula:</span>
-          {investmentType === 'sip'
-            ? 'A = P × [ (1 + r)^n – 1 ] / r × (1 + r)'
-            : 'A = P × (1 + r)^n'}
-        </Typography>
-        <Typography variant="body2" sx={{ color: colors.accent.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem' }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Example:</span>
-          {investmentType === 'sip'
-            ? `A = ₹${monthlyInvestment.toLocaleString('en-IN')} × [ (1 + ${expectedReturn / 1200})^${timePeriod * 12} – 1 ] / ${expectedReturn / 1200} × (1 + ${expectedReturn / 1200}) = `
-            : `A = ₹${principal.toLocaleString('en-IN')} × (1 + ${expectedReturn / 100})^${timePeriod} = `}
-          <b>{formatCurrency2(results.maturityValue)}</b>
-        </Typography>
-      </Box>
-      <Box component="ul" sx={{ m: 0, pl: 2, color: colors.secondary, fontSize: { xs: '0.98rem', md: '1.03rem' }, lineHeight: 1.6, listStyle: 'none' }}>
-        {investmentType === 'sip' ? (
-          <>
-            <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-              <Box sx={{ width: 6, height: 6, bgcolor: colors.primary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-              <span><b>P (Installment):</b> The monthly deposit amount.</span>
-            </Box>
-            <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-              <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.green, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-              <span><b>r (Rate):</b> The monthly interest rate (annual rate / 12 / 100).</span>
-            </Box>
-            <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-              <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.purple, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-              <span><b>n (Months):</b> The total number of monthly installments.</span>
-            </Box>
-            <Box component="li" sx={{ mb: 0, display: 'flex', alignItems: 'flex-start' }}>
-              <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-              <span><b>A (Amount):</b> The maturity value after compounding.</span>
-            </Box>
-          </>
-        ) : (
-          <>
-            <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-              <Box sx={{ width: 6, height: 6, bgcolor: colors.primary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-              <span><b>P (Principal):</b> The initial amount invested.</span>
-            </Box>
-            <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-              <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.green, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-              <span><b>r (Rate):</b> The annual interest rate (as a decimal).</span>
-            </Box>
-            <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-              <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.purple, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-              <span><b>n (Years):</b> Number of years the money is invested for.</span>
-            </Box>
-            <Box component="li" sx={{ mb: 0, display: 'flex', alignItems: 'flex-start' }}>
-              <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-              <span><b>A (Amount):</b> The maturity value after compounding.</span>
-            </Box>
-          </>
-        )}
-      </Box>
-    </Box>
+    <ParticularsSection
+      title="How Investment is Calculated"
+      items={[
+        <><b>Investment Type:</b> SIP or Lump Sum.</>,
+        <><b>Principal:</b> The amount invested.</>,
+        <><b>Rate of Return:</b> The expected annual return percentage.</>,
+        <><b>Time Period:</b> Number of years the investment is held.</>,
+        <><b>Formula:</b> Depends on SIP or Lump Sum calculation.</>,
+      ]}
+    />
   );
-
-  // Modern FAQ section (switches based on investmentType)
-  const [faqOpen, setFaqOpen] = React.useState(false);
+  const faqItems: FAQItem[] = [
+    { q: 'What is an investment calculator?', a: 'It helps you estimate returns for SIP or lump sum investments.' },
+    { q: 'What is SIP?', a: 'Systematic Investment Plan, a way to invest a fixed amount regularly.' },
+    { q: 'What is a lump sum investment?', a: 'A one-time investment of a large amount.' },
+    { q: 'How are returns calculated?', a: 'Returns are calculated using compound interest formulas for SIP or lump sum.' },
+    { q: 'Are returns guaranteed?', a: 'No, returns depend on market performance and are not guaranteed.' },
+  ];
   const faqSection = (
-    <Box sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
-          Frequently Asked Questions
-        </Typography>
-        <Box component="span" sx={{ color: colors.secondary, ml: 1, display: 'flex', alignItems: 'center' }}>
-          <svg style={{ transform: faqOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s', width: 22, height: 22 }} viewBox="0 0 24 24"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
-        </Box>
-      </Box>
-      <Box sx={{ display: faqOpen ? 'block' : 'none', mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
-        {(investmentType === 'sip'
-          ? [
-              { q: 'What is a SIP?', a: 'A Systematic Investment Plan (SIP) is a way to invest a fixed amount regularly in mutual funds or other investment vehicles.' },
-              { q: 'How is SIP maturity calculated?', a: 'A = P × [ (1 + r)^n – 1 ] / r × (1 + r), where A is maturity value, P is monthly investment, r is monthly rate, n is number of months.' },
-              { q: 'What are the benefits of SIP?', a: 'SIP allows rupee cost averaging, compounding, and disciplined investing.' },
-              { q: 'Can I change my SIP amount?', a: 'Yes, you can increase or decrease your SIP amount as per your financial goals.' },
-              { q: 'Is SIP safe?', a: 'SIP is a method of investing, not a product. The safety depends on the underlying investment.' },
-            ]
-          : [
-              { q: 'What is a Lump Sum investment?', a: 'A Lump Sum investment is a one-time investment of a large amount in a financial instrument.' },
-              { q: 'How is Lump Sum maturity calculated?', a: 'A = P × (1 + r)^n, where A is maturity value, P is principal, r is rate, n is years.' },
-              { q: 'What are the benefits of Lump Sum?', a: 'Lump Sum can be beneficial when you have a large amount to invest and want to take advantage of market timing.' },
-              { q: 'Is Lump Sum better than SIP?', a: 'It depends on market conditions and your financial goals. SIP is better for disciplined, long-term investing.' },
-              { q: 'Is Lump Sum safe?', a: 'The safety depends on the underlying investment product.' },
-            ]
-        ).map((item, idx, arr) => (
-          <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
-            <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
-            <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
-            {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
-          </Box>
-        ))}
-      </Box>
-    </Box>
+    <FAQSection faqs={faqItems} collapsible={true} />
   );
 
   return (
@@ -465,19 +390,9 @@ const InvestmentCalculator: React.FC = () => {
       resultSection={resultSection}
       tableSection={
         <>
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: colors.primary, mb: 2, fontSize: { xs: '1.05rem', md: '1.10rem' }, textAlign: 'center', letterSpacing: 0.1 }}>
-            {investmentType === 'sip' ? 'SIP Particulars & FAQ' : 'Lump Sum Particulars & FAQ'}
-          </Typography>
           {tableSection}
-          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary, mb: 2, fontSize: { xs: '1.15rem', md: '1.18rem' }, textAlign: 'left' }}>
-              How Investment is Calculated
-            </Typography>
-            {particularsSection}
-          </Box>
-          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>
-            {faqSection}
-          </Box>
+          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>{particularsSection}</Box>
+          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>{faqSection}</Box>
         </>
       }
     />

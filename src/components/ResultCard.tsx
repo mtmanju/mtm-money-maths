@@ -66,11 +66,11 @@ export const ResultCard: React.FC<ResultCardProps> = ({
     >
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
         {icon && <Box sx={{ mr: 1, color: variantStyle.iconColor }}>{icon}</Box>}
-        <Typography variant="body1" sx={{ color: colors.secondary, fontWeight: 500, fontFamily: typography.fontFamily, fontSize: fontSize }}>
+        <Typography variant="body1" sx={{ color: colors.secondary, fontWeight: 700, fontFamily: typography.fontFamily, fontSize: fontSize }}>
           {title}
         </Typography>
       </Box>
-      <Typography variant="subtitle1" sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, fontSize: fontSize }}>
+      <Typography variant="subtitle1" sx={{ color: colors.primary, fontWeight: 400, fontFamily: typography.fontFamily, fontSize: fontSize }}>
         {value}
       </Typography>
     </Paper>

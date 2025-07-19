@@ -12,6 +12,9 @@ import { Paper as MuiPaper } from '@mui/material';
 import { ResultCard } from '../components/ResultCard';
 import { Collapse, IconButton, Alert } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import FAQSection, { FAQItem } from '../components/common/FAQSection';
+import ParticularsSection from '../components/common/ParticularsSection';
+import EligibilityAlert from '../components/common/EligibilityAlert';
 
 interface GratuityResults {
   gratuityAmount: number;
@@ -249,116 +252,29 @@ const GratuityCalculator: React.FC = () => {
   );
 
   const particularsSection = (
-    <MuiPaper elevation={1} sx={{ p: { xs: 2, md: 3 }, mb: 3, mt: 4, background: '#fafdff', borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
-      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: colors.primary, mb: 2, letterSpacing: 0.2, fontSize: { xs: '1.1rem', md: '1.15rem' } }}>
-        How Gratuity is Calculated
-      </Typography>
-      {/* Modern formula and example card */}
-      <Box sx={{ background: '#f4f7fa', borderRadius: 2, p: 2, mb: 2, display: 'flex', flexDirection: 'column', gap: 1, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-        <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem', mb: 0.5 }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Formula:</span>
-          Gratuity = (Last Drawn Salary × Years of Service × 15) / 26
-        </Typography>
-        <Typography variant="body2" sx={{ color: colors.accent.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem' }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Example:</span>
-          Gratuity = (₹{basicSalary.toLocaleString('en-IN')} + ₹{da.toLocaleString('en-IN')}) × {getRoundedYears(serviceYears)} × 15 / 26 = <b>{formatCurrency2(((basicSalary + da) * getRoundedYears(serviceYears) * 15) / 26)}</b>
-        </Typography>
-        {/* Show both theoretical and capped gratuity if formula result exceeds 20 lakh */}
-        {(() => {
-          const theoretical = ((basicSalary + da) * getRoundedYears(serviceYears) * 15) / 26;
-          if (theoretical > 2000000) {
-            return (
-              <>
-                <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.01rem', mt: 0.5 }}>
-                  Calculated Gratuity (Formula): <b>{formatCurrency2(theoretical)}</b>
-                </Typography>
-                <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.01rem' }}>
-                  Maximum Payable (as per law): <b>₹20,00,000</b>
-                </Typography>
-              </>
-            );
-          }
-          return null;
-        })()}
-      </Box>
-      <Box component="ul" sx={{ m: 0, pl: 2, color: colors.secondary, fontSize: { xs: '0.98rem', md: '1.03rem' }, lineHeight: 1.6, listStyle: 'none' }}>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.green, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>Last Drawn Salary:</b> Sum of Basic Salary and Dearness Allowance (DA).</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.pink, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>Years of Service:</b> Completed years of service with the employer. If you have worked more than 6 months in the last year, it is rounded up to the next full year.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.purple, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>Tax-Free Gratuity:</b> Up to ₹20,00,000 is tax-free under Section 10(10) of the Income Tax Act (lifetime limit, subject to rules).</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>Taxable Gratuity:</b> Any amount above the exemption limit is taxable as per your income tax slab.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 0, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>Tax Status:</b> 'Exempt' means not taxable, 'Taxable' means subject to tax, 'Mixed' means partially exempt and partially taxable.</span>
-        </Box>
-      </Box>
-    </MuiPaper>
+    <ParticularsSection
+      title="How Gratuity is Calculated"
+      items={[
+        <><b>Last Drawn Salary:</b> The last monthly salary (basic + dearness allowance).</>,
+        <><b>Years of Service:</b> Number of years you have worked for the employer.</>,
+        <><b>Formula:</b> Gratuity = Last Drawn Salary × 15 × Years of Service / 26</>,
+        <><b>Maximum Limit:</b> As per law, the maximum gratuity payable is ₹20 lakh.</>,
+      ]}
+    />
   );
-
+  const faqItems: FAQItem[] = [
+    { q: 'Who is eligible for gratuity?', a: 'Employees who have completed at least 5 years of continuous service with the same employer.' },
+    { q: 'Is gratuity taxable?', a: 'Gratuity up to ₹20 lakh is tax-free for private sector employees under the Payment of Gratuity Act.' },
+    { q: 'Can gratuity be paid before 5 years?', a: 'Generally, no. But in case of death or disability, it may be paid before 5 years.' },
+    { q: 'How is gratuity calculated for seasonal employees?', a: 'For seasonal employees, gratuity is calculated at 7 days’ wages for each season.' },
+    { q: 'Is there a maximum limit for gratuity?', a: 'Yes, the maximum gratuity payable is ₹20 lakh as per current law.' },
+  ];
   const faqSection = (
-    <MuiPaper elevation={0} sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
-          Frequently Asked Questions
-        </Typography>
-        <IconButton size="small" sx={{ color: colors.secondary }}>
-          <ExpandMoreIcon sx={{ transform: faqOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s' }} />
-        </IconButton>
-      </Box>
-      <Collapse in={faqOpen}>
-        <Box sx={{ mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
-          {[
-            {
-              q: 'Who is eligible for gratuity?',
-              a: 'Employees who have completed at least 5 years of continuous service with the same employer.'
-            },
-            {
-              q: 'How is gratuity calculated?',
-              a: 'Gratuity = (Last Drawn Salary × Years of Service × 15) / 26'
-            },
-            {
-              q: 'Is gratuity taxable?',
-              a: 'Gratuity up to ₹20 lakh is tax-free. Any amount above this is taxable as per your income tax slab.'
-            },
-            {
-              q: 'What is included in salary?',
-              a: 'Basic Salary + Dearness Allowance (DA).'
-            },
-            {
-              q: 'What if I worked less than 5 years?',
-              a: 'You are not eligible for gratuity unless the reason is death or disablement.'
-            },
-            {
-              q: 'How is the number of years calculated?',
-              a: 'If you have worked more than 6 months in the last year, it is rounded up to the next full year.'
-            }
-          ].map((item, idx, arr) => (
-            <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
-              <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
-              <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
-              {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
-            </Box>
-          ))}
-    </Box>
-      </Collapse>
-    </MuiPaper>
+    <FAQSection faqs={faqItems} collapsible={true} />
   );
 
   const eligibilityAlert = !eligibility ? (
-    <Alert severity="warning" sx={{ mb: 2, fontWeight: 600, fontFamily: typography.fontFamily }}>
-      You are not eligible for gratuity (minimum 5 years of service required).
-    </Alert>
+    <EligibilityAlert message="You are not eligible for gratuity (minimum 5 years of service required)." severity="warning" />
   ) : null;
 
   const resultSection = (

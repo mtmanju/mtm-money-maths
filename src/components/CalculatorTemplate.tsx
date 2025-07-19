@@ -6,7 +6,9 @@ import {
   Box,
   useTheme,
   styled,
+  Button,
 } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import {
   GradientBackground,
   StyledPaper,
@@ -55,40 +57,74 @@ export const CalculatorTemplate: React.FC<CalculatorTemplateProps> = ({
   return (
     <GradientBackground>
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
-        <Box sx={{ mb: 4, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-          <Typography
-            variant="h1"
+        <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: 'space-between', gap: 2 }}>
+          <Box sx={{ textAlign: { xs: 'center', sm: 'left' }, flex: 1 }}>
+            <Typography
+              variant="h1"
+              sx={{
+                fontWeight: 600,
+                fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
+                lineHeight: 1.08,
+                letterSpacing: '-0.03em',
+                mb: 1.5,
+                color: '#1A1F36',
+                textAlign: { xs: 'center', sm: 'left' },
+              }}
+            >
+              {mainTitle}{' '}
+              <Box component="span" sx={{ color: '#00bfc6', fontWeight: 600 }}>
+                {subTitle}
+              </Box>
+            </Typography>
+            <Typography
+              component="span"
+              sx={{
+                color: colors.secondary,
+                fontWeight: 400,
+                fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
+                fontFamily: typography.fontFamily,
+                mb: 0,
+                lineHeight: 1.4,
+                maxWidth: '700px',
+                mx: { xs: 'auto', sm: 0 },
+                textAlign: { xs: 'center', sm: 'left' },
+              }}
+            >
+              {description}
+            </Typography>
+          </Box>
+          <Button
+            component={RouterLink}
+            to="/calculators"
+            variant="outlined"
             sx={{
+              borderRadius: '999px',
               fontWeight: 600,
               fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-              fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2rem' },
-              lineHeight: 1.08,
-              letterSpacing: '-0.03em',
-              mb: 1.5,
-              color: '#1A1F36',
-              textAlign: 'center',
+              fontSize: '0.95rem',
+              textTransform: 'none',
+              px: 3,
+              py: 1.2,
+              minWidth: 0,
+              whiteSpace: 'nowrap',
+              alignSelf: { xs: 'stretch', sm: 'center' },
+              ml: { sm: 3 },
+              mt: { xs: 2, sm: 0 },
+              border: '2px solid #00bfc6',
+              color: '#00bfc6',
+              background: '#fff',
+              boxShadow: '0 2px 8px rgba(0, 191, 198, 0.08)',
+              '&:hover': {
+                background: '#00bfc6',
+                color: '#fff',
+                border: '2px solid #00bfc6',
+                boxShadow: '0 4px 16px rgba(0, 191, 198, 0.12)',
+              },
             }}
           >
-            {mainTitle}{' '}
-            <Box component="span" sx={{ color: '#00bfc6', fontWeight: 600 }}>
-              {subTitle}
-            </Box>
-          </Typography>
-          <Typography
-            component="span"
-            sx={{
-              color: colors.secondary,
-              fontWeight: 400,
-              fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' },
-              fontFamily: typography.fontFamily,
-              mb: 0,
-              lineHeight: 1.4,
-              maxWidth: '700px',
-              mx: 'auto',
-            }}
-          >
-            {description}
-          </Typography>
+            Back to Calculators
+          </Button>
         </Box>
         <Box>
           <Grid container spacing={4}>

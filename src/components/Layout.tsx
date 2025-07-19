@@ -3,6 +3,8 @@ import { Box, useTheme, Container } from '@mui/material';
 import Header from './Header';
 import Footer from './Footer';
 import ScrollToTopButton from './ScrollToTopButton';
+import MobileHeader from './MobileHeader';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,6 +12,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
     <>
@@ -18,11 +21,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           display: 'flex',
           flexDirection: 'column',
           minHeight: '100vh',
-          background: '#fff',
           color: theme.palette.text.primary,
         }}
       >
-        <Header />
+        {isMobile ? <MobileHeader /> : <Header />}
         <Box
           component="main"
           sx={{
@@ -39,7 +41,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               position: 'relative',
               zIndex: 1,
               px: { xs: 2, sm: 3, md: 4 },
-              py: { xs: 4, sm: 6, md: 8 },
+              py: 0,
             }}
           >
             {children}

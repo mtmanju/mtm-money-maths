@@ -19,6 +19,8 @@ import { CalculatorTable } from '../components/CalculatorTable';
 import { ResultCard } from '../components/ResultCard';
 import { CalculatorChart } from '../components/CalculatorChart';
 import { calculateFd, FdCalculationParams, FdCalculationResult } from '../utils/calculatorUtils';
+import FAQSection, { FAQItem } from '../components/common/FAQSection';
+import ParticularsSection from '../components/common/ParticularsSection';
 
 const FdCalculator: React.FC = () => {
   const [principal, setPrincipal] = useState<number>(100000);
@@ -286,85 +288,26 @@ const FdCalculator: React.FC = () => {
 
   // Modern particulars section
   const particularsSection = (
-    <Box sx={{ mt: 3, mb: 2 }}>
-      <Box sx={{ background: '#f4f7fa', borderRadius: 2, p: 2, mb: 2, display: 'flex', flexDirection: 'column', gap: 1, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-        <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem', mb: 0.5 }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Formula:</span>
-          A = P × (1 + r/n)^(nt)
-        </Typography>
-        <Typography variant="body2" sx={{ color: colors.accent.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem' }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Example:</span>
-          A = ₹{principal.toLocaleString('en-IN')} × (1 + {interestRate / 100}/4)^{4 * timePeriod} = <b>{formatCurrency2(results.maturityValue)}</b>
-        </Typography>
-      </Box>
-      <Box component="ul" sx={{ m: 0, pl: 2, color: colors.secondary, fontSize: { xs: '0.98rem', md: '1.03rem' }, lineHeight: 1.6, listStyle: 'none' }}>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.primary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>P (Principal):</b> The initial amount invested.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.green, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>r (Rate):</b> The annual interest rate (as a decimal).</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.purple, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>n (Frequency):</b> Number of times interest is compounded per year (for FD, usually 4 for quarterly).</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>t (Time):</b> Number of years the money is invested for.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 0, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>A (Amount):</b> The maturity value after compounding.</span>
-        </Box>
-      </Box>
-    </Box>
+    <ParticularsSection
+      title="How FD is Calculated"
+      items={[
+        <><b>P (Principal):</b> The amount you deposit in the FD.</>,
+        <><b>r (Rate):</b> The annual interest rate.</>,
+        <><b>n (Compounds per year):</b> Number of times interest is compounded per year.</>,
+        <><b>t (Time):</b> Number of years the money is deposited for.</>,
+        <><b>A (Amount):</b> The maturity value after compounding.<br/>Formula: <b>A = P × (1 + r/n)^(nt)</b></>,
+      ]}
+    />
   );
-
-  // Modern FAQ section
-  const [faqOpen, setFaqOpen] = React.useState(false);
+  const faqItems: FAQItem[] = [
+    { q: 'What is a Fixed Deposit (FD)?', a: 'A Fixed Deposit is a financial instrument where you deposit money for a fixed tenure at a fixed interest rate.' },
+    { q: 'How is FD interest calculated?', a: 'A = P × (1 + r/n)^(nt), where A is maturity value, P is principal, r is rate, n is frequency, t is time.' },
+    { q: 'Is FD interest taxable?', a: 'Yes, FD interest is taxable as per your income tax slab.' },
+    { q: 'Can I withdraw FD before maturity?', a: 'Yes, but you may incur a penalty and get a lower interest rate.' },
+    { q: 'What is the minimum tenure for FD?', a: 'It varies by bank, but usually starts from 7 days.' },
+  ];
   const faqSection = (
-    <Box sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
-          Frequently Asked Questions
-        </Typography>
-        <Box component="span" sx={{ color: colors.secondary, ml: 1, display: 'flex', alignItems: 'center' }}>
-          <svg style={{ transform: faqOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s', width: 22, height: 22 }} viewBox="0 0 24 24"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
-        </Box>
-      </Box>
-      <Box sx={{ display: faqOpen ? 'block' : 'none', mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
-        {[
-          {
-            q: 'What is a Fixed Deposit (FD)?',
-            a: 'A Fixed Deposit is a financial instrument where you deposit money for a fixed tenure at a fixed interest rate.'
-          },
-          {
-            q: 'How is FD interest calculated?',
-            a: 'A = P × (1 + r/n)^(nt), where A is maturity value, P is principal, r is rate, n is frequency, t is time.'
-          },
-          {
-            q: 'What is compounding frequency in FD?',
-            a: 'It is the number of times interest is added to the principal per year (for FD, usually quarterly = 4).' 
-          },
-          {
-            q: 'How does inflation affect FD returns?',
-            a: 'Inflation reduces the real value of your returns. The calculator can show inflation-adjusted results.'
-          },
-          {
-            q: 'Is FD interest taxable?',
-            a: 'Yes, interest earned on FD is taxable as per your income tax slab.'
-          }
-        ].map((item, idx, arr) => (
-          <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
-            <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
-            <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
-            {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
-          </Box>
-        ))}
-      </Box>
-    </Box>
+    <FAQSection faqs={faqItems} collapsible={true} />
   );
 
   return (
@@ -376,15 +319,8 @@ const FdCalculator: React.FC = () => {
       tableSection={
         <>
           {tableSection}
-          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary, mb: 2, fontSize: { xs: '1.15rem', md: '1.18rem' }, textAlign: 'left' }}>
-              How FD is Calculated
-            </Typography>
-            {particularsSection}
-          </Box>
-          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>
-            {faqSection}
-          </Box>
+          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>{particularsSection}</Box>
+          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>{faqSection}</Box>
         </>
       }
     />

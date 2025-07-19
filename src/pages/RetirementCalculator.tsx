@@ -16,6 +16,8 @@ import { CalculatorTable } from '../components/CalculatorTable';
 import { ResultCard } from '../components/ResultCard';
 import { CalculatorChart } from '../components/CalculatorChart';
 import { calculateRetirement, RetirementCalculationParams, RetirementCalculationResult } from '../utils/calculatorUtils';
+import FAQSection, { FAQItem } from '../components/common/FAQSection';
+import ParticularsSection from '../components/common/ParticularsSection';
 
 const RetirementCalculator: React.FC = () => {
   const [currentAge, setCurrentAge] = useState<number>(30);
@@ -293,34 +295,28 @@ const RetirementCalculator: React.FC = () => {
     <CalculatorTable columns={retirementTableColumns} rows={retirementTableRows} />
   );
 
-  // Add FAQ section
-  const [faqOpen, setFaqOpen] = React.useState(false);
+  const particularsSection = (
+    <ParticularsSection
+      title="How Retirement Corpus is Calculated"
+      items={[
+        <><b>Current Age:</b> Your present age.</>,
+        <><b>Retirement Age:</b> The age at which you plan to retire.</>,
+        <><b>Monthly Expenses:</b> Your expected monthly expenses during retirement.</>,
+        <><b>Inflation Rate:</b> The expected annual inflation rate.</>,
+        <><b>Expected Return:</b> The annual return on your retirement corpus.</>,
+        <><b>Formula:</b> Corpus = Required monthly income × 12 × number of years in retirement, adjusted for inflation and returns.</>,
+      ]}
+    />
+  );
+  const faqItems: FAQItem[] = [
+    { q: 'What is a retirement corpus?', a: 'The total amount you need at retirement to cover your expenses for the rest of your life.' },
+    { q: 'How is retirement corpus calculated?', a: 'Based on your expected expenses, inflation, retirement age, and life expectancy.' },
+    { q: 'What is the impact of inflation?', a: 'Inflation increases your future expenses, so your corpus must be higher to maintain your lifestyle.' },
+    { q: 'What is a safe withdrawal rate?', a: 'A rule of thumb is 3-4% per year, but it depends on your investment returns and expenses.' },
+    { q: 'Can I retire early?', a: 'Yes, but you need a larger corpus to cover more years of expenses.' },
+  ];
   const faqSection = (
-    <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
-          Frequently Asked Questions
-        </Typography>
-        <span style={{ color: colors.secondary, fontWeight: 700 }}>{faqOpen ? '▲' : '▼'}</span>
-      </Box>
-      {faqOpen && (
-        <Box sx={{ mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
-          {[
-            { q: 'How much retirement corpus do I need?', a: 'It depends on your expected monthly expenses, inflation, life expectancy, and expected returns after retirement.' },
-            { q: 'What is the impact of inflation on retirement planning?', a: 'Inflation increases your future expenses, so your retirement corpus must account for rising costs.' },
-            { q: 'How do I calculate my monthly investment for retirement?', a: 'The calculator estimates the monthly investment needed to reach your target corpus by retirement age.' },
-            { q: 'What is a safe withdrawal rate?', a: 'A common rule is 4% per year, but it depends on your investment returns and risk tolerance.' },
-            { q: 'Should I include pension or rental income?', a: 'Yes, include all expected post-retirement income to get an accurate estimate.' },
-          ].map((item, idx, arr) => (
-            <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
-              <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
-              <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
-              {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
-            </Box>
-          ))}
-        </Box>
-      )}
-    </Paper>
+    <FAQSection faqs={faqItems} collapsible={true} />
   );
 
   return (
@@ -332,9 +328,7 @@ const RetirementCalculator: React.FC = () => {
       tableSection={
         <>
           {tableSection}
-          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>
-            {faqSection}
-          </Box>
+          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>{faqSection}</Box>
         </>
       }
     />

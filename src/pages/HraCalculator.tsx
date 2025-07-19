@@ -9,6 +9,8 @@ import { CustomNumberField } from '../components/CustomNumberField';
 import { ResultCard } from '../components/ResultCard';
 import { CalculatorTable } from '../components/CalculatorTable';
 import { calculateHra, HraCalculationParams, HraCalculationResult } from '../utils/calculatorUtils';
+import FAQSection, { FAQItem } from '../components/common/FAQSection';
+import ParticularsSection from '../components/common/ParticularsSection';
 
 function HraCalculator() {
   const [basicSalary, setBasicSalary] = useState<number>(50000);
@@ -237,81 +239,25 @@ function HraCalculator() {
 
   // Modern particulars section
   const particularsSection = (
-    <Box sx={{ mt: 3, mb: 2 }}>
-      <Box sx={{ background: '#f4f7fa', borderRadius: 2, p: 2, mb: 2, display: 'flex', flexDirection: 'column', gap: 1, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-        <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem', mb: 0.5 }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Formula:</span>
-          HRA Exemption = Least of [Actual HRA Received, 50% (metro)/40% (non-metro) of Salary, Rent Paid - 10% of Salary]
-        </Typography>
-        <Typography variant="body2" sx={{ color: colors.accent.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem' }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Example:</span>
-          HRA Exemption = Least of [₹{hraReceived.toLocaleString('en-IN')}, {metroCity ? '50%' : '40%'} of ₹{basicSalary.toLocaleString('en-IN')}, ₹{rentPaid.toLocaleString('en-IN')} - 10% of ₹{basicSalary.toLocaleString('en-IN')}] = <b>{formatCurrency2(results.hraExemption)}</b>
-        </Typography>
-      </Box>
-      <Box component="ul" sx={{ m: 0, pl: 2, color: colors.secondary, fontSize: { xs: '0.98rem', md: '1.03rem' }, lineHeight: 1.6, listStyle: 'none' }}>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.primary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>Actual HRA Received:</b> The HRA component of your salary.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.green, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>50%/40% of Salary:</b> 50% for metro cities, 40% for non-metro cities.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.purple, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>Rent Paid - 10% of Salary:</b> The excess of rent paid over 10% of salary.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 0, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>HRA Exemption:</b> The minimum of the above three is exempt from tax.</span>
-        </Box>
-      </Box>
-    </Box>
+    <ParticularsSection
+      title="How HRA is Calculated"
+      items={[
+        <><b>Basic Salary:</b> The basic component of your salary.</>,
+        <><b>HRA Received:</b> The actual HRA received from your employer.</>,
+        <><b>Rent Paid:</b> The rent you pay for your accommodation.</>,
+        <><b>Formula:</b> HRA Exemption = Least of (Actual HRA received, 50%/40% of salary, Rent paid - 10% of salary)</>,
+      ]}
+    />
   );
-
-  // Modern FAQ section
-  const [faqOpen, setFaqOpen] = React.useState(false);
+  const faqItems: FAQItem[] = [
+    { q: 'What is HRA?', a: 'HRA stands for House Rent Allowance, a component of salary given by employers to employees to meet house rent expenses.' },
+    { q: 'Is HRA fully exempt from tax?', a: 'No, HRA exemption is calculated as the least of three values as per Income Tax rules.' },
+    { q: 'Can I claim HRA if I live with parents?', a: 'Yes, if you pay rent to your parents and have rent receipts.' },
+    { q: 'Is HRA available for self-employed?', a: 'No, HRA exemption is only for salaried individuals.' },
+    { q: 'What documents are required for HRA exemption?', a: 'Rent receipts, PAN of landlord (if rent > ₹1 lakh/year), and rental agreement if available.' },
+  ];
   const faqSection = (
-    <Box sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
-          Frequently Asked Questions
-        </Typography>
-        <Box component="span" sx={{ color: colors.secondary, ml: 1, display: 'flex', alignItems: 'center' }}>
-          <svg style={{ transform: faqOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s', width: 22, height: 22 }} viewBox="0 0 24 24"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
-        </Box>
-      </Box>
-      <Box sx={{ display: faqOpen ? 'block' : 'none', mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
-        {[
-          {
-            q: 'What is HRA?',
-            a: 'House Rent Allowance (HRA) is a component of salary provided by employers to employees to meet rental expenses.'
-          },
-          {
-            q: 'How is HRA exemption calculated?',
-            a: 'It is the minimum of actual HRA received, 50%/40% of salary, and rent paid minus 10% of salary.'
-          },
-          {
-            q: 'Is HRA fully exempt from tax?',
-            a: 'No, only the minimum of the three criteria is exempt; the rest is taxable.'
-          },
-          {
-            q: 'Can I claim HRA if I live with parents?',
-            a: 'Yes, if you pay rent to your parents and have valid proof of payment.'
-          },
-          {
-            q: 'Is HRA available under the new tax regime?',
-            a: 'No, HRA exemption is not available under the new tax regime.'
-          }
-        ].map((item, idx, arr) => (
-          <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
-            <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
-            <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
-            {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
-          </Box>
-        ))}
-      </Box>
-    </Box>
+    <FAQSection faqs={faqItems} collapsible={true} />
   );
 
   return (
@@ -323,15 +269,8 @@ function HraCalculator() {
       tableSection={
         <>
           {tableSection}
-          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary, mb: 2, fontSize: { xs: '1.15rem', md: '1.18rem' }, textAlign: 'left' }}>
-              How HRA is Calculated
-            </Typography>
-            {particularsSection}
-          </Box>
-          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>
-            {faqSection}
-          </Box>
+          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>{particularsSection}</Box>
+          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>{faqSection}</Box>
         </>
       }
     />

@@ -21,6 +21,8 @@ import { colors, typography } from '../components/calculatorStyles';
 import { CalculatorTable } from '../components/CalculatorTable';
 import { ResultCard } from '../components/ResultCard';
 import { calculateIncomeTax, IncomeTaxCalculationParams, IncomeTaxCalculationResult } from '../utils/calculatorUtils';
+import FAQSection, { FAQItem } from '../components/common/FAQSection';
+import ParticularsSection from '../components/common/ParticularsSection';
 
 const IncomeTaxCalculator: React.FC = () => {
   const [income, setIncome] = useState<number>(1000000);
@@ -167,22 +169,30 @@ const IncomeTaxCalculator: React.FC = () => {
   );
 
   const particularsSection = (
-    <Paper elevation={1} sx={{ p: { xs: 2, md: 3 }, mb: 3, mt: 4, background: '#f8f9fc', borderRadius: 1 }}>
-      <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary, mb: 1 }}>
-        How Your Tax is Calculated
-      </Typography>
-      <ul style={{ margin: 0, paddingLeft: 20, color: colors.secondary, fontSize: '1rem', lineHeight: 1.7 }}>
-        <li><b>Total Income:</b> Your gross annual income before any deductions.</li>
-        <li><b>Taxable Income:</b> Income after subtracting standard deduction and (if in old regime) other deductions.</li>
-        <li><b>Standard Deduction:</b> Flat deduction from salary income (₹75,000 in new regime, ₹50,000 in old regime).</li>
-        <li><b>Other Deductions:</b> Section 80C, 80D, HRA, etc. (only in old regime).</li>
-        <li><b>Section 87A Rebate:</b> Tax relief for low/mid incomes (up to ₹60,000 for taxable income ≤ ₹12L in new regime, up to ₹12,500 for ≤ ₹5L in old regime).</li>
-        <li><b>Surcharge:</b> Extra tax for high incomes (10% for &gt;₹50L, 15% for &gt;₹1Cr, 25% for &gt;₹2Cr, 37% for &gt;₹5Cr).</li>
-        <li><b>Cess (4%):</b> Health & Education Cess on total tax (after rebate and surcharge).</li>
-        <li><b>Total Tax:</b> Final tax payable after all deductions, rebate, surcharge, and cess.</li>
-        <li><b>Regimes:</b> <b>New Regime</b> (default, lower rates, fewer deductions, higher standard deduction, higher rebate) vs <b>Old Regime</b> (higher rates, more deductions, lower standard deduction, lower rebate).</li>
-      </ul>
-    </Paper>
+    <ParticularsSection
+      title="How Your Tax is Calculated"
+      items={[
+        <><b>Total Income:</b> Your gross annual income before any deductions.</>,
+        <><b>Taxable Income:</b> Income after subtracting standard deduction and (if in old regime) other deductions.</>,
+        <><b>Standard Deduction:</b> Flat deduction from salary income (₹75,000 in new regime, ₹50,000 in old regime).</>,
+        <><b>Other Deductions:</b> Section 80C, 80D, HRA, etc. (only in old regime).</>,
+        <><b>Section 87A Rebate:</b> Tax relief for low/mid incomes (up to ₹60,000 for taxable income ≤ ₹12L in new regime, up to ₹12,500 for ≤ ₹5L in old regime).</>,
+        <><b>Surcharge:</b> Extra tax for high incomes (10% for &gt;₹50L, 15% for &gt;₹1Cr, 25% for &gt;₹2Cr, 37% for &gt;₹5Cr).</>,
+        <><b>Cess (4%):</b> Health & Education Cess on total tax (after rebate and surcharge).</>,
+        <><b>Total Tax:</b> Final tax payable after all deductions, rebate, surcharge, and cess.</>,
+        <><b>Regimes:</b> <b>New Regime</b> (default, lower rates, fewer deductions, higher standard deduction, higher rebate) vs <b>Old Regime</b> (higher rates, more deductions, lower standard deduction, lower rebate).</>,
+      ]}
+    />
+  );
+  const faqItems: FAQItem[] = [
+    { q: 'What is the difference between new and old tax regime?', a: 'The new regime offers lower tax rates but fewer deductions, while the old regime allows more deductions but has higher rates.' },
+    { q: 'What is the standard deduction?', a: 'A flat deduction from salary income: ₹75,000 (new regime), ₹50,000 (old regime).' },
+    { q: 'What is Section 87A rebate?', a: 'A tax rebate for individuals with taxable income up to ₹12 lakh (new regime) or ₹5 lakh (old regime).' },
+    { q: 'What is surcharge and cess?', a: 'Surcharge is extra tax for high incomes; cess is a 4% charge on total tax for health and education.' },
+    { q: 'Can I switch between regimes every year?', a: 'Salaried individuals can choose their regime each year; business owners have restrictions.' },
+  ];
+  const faqSection = (
+    <FAQSection faqs={faqItems} collapsible={true} />
   );
 
   const formSection = (
@@ -280,36 +290,6 @@ const IncomeTaxCalculator: React.FC = () => {
     <CalculatorTable columns={tableColumns} rows={tableRows} />
   );
 
-  // Add FAQ section
-  const [faqOpen, setFaqOpen] = React.useState(false);
-  const faqSection = (
-    <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
-          Frequently Asked Questions
-        </Typography>
-        <span style={{ color: colors.secondary, fontWeight: 700 }}>{faqOpen ? '▲' : '▼'}</span>
-      </Box>
-      {faqOpen && (
-        <Box sx={{ mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
-          {[
-            { q: 'What is the difference between new and old tax regime?', a: 'The new regime offers lower tax rates but fewer deductions, while the old regime allows more deductions but has higher rates.' },
-            { q: 'What is the standard deduction?', a: 'A flat deduction from salary income: ₹75,000 (new regime), ₹50,000 (old regime).' },
-            { q: 'What is Section 87A rebate?', a: 'A tax rebate for individuals with taxable income up to ₹12 lakh (new regime) or ₹5 lakh (old regime).' },
-            { q: 'What is surcharge and cess?', a: 'Surcharge is extra tax for high incomes; cess is a 4% charge on total tax for health and education.' },
-            { q: 'Can I switch between regimes every year?', a: 'Salaried individuals can choose their regime each year; business owners have restrictions.' },
-          ].map((item, idx, arr) => (
-            <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
-              <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
-              <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
-              {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
-            </Box>
-          ))}
-        </Box>
-      )}
-    </Paper>
-  );
-
   return (
     <CalculatorTemplate
       title="Income Tax Calculator"
@@ -320,9 +300,7 @@ const IncomeTaxCalculator: React.FC = () => {
         <>
           {tableSection}
           {particularsSection}
-          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>
-            {faqSection}
-          </Box>
+          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>{faqSection}</Box>
         </>
       }
     />

@@ -20,6 +20,8 @@ import { CalculatorChart } from '../components/CalculatorChart';
 import { CalculatorTable } from '../components/CalculatorTable';
 import { CalendarMonth as CalendarMonthIcon } from '@mui/icons-material';
 import { ResultCard } from '../components/ResultCard';
+import FAQSection, { FAQItem } from '../components/common/FAQSection';
+import ParticularsSection from '../components/common/ParticularsSection';
 
 const RoiCalculator: React.FC = () => {
   const [initialInvestment, setInitialInvestment] = useState<number>(100000);
@@ -188,85 +190,27 @@ const RoiCalculator: React.FC = () => {
 
   // Modern formula and particulars section
   const particularsSection = (
-    <Box sx={{ mt: 3, mb: 2 }}>
-      <Box sx={{ background: '#f4f7fa', borderRadius: 2, p: 2, mb: 2, display: 'flex', flexDirection: 'column', gap: 1, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-        <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem', mb: 0.5 }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Formula:</span>
-          ROI = ((Final Value - Initial Investment) / Initial Investment) × 100
-        </Typography>
-        <Typography variant="body2" sx={{ color: colors.accent.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem' }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Example:</span>
-          ROI = ((₹{finalValue.toLocaleString('en-IN')} - ₹{initialInvestment.toLocaleString('en-IN')}) / ₹{initialInvestment.toLocaleString('en-IN')}) × 100 = <b>{formatPercentage(results.roi)}</b>
-        </Typography>
-      </Box>
-      <Box component="ul" sx={{ m: 0, pl: 2, color: colors.secondary, fontSize: { xs: '0.98rem', md: '1.03rem' }, lineHeight: 1.6, listStyle: 'none' }}>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.primary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>Initial Investment:</b> The amount you originally invested.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.green, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>Final Value:</b> The value of your investment at the end of the period.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.purple, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>Time Period:</b> The number of years the investment was held.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>Absolute Returns:</b> The total profit earned (Final Value - Initial Investment).</span>
-        </Box>
-        <Box component="li" sx={{ mb: 0, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>ROI:</b> Return on Investment, expressed as a percentage of the initial investment.</span>
-        </Box>
-      </Box>
-    </Box>
+    <ParticularsSection
+      title="How ROI is Calculated"
+      items={[
+        <><b>Initial Investment:</b> The amount you originally invested.</>,
+        <><b>Final Value:</b> The value of your investment at the end of the period.</>,
+        <><b>Time Period:</b> The number of years the investment was held.</>,
+        <><b>Absolute Returns:</b> The total profit earned (Final Value - Initial Investment).</>,
+        <><b>ROI:</b> Return on Investment, expressed as a percentage of the initial investment.</>,
+        <><b>Formula:</b> ROI = (Final Value - Initial Investment) / Initial Investment × 100%</>,
+      ]}
+    />
   );
-
-  // Modern FAQ section
-  const [faqOpen, setFaqOpen] = React.useState(false);
+  const faqItems: FAQItem[] = [
+    { q: 'What is ROI?', a: 'ROI stands for Return on Investment, a measure of the profitability of an investment.' },
+    { q: 'How is ROI calculated?', a: 'ROI = (Final Value - Initial Investment) / Initial Investment × 100%' },
+    { q: 'What is a good ROI?', a: 'It depends on the investment type and market conditions. Compare with benchmarks.' },
+    { q: 'Is ROI the same as CAGR?', a: 'No, CAGR measures annualized growth, while ROI is total return over the period.' },
+    { q: 'Can ROI be negative?', a: 'Yes, if the final value is less than the initial investment.' },
+  ];
   const faqSection = (
-    <Box sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
-          Frequently Asked Questions
-        </Typography>
-        <Box component="span" sx={{ color: colors.secondary, ml: 1, display: 'flex', alignItems: 'center' }}>
-          <svg style={{ transform: faqOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s', width: 22, height: 22 }} viewBox="0 0 24 24"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
-        </Box>
-      </Box>
-      <Box sx={{ display: faqOpen ? 'block' : 'none', mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
-        {[
-          {
-            q: 'What is ROI?',
-            a: 'ROI (Return on Investment) measures the gain or loss generated on an investment relative to the amount invested.'
-          },
-          {
-            q: 'How is ROI calculated?',
-            a: 'ROI = ((Final Value - Initial Investment) / Initial Investment) × 100.'
-          },
-          {
-            q: 'What does a positive ROI mean?',
-            a: 'A positive ROI means your investment has grown in value.'
-          },
-          {
-            q: 'Can ROI be negative?',
-            a: 'Yes, a negative ROI means your investment has lost value.'
-          },
-          {
-            q: 'Is ROI the same as CAGR?',
-            a: 'No, ROI measures total return over a period, while CAGR measures the annual growth rate.'
-          }
-        ].map((item, idx, arr) => (
-          <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
-            <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
-            <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
-            {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
-          </Box>
-        ))}
-      </Box>
-    </Box>
+    <FAQSection faqs={faqItems} collapsible={true} />
   );
 
   // Unified result cards and chart in one container
@@ -332,15 +276,8 @@ const RoiCalculator: React.FC = () => {
       tableSection={
         <>
           {tableSection}
-          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary, mb: 2, fontSize: { xs: '1.15rem', md: '1.18rem' }, textAlign: 'left' }}>
-              How ROI is Calculated
-            </Typography>
-            {particularsSection}
-          </Box>
-          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>
-            {faqSection}
-          </Box>
+          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>{particularsSection}</Box>
+          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>{faqSection}</Box>
         </>
       }
     />

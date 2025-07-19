@@ -2,9 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, GlobalStyles } from '@mui/material';
 import theme from './theme';
-import Header from './components/Header';
-import MobileHeader from './components/MobileHeader';
-import Footer from './components/Footer';
+import Layout from './components/Layout';
 import Home from './pages/Home';
 import SipCalculator from './pages/SipCalculator';
 import EmiCalculator from './pages/EmiCalculator';
@@ -39,10 +37,7 @@ function App() {
       <GlobalStyles styles={globalStyles(theme)} />
       <BrowserRouter>
         <ScrollToTop />
-        <div className="app-container">
-          <Header />
-          <MobileHeader />
-          <main className="main-content">
+        <Layout>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/calculators" element={<Calculators />} />
@@ -67,9 +62,7 @@ function App() {
               <Route path="/faq" element={<FAQ />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </main>
-          <Footer />
-        </div>
+        </Layout>
       </BrowserRouter>
     </ThemeProvider>
   );

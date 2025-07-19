@@ -18,6 +18,8 @@ import { CalculatorTable } from '../components/CalculatorTable';
 import { ResultCard } from '../components/ResultCard';
 import { CalculatorChart } from '../components/CalculatorChart';
 import { calculateNps, NpsCalculationParams, NpsCalculationResult } from '../utils/calculatorUtils';
+import FAQSection, { FAQItem } from '../components/common/FAQSection';
+import ParticularsSection from '../components/common/ParticularsSection';
 
 function NpsCalculator() {
   const [monthlyInvestment, setMonthlyInvestment] = useState<number>(5000);
@@ -236,85 +238,26 @@ function NpsCalculator() {
 
   // Modern particulars section
   const particularsSection = (
-    <Box sx={{ mt: 3, mb: 2 }}>
-      <Box sx={{ background: '#f4f7fa', borderRadius: 2, p: 2, mb: 2, display: 'flex', flexDirection: 'column', gap: 1, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-        <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem', mb: 0.5 }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Formula:</span>
-          FV = P × [(1 + r)^nt - 1] / r × (1 + r)
-        </Typography>
-        <Typography variant="body2" sx={{ color: colors.accent.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem' }}>
-          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Example:</span>
-          FV = ₹{monthlyInvestment.toLocaleString('en-IN')} × [(1 + {expectedReturn / 1200})^{timePeriod * 12} - 1] / {expectedReturn / 1200} × (1 + {expectedReturn / 1200}) = <b>{formatCurrency2(results.corpusAtRetirement)}</b>
-        </Typography>
-      </Box>
-      <Box component="ul" sx={{ m: 0, pl: 2, color: colors.secondary, fontSize: { xs: '0.98rem', md: '1.03rem' }, lineHeight: 1.6, listStyle: 'none' }}>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.primary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>P (Installment):</b> The monthly deposit amount.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.green, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>r (Rate):</b> The monthly interest rate (annual rate / 12 / 100).</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.purple, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>n (Frequency):</b> Number of times interest is compounded per year (for NPS, usually 12 for monthly).</span>
-        </Box>
-        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>t (Time):</b> Number of years the money is invested for.</span>
-        </Box>
-        <Box component="li" sx={{ mb: 0, display: 'flex', alignItems: 'flex-start' }}>
-          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
-          <span><b>FV (Future Value):</b> The corpus at retirement.</span>
-        </Box>
-      </Box>
-    </Box>
+    <ParticularsSection
+      title="How NPS is Calculated"
+      items={[
+        <><b>Monthly Contribution:</b> The fixed amount invested every month.</>,
+        <><b>Rate of Return:</b> The expected annual return percentage.</>,
+        <><b>Time Period:</b> Number of years the investment is held.</>,
+        <><b>Annuity Purchase:</b> Portion of corpus used to buy annuity at retirement.</>,
+        <><b>Lump Sum Withdrawal:</b> Portion of corpus withdrawn as lump sum at retirement.</>,
+      ]}
+    />
   );
-
-  // Modern FAQ section
-  const [faqOpen, setFaqOpen] = React.useState(false);
+  const faqItems: FAQItem[] = [
+    { q: 'What is NPS?', a: 'NPS stands for National Pension System, a government-sponsored retirement savings scheme.' },
+    { q: 'How is NPS maturity calculated?', a: 'Based on monthly contributions, expected returns, and tenure. At retirement, part of the corpus is used to buy annuity, rest can be withdrawn.' },
+    { q: 'Is NPS return guaranteed?', a: 'No, returns depend on market performance of underlying funds.' },
+    { q: 'What is annuity in NPS?', a: 'An annuity is a regular pension purchased from the NPS corpus at retirement.' },
+    { q: 'Is NPS tax-free?', a: 'Partial withdrawals and annuity have different tax treatments. Check latest tax rules.' },
+  ];
   const faqSection = (
-    <Box sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
-          Frequently Asked Questions
-        </Typography>
-        <Box component="span" sx={{ color: colors.secondary, ml: 1, display: 'flex', alignItems: 'center' }}>
-          <svg style={{ transform: faqOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s', width: 22, height: 22 }} viewBox="0 0 24 24"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
-        </Box>
-      </Box>
-      <Box sx={{ display: faqOpen ? 'block' : 'none', mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
-        {[
-          {
-            q: 'What is NPS?',
-            a: 'The National Pension System (NPS) is a government-sponsored retirement savings scheme for individuals in India.'
-          },
-          {
-            q: 'How is NPS maturity value calculated?',
-            a: 'FV = P × [(1 + r)^nt - 1] / r × (1 + r), where FV is corpus, P is monthly investment, r is monthly rate, n is frequency, t is time.'
-          },
-          {
-            q: 'What is the annuity return?',
-            a: 'It is the expected annual return from the annuity purchased at retirement.' 
-          },
-          {
-            q: 'Is NPS taxable?',
-            a: 'Partial withdrawal and annuity are taxable as per prevailing tax laws.'
-          },
-          {
-            q: 'Can I change my monthly investment?',
-            a: 'Yes, you can increase or decrease your monthly contribution as per your financial goals.'
-          }
-        ].map((item, idx, arr) => (
-          <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
-            <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
-            <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
-            {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
-          </Box>
-        ))}
-      </Box>
-    </Box>
+    <FAQSection faqs={faqItems} collapsible={true} />
   );
 
   return (
@@ -326,15 +269,8 @@ function NpsCalculator() {
       tableSection={
         <>
           {tableSection}
-          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary, mb: 2, fontSize: { xs: '1.15rem', md: '1.18rem' }, textAlign: 'left' }}>
-              How NPS is Calculated
-            </Typography>
-            {particularsSection}
-          </Box>
-          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>
-            {faqSection}
-          </Box>
+          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>{particularsSection}</Box>
+          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>{faqSection}</Box>
         </>
       }
     />
