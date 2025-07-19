@@ -2,207 +2,54 @@ import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
-  useTheme,
-  styled,
   InputAdornment,
+  Paper,
 } from '@mui/material';
 import {
-  TrendingUp as TrendingUpIcon,
-  AccountBalance as AccountBalanceIcon,
-  CalendarToday as CalendarTodayIcon,
-  AttachMoney as AttachMoneyIcon,
   Percent as PercentIcon,
   CalendarMonth as CalendarMonthIcon,
 } from '@mui/icons-material';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
 import { CalculatorTemplate } from '../components/CalculatorTemplate';
 import {
   StyledPaper,
   StyledSlider,
-  ChartContainer,
   colors,
   typography,
-  StyledTableContainer,
-  tableHeaderCell,
-  tableCell,
-  chartAxisStyle,
-  chartTooltipStyle,
-  chartTooltipItemStyle,
-  chartTooltipLabelStyle,
-  chartLegendStyle,
 } from '../components/calculatorStyles';
 import { CustomNumberField } from '../components/CustomNumberField';
 import { ResultCard } from '../components/ResultCard';
+import { CalculatorTable } from '../components/CalculatorTable';
+import { calculateEmi, EmiCalculationParams, EmiCalculationResult } from '../utils/calculatorUtils';
 
-const CompactSummary = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  background: colors.background,
-  borderRadius: '10px',
-  boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
-  border: `1.5px solid ${colors.border}`,
-  padding: theme.spacing(3, 4),
-  marginBottom: theme.spacing(3),
-  transition: 'box-shadow 0.2s, transform 0.2s',
-  '&:hover': {
-    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.12)',
-    transform: 'translateY(-4px) scale(1.02)',
-  },
-}));
-
-const SummaryItem = styled(Box)(({ theme }) => ({
-  flex: 1,
-  textAlign: 'center',
-  '& .label': {
-    color: colors.secondary,
-    fontSize: typography.label.fontSize,
-    fontWeight: typography.label.fontWeight,
-    marginBottom: 2,
-    display: 'block',
-  },
-  '& .value': {
-    color: colors.primary,
-    fontWeight: typography.value.fontWeight,
-    fontSize: typography.value.fontSize,
-    fontFamily: typography.fontFamily,
-  },
-}));
-
-const StatBar = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: theme.spacing(2),
-  marginBottom: theme.spacing(3),
-  justifyContent: 'space-between',
-}));
-
-const StatCard = styled(Box)(({ theme }) => ({
-  flex: '1 1 180px',
-  minWidth: 150,
-  background: colors.background,
-  borderRadius: '10px',
-  boxShadow: '0 2px 16px 0 rgba(30, 34, 90, 0.08)',
-  border: `1.5px solid ${colors.border}`,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  padding: theme.spacing(2.5, 2),
-  textAlign: 'center',
-  transition: 'box-shadow 0.2s, transform 0.2s',
-  '&:hover': {
-    boxShadow: '0 8px 32px 0 rgba(0, 191, 198, 0.12)',
-    transform: 'translateY(-4px) scale(1.02)',
-  },
-}));
-
-const StatIcon = styled(Box)(({ theme }) => ({
-  fontSize: 28,
-  marginBottom: theme.spacing(1),
-  color: colors.accent.primary,
-}));
-
-const EmiCalculator: React.FC = () => {
-  const theme = useTheme();
+function EmiCalculator() {
   const [loanAmount, setLoanAmount] = useState<number>(1000000);
   const [interestRate, setInterestRate] = useState<number>(8.5);
   const [loanTerm, setLoanTerm] = useState<number>(20);
-  const [monthlyEmi, setMonthlyEmi] = useState<number>(0);
-  const [totalInterest, setTotalInterest] = useState<number>(0);
-  const [totalPayment, setTotalPayment] = useState<number>(0);
-  const [amortizationSchedule, setAmortizationSchedule] = useState<any[]>([]);
+  const [results, setResults] = useState<EmiCalculationResult>({
+    monthlyEmi: 0,
+    totalInterest: 0,
+    totalPayment: 0,
+    amortizationSchedule: [],
+  });
 
   useEffect(() => {
-    calculateEmi();
+    const params: EmiCalculationParams = {
+      loanAmount,
+      interestRate,
+      loanTerm,
+    };
+    setResults(calculateEmi(params));
   }, [loanAmount, interestRate, loanTerm]);
 
-  const calculateEmi = () => {
-    const principal = loanAmount;
-    const annualInterestRate = interestRate;
-    const years = loanTerm;
-
-    if (principal === 0 || annualInterestRate === 0 || years === 0) {
-      setMonthlyEmi(0);
-      setTotalInterest(0);
-      setTotalPayment(0);
-      setAmortizationSchedule([]);
-      return;
-    }
-
-    const monthlyInterestRate = annualInterestRate / 12 / 100;
-    const numberOfPayments = years * 12;
-
-    const emi = (principal * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments)) /
-      (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
-
-    const totalPay = emi * numberOfPayments;
-    const totalInt = totalPay - principal;
-
-    setMonthlyEmi(emi);
-    setTotalInterest(totalInt);
-    setTotalPayment(totalPay);
-
-    generateAmortizationSchedule(emi, principal, monthlyInterestRate, numberOfPayments);
-  };
-
-  const generateAmortizationSchedule = (
-    emi: number,
-    principal: number,
-    monthlyInterestRate: number,
-    numberOfPayments: number,
-  ) => {
-    const schedule = [];
-    let outstandingBalance = principal;
-
-    for (let i = 1; i <= numberOfPayments; i++) {
-      const interestComponent = outstandingBalance * monthlyInterestRate;
-      const principalComponent = emi - interestComponent;
-      outstandingBalance -= principalComponent;
-
-      schedule.push({
-        month: i,
-        emi: emi,
-        principalComponent: principalComponent,
-        interestComponent: interestComponent,
-        outstandingBalance: outstandingBalance,
-      });
-    }
-    setAmortizationSchedule(schedule);
-  };
-
-  const formatCurrency = (value: number) => {
+  // Helper for 2-decimal currency formatting, but no decimals if integer
+  const formatCurrency2 = (value: number) => {
+    const isInt = Number.isInteger(value);
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: isInt ? 0 : 2,
+      maximumFractionDigits: 2,
     }).format(value);
-  };
-
-  const handleLoanAmountChange = (value: number | string) => {
-    if (typeof value === 'number') {
-      setLoanAmount(value);
-    }
-  };
-
-  const handleInterestRateChange = (value: number | string) => {
-    if (typeof value === 'number') {
-      setInterestRate(value);
-    }
-  };
-
-  const handleLoanTermChange = (value: number | string) => {
-    if (typeof value === 'number') {
-      setLoanTerm(value);
-    }
   };
 
   const formSection = (
@@ -212,7 +59,7 @@ const EmiCalculator: React.FC = () => {
           fullWidth
           label="Loan Amount"
           value={loanAmount}
-          onChange={handleLoanAmountChange}
+          onChange={(value) => setLoanAmount(typeof value === 'number' ? value : 0)}
           min={10000}
           max={50000000}
           step={10000}
@@ -233,7 +80,7 @@ const EmiCalculator: React.FC = () => {
           max={50000000}
           step={10000}
           valueLabelDisplay="auto"
-          valueLabelFormat={formatCurrency}
+          valueLabelFormat={formatCurrency2}
         />
       </Box>
       <Box>
@@ -268,7 +115,7 @@ const EmiCalculator: React.FC = () => {
           fullWidth
           label="Loan Term (Years)"
           value={loanTerm}
-          onChange={handleLoanTermChange}
+          onChange={(value) => setLoanTerm(typeof value === 'number' ? value : 0)}
           min={1}
           max={30}
           step={1}
@@ -293,75 +140,54 @@ const EmiCalculator: React.FC = () => {
     </StyledPaper>
   );
 
+  // Result cards in logical order
+  const summaryCards = [
+    {
+      title: 'Monthly EMI',
+      value: formatCurrency2(results.monthlyEmi),
+      variant: 'primary' as const,
+    },
+    {
+      title: 'Total Interest',
+      value: formatCurrency2(results.totalInterest),
+      variant: 'secondary' as const,
+    },
+    {
+      title: 'Total Payment',
+      value: formatCurrency2(results.totalPayment),
+      variant: 'purple' as const,
+    },
+  ];
+
+  // Result cards
   const resultSection = (
-    <Box>
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-        <ResultCard title="Monthly EMI" value={formatCurrency(monthlyEmi)} variant="primary" />
-        <ResultCard title="Total Interest" value={formatCurrency(totalInterest)} variant="secondary" />
-        <ResultCard title="Total Payment" value={formatCurrency(totalPayment)} variant="purple" />
+    <Paper elevation={2} sx={{ p: { xs: 2, md: 3 }, mb: 2, borderRadius: 1, background: '#fff' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 2, mb: 2, fontFamily: typography.fontFamily }}>
+        {summaryCards.map((card) => (
+          <ResultCard key={card.title} title={card.title} value={card.value} variant={card.variant} fontSize="0.9rem" />
+        ))}
       </Box>
-      <ChartContainer>
-        <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
-          Amortization Schedule
-        </Typography>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={amortizationSchedule} style={{ fontFamily: typography.fontFamily }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E0" />
-            <XAxis
-              dataKey="month"
-              stroke={colors.secondary}
-              tick={chartAxisStyle}
-              axisLine={{ stroke: colors.border }}
-              tickLine={{ stroke: colors.border }}
-            />
-            <YAxis
-              stroke={colors.secondary}
-              tick={chartAxisStyle}
-              axisLine={{ stroke: colors.border }}
-              tickLine={{ stroke: colors.border }}
-              tickFormatter={(value) => value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            />
-            <RechartsTooltip
-              contentStyle={chartTooltipStyle}
-              itemStyle={chartTooltipItemStyle}
-              labelStyle={chartTooltipLabelStyle}
-              formatter={(value) => value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            />
-            <Legend wrapperStyle={chartLegendStyle} />
-            <Line
-              type="monotone"
-              dataKey="principalComponent"
-              name="Principal"
-              stroke={colors.accent.secondary}
-              strokeWidth={2}
-              dot={{ fill: colors.accent.secondary, strokeWidth: 2 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="interestComponent"
-              name="Interest"
-              stroke={colors.accent.primary}
-              strokeWidth={2}
-              dot={{ fill: colors.accent.primary, strokeWidth: 2 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </ChartContainer>
-    </Box>
+    </Paper>
   );
 
   // Aggregate amortization schedule by year
-  const yearlySchedule = [];
-  if (amortizationSchedule.length > 0) {
+  const yearlySchedule = [] as Array<{
+    year: number;
+    emi: number;
+    principalComponent: number;
+    interestComponent: number;
+    outstandingBalance: number;
+  }>;
+  if (results.amortizationSchedule.length > 0) {
     let year = 1;
     let emiSum = 0, principalSum = 0, interestSum = 0;
-    let lastOutstanding = amortizationSchedule[0].outstandingBalance;
-    for (let i = 0; i < amortizationSchedule.length; i++) {
-      emiSum += amortizationSchedule[i].emi;
-      principalSum += amortizationSchedule[i].principalComponent;
-      interestSum += amortizationSchedule[i].interestComponent;
-      lastOutstanding = amortizationSchedule[i].outstandingBalance;
-      if ((i + 1) % 12 === 0 || i === amortizationSchedule.length - 1) {
+    let lastOutstanding = results.amortizationSchedule[0].outstandingBalance;
+    for (let i = 0; i < results.amortizationSchedule.length; i++) {
+      emiSum += results.amortizationSchedule[i].emi;
+      principalSum += results.amortizationSchedule[i].principalComponent;
+      interestSum += results.amortizationSchedule[i].interestComponent;
+      lastOutstanding = results.amortizationSchedule[i].outstandingBalance;
+      if ((i + 1) % 12 === 0 || i === results.amortizationSchedule.length - 1) {
         yearlySchedule.push({
           year,
           emi: emiSum,
@@ -377,33 +203,88 @@ const EmiCalculator: React.FC = () => {
     }
   }
 
-  // Table section for yearly amortization schedule
-  const tableSection = yearlySchedule.length > 0 ? (
-    <StyledTableContainer>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: typography.fontFamily, fontSize: '0.9rem', color: colors.secondary }}>
-        <thead>
-          <tr>
-            <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>Year</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>EMI</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Principal</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Interest</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Balance</th>
-          </tr>
-        </thead>
-        <tbody>
-          {yearlySchedule.map((row) => (
-            <tr key={row.year}>
-              <td style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>{row.year}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.emi)}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.principalComponent)}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.interestComponent)}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.outstandingBalance)}</td>
-            </tr>
+  // Table
+  const emiTableColumns = [
+    { label: 'Year', key: 'year' },
+    { label: 'EMI', key: 'emi' },
+    { label: 'Principal', key: 'principalComponent' },
+    { label: 'Interest', key: 'interestComponent' },
+    { label: 'Balance', key: 'outstandingBalance' },
+  ];
+  const emiTableRows = yearlySchedule.map(row => ({
+    ...row,
+    emi: formatCurrency2(row.emi),
+    principalComponent: formatCurrency2(row.principalComponent),
+    interestComponent: formatCurrency2(row.interestComponent),
+    outstandingBalance: formatCurrency2(row.outstandingBalance),
+  }));
+  const tableSection = (
+    <CalculatorTable columns={emiTableColumns} rows={emiTableRows} />
+  );
+
+  // Modern particulars section
+  const particularsSection = (
+    <Box sx={{ mt: 3, mb: 2 }}>
+      <Box sx={{ background: '#f4f7fa', borderRadius: 2, p: 2, mb: 2, display: 'flex', flexDirection: 'column', gap: 1, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+        <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem', mb: 0.5 }}>
+          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Formula:</span>
+          EMI = [P × r × (1 + r)^n] / [(1 + r)^n – 1]
+        </Typography>
+        <Typography variant="body2" sx={{ color: colors.accent.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem' }}>
+          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Example:</span>
+          EMI = [₹{loanAmount.toLocaleString('en-IN')} × {interestRate / 1200} × (1 + {interestRate / 1200})^{loanTerm * 12}] / [(1 + {interestRate / 1200})^{loanTerm * 12} – 1] = <b>{formatCurrency2(results.monthlyEmi)}</b>
+        </Typography>
+      </Box>
+      <Box component="ul" sx={{ m: 0, pl: 2, color: colors.secondary, fontSize: { xs: '0.98rem', md: '1.03rem' }, lineHeight: 1.6, listStyle: 'none' }}>
+        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
+          <Box sx={{ width: 6, height: 6, bgcolor: colors.primary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+          <span><b>P (Principal):</b> The loan amount.</span>
+        </Box>
+        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
+          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.green, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+          <span><b>r (Rate):</b> The monthly interest rate (annual rate / 12 / 100).</span>
+        </Box>
+        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
+          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.purple, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+          <span><b>n (Tenure):</b> The total number of monthly installments.</span>
+        </Box>
+        <Box component="li" sx={{ mb: 0, display: 'flex', alignItems: 'flex-start' }}>
+          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+          <span><b>EMI:</b> The fixed monthly payment amount.</span>
+        </Box>
+      </Box>
+    </Box>
+  );
+
+  // Add FAQ section
+  const [faqOpen, setFaqOpen] = React.useState(false);
+  const faqSection = (
+    <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
+          Frequently Asked Questions
+        </Typography>
+        <span style={{ color: colors.secondary, fontWeight: 700 }}>{faqOpen ? '▲' : '▼'}</span>
+      </Box>
+      {faqOpen && (
+        <Box sx={{ mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
+          {[
+            { q: 'What is an EMI?', a: 'EMI stands for Equated Monthly Installment, a fixed payment amount made by a borrower to a lender at a specified date each calendar month.' },
+            { q: 'How is EMI calculated?', a: 'EMI = [P × r × (1 + r)^n] / [(1 + r)^n – 1], where P is principal, r is monthly interest rate, n is number of installments.' },
+            { q: 'What factors affect EMI?', a: 'Loan amount, interest rate, and loan tenure are the main factors.' },
+            { q: 'Can I prepay my loan EMI?', a: 'Yes, most loans allow prepayment, but check for any prepayment charges.' },
+            { q: 'Does EMI change if interest rates change?', a: 'For floating rate loans, EMI or tenure may change if interest rates change.' },
+          ].map((item, idx, arr) => (
+            <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
+              <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
+              <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
+              {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
+            </Box>
           ))}
-        </tbody>
-      </table>
-    </StyledTableContainer>
-  ) : null;
+        </Box>
+      )}
+    </Paper>
+  );
 
   return (
     <CalculatorTemplate
@@ -411,9 +292,22 @@ const EmiCalculator: React.FC = () => {
       description="Calculate your Equated Monthly Installments for loans and plan your repayments."
       formSection={formSection}
       resultSection={resultSection}
-      tableSection={tableSection}
+      tableSection={
+        <>
+          {tableSection}
+          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary, mb: 2, fontSize: { xs: '1.15rem', md: '1.18rem' }, textAlign: 'left' }}>
+              How EMI is Calculated
+            </Typography>
+            {particularsSection}
+          </Box>
+          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>
+            {faqSection}
+          </Box>
+        </>
+      }
     />
   );
-};
+}
 
 export default EmiCalculator; 

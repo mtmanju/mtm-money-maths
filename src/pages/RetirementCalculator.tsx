@@ -3,36 +3,19 @@ import {
   Box,
   InputAdornment,
   Typography,
+  Paper,
 } from '@mui/material';
 import {
-  AccountBalance as AccountBalanceIcon,
-  Percent as PercentIcon,
   CalendarMonth as CalendarMonthIcon,
-  TrendingUp as TrendingUpIcon,
-  Payments as PaymentsIcon,
 } from '@mui/icons-material';
 import { CalculatorTemplate } from '../components/CalculatorTemplate';
 import { CustomNumberField } from '../components/CustomNumberField';
-import { StyledPaper, StyledSlider, ChartContainer, StyledTableContainer } from '../components/calculatorStyles';
+import { StyledPaper, StyledSlider } from '../components/calculatorStyles';
 import { colors, typography } from '../components/calculatorStyles';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
-import { CalculatorResultCards } from '../components/CalculatorResultCards';
 import { CalculatorTable } from '../components/CalculatorTable';
 import { ResultCard } from '../components/ResultCard';
-
-interface RetirementResults {
-  corpusNeeded: number;
-  monthlyInvestment: number;
-  totalInvestment: number;
-  totalReturns: number;
-  chartData: Array<{
-    year: number;
-    corpus: number;
-    investment: number;
-    returns: number;
-    total: number;
-  }>;
-}
+import { CalculatorChart } from '../components/CalculatorChart';
+import { calculateRetirement, RetirementCalculationParams, RetirementCalculationResult } from '../utils/calculatorUtils';
 
 const RetirementCalculator: React.FC = () => {
   const [currentAge, setCurrentAge] = useState<number>(30);
@@ -41,7 +24,7 @@ const RetirementCalculator: React.FC = () => {
   const [inflationRate, setInflationRate] = useState<number>(6);
   const [expectedReturn, setExpectedReturn] = useState<number>(8);
   const [lifeExpectancy, setLifeExpectancy] = useState<number>(85);
-  const [results, setResults] = useState<RetirementResults>({
+  const [results, setResults] = useState<RetirementCalculationResult>({
     corpusNeeded: 0,
     monthlyInvestment: 0,
     totalInvestment: 0,
@@ -50,90 +33,26 @@ const RetirementCalculator: React.FC = () => {
   });
 
   useEffect(() => {
-    calculateRetirement();
+    const params: RetirementCalculationParams = {
+      currentAge,
+      retirementAge,
+      monthlyExpenses,
+      inflationRate,
+      expectedReturn,
+      lifeExpectancy,
+    };
+    setResults(calculateRetirement(params));
   }, [currentAge, retirementAge, monthlyExpenses, inflationRate, expectedReturn, lifeExpectancy]);
 
-  const calculateRetirement = () => {
-    const yearsToRetirement = retirementAge - currentAge;
-    const yearsInRetirement = lifeExpectancy - retirementAge;
-
-    // Calculate monthly expenses at retirement considering inflation
-    const monthlyExpensesAtRetirement = monthlyExpenses * Math.pow(1 + inflationRate / 100, yearsToRetirement);
-    const yearlyExpensesAtRetirement = monthlyExpensesAtRetirement * 12;
-
-    // Calculate corpus needed at retirement
-    const corpusNeeded = yearlyExpensesAtRetirement * (1 - Math.pow(1 + inflationRate / 100, yearsInRetirement)) / (1 - (1 + inflationRate / 100));
-
-    // Calculate monthly investment needed
-    const monthlyRate = expectedReturn / 100 / 12;
-    const totalMonths = yearsToRetirement * 12;
-    const monthlyInvestment = corpusNeeded / ((Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate);
-
-    // Generate chart data
-    const chartData = Array.from({ length: yearsToRetirement + 1 }, (_, i) => {
-      const year = i;
-      const investment = monthlyInvestment * 12 * year;
-      const returns = investment * (expectedReturn / 100 / 12);
-      const total = investment + returns;
-
-      return {
-        year,
-        corpus: total,
-        investment,
-        returns,
-        total,
-      };
-    });
-
-    setResults({
-      corpusNeeded,
-      monthlyInvestment,
-      totalInvestment: monthlyInvestment * totalMonths,
-      totalReturns: corpusNeeded - (monthlyInvestment * totalMonths),
-      chartData,
-    });
-  };
-
-  const formatCurrency = (value: number) => {
+  // Helper for 2-decimal currency formatting, but no decimals if integer
+  const formatCurrency2 = (value: number) => {
+    const isInt = Number.isInteger(value);
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      minimumFractionDigits: isInt ? 0 : 2,
+      maximumFractionDigits: 2,
     }).format(value);
-  };
-
-  const chartAxisStyle = {
-    fill: colors.secondary,
-    fontSize: 12,
-    fontFamily: typography.fontFamily,
-  };
-
-  const chartTooltipStyle = {
-    backgroundColor: '#fff',
-    border: '1px solid #E0E0E0',
-    borderRadius: '8px',
-    padding: '12px',
-    fontFamily: typography.fontFamily,
-  };
-
-  const chartTooltipItemStyle = {
-    color: colors.secondary,
-    fontSize: '0.9rem',
-    fontFamily: typography.fontFamily,
-  };
-
-  const chartTooltipLabelStyle = {
-    color: colors.primary,
-    fontSize: '0.9rem',
-    fontWeight: 600,
-    fontFamily: typography.fontFamily,
-    marginBottom: '4px',
-  };
-
-  const chartLegendStyle = {
-    paddingTop: '20px',
-    fontFamily: typography.fontFamily,
   };
 
   const formSection = (
@@ -165,7 +84,6 @@ const RetirementCalculator: React.FC = () => {
           valueLabelFormat={(v) => `${v} yrs`}
         />
       </Box>
-
       <Box>
         <CustomNumberField
           fullWidth
@@ -193,7 +111,6 @@ const RetirementCalculator: React.FC = () => {
           valueLabelFormat={(v) => `${v} yrs`}
         />
       </Box>
-
       <Box>
         <CustomNumberField
           fullWidth
@@ -220,10 +137,9 @@ const RetirementCalculator: React.FC = () => {
           max={200000}
           step={5000}
           valueLabelDisplay="auto"
-          valueLabelFormat={formatCurrency}
+          valueLabelFormat={formatCurrency2}
         />
       </Box>
-
       <Box>
         <CustomNumberField
           fullWidth
@@ -236,7 +152,9 @@ const RetirementCalculator: React.FC = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <PercentIcon sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }} />
+                <Typography sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }}>
+                  ₹
+                </Typography>
               </InputAdornment>
             ),
           }}
@@ -251,7 +169,6 @@ const RetirementCalculator: React.FC = () => {
           valueLabelFormat={(v) => `${v}%`}
         />
       </Box>
-
       <Box>
         <CustomNumberField
           fullWidth
@@ -264,7 +181,9 @@ const RetirementCalculator: React.FC = () => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <PercentIcon sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }} />
+                <Typography sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 20, mr: 0.5 }}>
+                  ₹
+                </Typography>
               </InputAdornment>
             ),
           }}
@@ -279,7 +198,6 @@ const RetirementCalculator: React.FC = () => {
           valueLabelFormat={(v) => `${v}%`}
         />
       </Box>
-
       <Box>
         <CustomNumberField
           fullWidth
@@ -310,93 +228,99 @@ const RetirementCalculator: React.FC = () => {
     </StyledPaper>
   );
 
-  const resultCards = [
-    { label: 'Total Returns', value: formatCurrency(results.totalReturns), bgcolor: '#eafafd' },
-    { label: 'Total Investment', value: formatCurrency(results.totalInvestment), bgcolor: '#f3f1fa' },
-    { label: 'Monthly Investment', value: formatCurrency(results.monthlyInvestment), bgcolor: '#fbeeee' },
-    { label: 'Corpus Needed', value: formatCurrency(results.corpusNeeded), bgcolor: '#eafafd' },
+  // Result cards in logical order
+  const summaryCards = [
+    {
+      title: 'Corpus Needed',
+      value: formatCurrency2(results.corpusNeeded),
+      variant: 'primary' as const,
+    },
+    {
+      title: 'Monthly Investment',
+      value: formatCurrency2(results.monthlyInvestment),
+      variant: 'secondary' as const,
+    },
+    {
+      title: 'Total Investment',
+      value: formatCurrency2(results.totalInvestment),
+      variant: 'purple' as const,
+    },
+    {
+      title: 'Total Returns',
+      value: formatCurrency2(results.totalReturns),
+      variant: 'green' as const,
+    },
   ];
 
   const resultSection = (
-    <Box>
-      <CalculatorResultCards items={resultCards} />
-      
-      <ChartContainer>
-        <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
-          Investment Growth
-        </Typography>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={results.chartData} style={{ fontFamily: typography.fontFamily }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={colors.border} />
-            <XAxis 
-              dataKey="year" 
-              stroke={colors.secondary} 
-              tick={chartAxisStyle} 
-              axisLine={{ stroke: colors.border }} 
-              tickLine={{ stroke: colors.border }}
-              label={{ value: 'Years', position: 'insideBottom', offset: -5 }}
-            />
-            <YAxis 
-              stroke={colors.secondary} 
-              tick={chartAxisStyle} 
-              axisLine={{ stroke: colors.border }} 
-              tickLine={{ stroke: colors.border }}
-              tickFormatter={(value) => formatCurrency(value)}
-              label={{ value: 'Amount', angle: -90, position: 'insideLeft' }}
-            />
-            <RechartsTooltip
-              contentStyle={chartTooltipStyle}
-              itemStyle={chartTooltipItemStyle}
-              labelStyle={chartTooltipLabelStyle}
-              formatter={(value) => formatCurrency(value as number)}
-            />
-            <Legend wrapperStyle={chartLegendStyle} />
-            <Line
-              type="monotone"
-              dataKey="investment"
-              name="Investment"
-              stroke={colors.accent.primary}
-              strokeWidth={2}
-              dot={{ fill: colors.accent.primary, strokeWidth: 2 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="returns"
-              name="Returns"
-              stroke={colors.accent.secondary}
-              strokeWidth={2}
-              dot={{ fill: colors.accent.secondary, strokeWidth: 2 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="total"
-              name="Total Value"
-              stroke="#e57373"
-              strokeWidth={2}
-              dot={{ fill: '#e57373', strokeWidth: 2 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </ChartContainer>
-    </Box>
+    <Paper elevation={2} sx={{ p: { xs: 2, md: 3 }, mb: 2, borderRadius: 1, background: '#fff' }}>
+      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 3, fontFamily: typography.fontFamily }}>
+        {summaryCards.map((card) => (
+          <ResultCard key={card.title} title={card.title} value={card.value} variant={card.variant} fontSize="0.9rem" />
+        ))}
+      </Box>
+      <CalculatorChart
+        data={results.chartData}
+        lines={[
+          { dataKey: 'total', color: colors.accent.secondary, name: 'Total Value' },
+          { dataKey: 'investment', color: colors.accent.primary, name: 'Investment' },
+          { dataKey: 'returns', color: colors.accent.purple, name: 'Returns' },
+        ]}
+        xKey="year"
+        yLabel="Amount"
+        tooltipFormatter={(value: number) => formatCurrency2(value)}
+        xAxisFormatter={(value: number) => `Year ${value}`}
+        yAxisFormatter={formatCurrency2}
+        height={400}
+      />
+    </Paper>
   );
 
-  const tableColumns = [
+  // Table columns and rows
+  const retirementTableColumns = [
     { label: 'Year', key: 'year' },
     { label: 'Investment', key: 'investment' },
     { label: 'Returns', key: 'returns' },
     { label: 'Total Value', key: 'total' },
   ];
-
-  const tableRows = results.chartData.map((row) => ({
-    year: row.year + 1,
-    investment: formatCurrency(row.investment),
-    returns: formatCurrency(row.returns),
-    total: formatCurrency(row.total),
+  const retirementTableRows = results.chartData.map(row => ({
+    ...row,
+    investment: formatCurrency2(row.investment),
+    returns: formatCurrency2(row.returns),
+    total: formatCurrency2(row.total),
   }));
-
   const tableSection = (
-    <CalculatorTable columns={tableColumns} rows={tableRows} />
+    <CalculatorTable columns={retirementTableColumns} rows={retirementTableRows} />
+  );
+
+  // Add FAQ section
+  const [faqOpen, setFaqOpen] = React.useState(false);
+  const faqSection = (
+    <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
+          Frequently Asked Questions
+        </Typography>
+        <span style={{ color: colors.secondary, fontWeight: 700 }}>{faqOpen ? '▲' : '▼'}</span>
+      </Box>
+      {faqOpen && (
+        <Box sx={{ mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
+          {[
+            { q: 'How much retirement corpus do I need?', a: 'It depends on your expected monthly expenses, inflation, life expectancy, and expected returns after retirement.' },
+            { q: 'What is the impact of inflation on retirement planning?', a: 'Inflation increases your future expenses, so your retirement corpus must account for rising costs.' },
+            { q: 'How do I calculate my monthly investment for retirement?', a: 'The calculator estimates the monthly investment needed to reach your target corpus by retirement age.' },
+            { q: 'What is a safe withdrawal rate?', a: 'A common rule is 4% per year, but it depends on your investment returns and risk tolerance.' },
+            { q: 'Should I include pension or rental income?', a: 'Yes, include all expected post-retirement income to get an accurate estimate.' },
+          ].map((item, idx, arr) => (
+            <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
+              <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
+              <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
+              {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
+            </Box>
+          ))}
+        </Box>
+      )}
+    </Paper>
   );
 
   return (
@@ -405,7 +329,14 @@ const RetirementCalculator: React.FC = () => {
       description="Plan your retirement and calculate the corpus needed for a comfortable life."
       formSection={formSection}
       resultSection={resultSection}
-      tableSection={tableSection}
+      tableSection={
+        <>
+          {tableSection}
+          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>
+            {faqSection}
+          </Box>
+        </>
+      }
     />
   );
 };

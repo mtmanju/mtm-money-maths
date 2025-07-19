@@ -24,7 +24,7 @@ const CalculatorContainer = styled(Box)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   padding: theme.spacing(4, 2),
   margin: '0 auto',
-  maxWidth: 900,
+  // maxWidth: 900, // Remove this line to allow full width
   fontFamily: typography.fontFamily,
 }));
 
@@ -54,7 +54,7 @@ export const CalculatorTemplate: React.FC<CalculatorTemplateProps> = ({
 
   return (
     <GradientBackground>
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1, px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
         <Box sx={{ mb: 4, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
           <Typography
             variant="h1"
@@ -91,11 +91,11 @@ export const CalculatorTemplate: React.FC<CalculatorTemplateProps> = ({
           </Typography>
         </Box>
         <Box>
-          <Grid container spacing={6} alignItems="flex-start">
-            <Grid item xs={12} md={6}>
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={5} sx={{ flexBasis: { md: '40%' }, maxWidth: { md: '40%' } }}>
               {formSection}
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={7} sx={{ flexBasis: { md: '60%' }, maxWidth: { md: '60%' } }}>
               {resultSection}
             </Grid>
           </Grid>

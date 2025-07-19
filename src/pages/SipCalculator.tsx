@@ -16,12 +16,6 @@ import {
   FormControlLabel,
   Button,
   Paper,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -40,8 +34,6 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Legend,
-  AreaChart,
-  Area,
 } from 'recharts';
 import { CalculatorTemplate } from '../components/CalculatorTemplate';
 import {
@@ -50,21 +42,13 @@ import {
   ChartContainer,
   colors,
   typography,
-  CalculatorHeading,
-  StyledTableContainer,
-  tableStyles,
-  tableHeaderCell,
-  tableCell,
-  chartAxisStyle,
-  chartTooltipStyle,
-  chartTooltipItemStyle,
-  chartTooltipLabelStyle,
-  chartLegendStyle,
 } from '../components/calculatorStyles';
 import { CustomNumberField } from '../components/CustomNumberField';
 import { formatCurrency } from '../utils/formatUtils';
 import { CalculatorTable } from '../components/CalculatorTable';
 import { ResultCard } from '../components/ResultCard';
+import { calculateSip, SipCalculationParams, SipCalculationResult } from '../utils/calculatorUtils';
+import { CalculatorChart } from '../components/CalculatorChart';
 
 const CompactSummary = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -150,14 +134,7 @@ const SipCalculator: React.FC = () => {
   const [stepUpPercentage, setStepUpPercentage] = useState<number>(10);
   const [considerInflation, setConsiderInflation] = useState<boolean>(false);
   const [inflationRate, setInflationRate] = useState<number>(6);
-  const [results, setResults] = useState<{
-    maturityValue: number;
-    totalInvestment: number;
-    totalReturns: number;
-    inflationAdjustedMaturity: number;
-    inflationAdjustedReturns: number;
-    chartData: any[];
-  }>({
+  const [results, setResults] = useState<SipCalculationResult>({
     maturityValue: 0,
     totalInvestment: 0,
     totalReturns: 0,
@@ -167,65 +144,26 @@ const SipCalculator: React.FC = () => {
   });
 
   useEffect(() => {
-    calculateSIP();
+    const params: SipCalculationParams = {
+      monthlyInvestment,
+      expectedReturn,
+      timePeriod,
+      stepUpEnabled,
+      stepUpPercentage,
+      considerInflation,
+      inflationRate,
+    };
+    setResults(calculateSip(params));
   }, [monthlyInvestment, expectedReturn, timePeriod, stepUpEnabled, stepUpPercentage, considerInflation, inflationRate]);
 
-  const calculateSIP = () => {
-    const monthlyRate = expectedReturn / 12 / 100;
-    const months = timePeriod * 12;
-    let totalInvestment = 0;
-    let maturityValue = 0;
-    let currentMonthly = monthlyInvestment;
-    let monthCounter = 0;
-    const chartData = [];
-
-    // For yearly breakdown
-    for (let year = 1; year <= timePeriod; year++) {
-      let yearInvestment = 0;
-      let yearValue = maturityValue;
-      for (let m = 1; m <= 12; m++) {
-        monthCounter++;
-        // Step-up logic: increase SIP at the start of each year (except first)
-        if (stepUpEnabled && m === 1 && year > 1) {
-          currentMonthly = currentMonthly * (1 + stepUpPercentage / 100);
-        }
-        maturityValue = (maturityValue + currentMonthly) * (1 + monthlyRate);
-        yearInvestment += currentMonthly;
-      }
-      totalInvestment += yearInvestment;
-      chartData.push({
-        year,
-        investment: totalInvestment,
-        returns: maturityValue - totalInvestment,
-        total: maturityValue,
-      });
-    }
-
-    const totalReturns = maturityValue - totalInvestment;
-
-    // Inflation adjustment
-    let inflationAdjustedMaturity = maturityValue;
-    let inflationAdjustedReturns = totalReturns;
-    if (considerInflation) {
-      inflationAdjustedMaturity = maturityValue / Math.pow(1 + inflationRate / 100, timePeriod);
-      inflationAdjustedReturns = inflationAdjustedMaturity - totalInvestment;
-    }
-
-    setResults({
-      maturityValue,
-      totalInvestment,
-      totalReturns,
-      inflationAdjustedMaturity,
-      inflationAdjustedReturns,
-      chartData,
-    });
-  };
-
-  const formatCurrency = (value: number) => {
+  // Helper for 2-decimal currency formatting, but no decimals if integer
+  const formatCurrency2 = (value: number) => {
+    const isInt = Number.isInteger(value);
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      maximumFractionDigits: 0,
+      minimumFractionDigits: isInt ? 0 : 2,
+      maximumFractionDigits: 2,
     }).format(value);
   };
 
@@ -360,109 +298,126 @@ const SipCalculator: React.FC = () => {
     </StyledPaper>
   );
 
+  // Estimate a fixed height for the form section (e.g., 520px)
+  const resultSectionHeight = 520;
+
   const resultSection = (
-    <Box>
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-        <ResultCard title="Total Returns" value={formatCurrency(results.totalReturns)} variant="purple" />
-        <ResultCard title="Total Investment" value={formatCurrency(results.totalInvestment)} variant="secondary" />
-        <ResultCard title="Maturity Value" value={formatCurrency(results.maturityValue)} variant="primary" />
+    <Paper elevation={2} sx={{ p: { xs: 2, md: 3 }, mb: 2, borderRadius: 1, background: '#fff' }}>
+      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 3, fontFamily: typography.fontFamily }}>
+        <ResultCard title="Total Investment" value={formatCurrency(results.totalInvestment)} variant="secondary" fontSize="0.9rem" />
+        <ResultCard title="Total Returns" value={formatCurrency(results.totalReturns)} variant="purple" fontSize="0.9rem" />
+        <ResultCard title="Maturity Value" value={formatCurrency(results.maturityValue)} variant="primary" fontSize="0.9rem" />
       </Box>
       {considerInflation && (
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-          <ResultCard title="Inflation Adjusted Maturity" value={formatCurrency(results.inflationAdjustedMaturity)} variant="primary" />
-          <ResultCard title="Inflation Adjusted Returns" value={formatCurrency(results.inflationAdjustedReturns)} variant="secondary" />
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 3, fontFamily: typography.fontFamily }}>
+          <ResultCard title="Inflation Adjusted Returns" value={formatCurrency(results.inflationAdjustedReturns)} variant="green" fontSize="0.9rem" />
+          <ResultCard title="Inflation Adjusted Maturity" value={formatCurrency(results.inflationAdjustedMaturity)} variant="pink" fontSize="0.9rem" />
         </Box>
       )}
-      <ChartContainer>
-        <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
-          Investment Growth
-        </Typography>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={results.chartData} style={{ fontFamily: typography.fontFamily }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={colors.border} />
-            <XAxis
-              dataKey="year"
-              stroke={colors.secondary}
-              tick={chartAxisStyle}
-              axisLine={{ stroke: colors.border }}
-              tickLine={{ stroke: colors.border }}
-              label={{ value: 'Years', position: 'insideBottom', offset: -5 }}
-            />
-            <YAxis
-              stroke={colors.secondary}
-              tick={chartAxisStyle}
-              axisLine={{ stroke: colors.border }}
-              tickLine={{ stroke: colors.border }}
-              tickFormatter={(value) => formatCurrency(value)}
-              label={{ value: 'Amount', angle: -90, position: 'insideLeft' }}
-            />
-            <RechartsTooltip
-              contentStyle={chartTooltipStyle}
-              itemStyle={chartTooltipItemStyle}
-              labelStyle={chartTooltipLabelStyle}
-              formatter={(value: number) => formatCurrency(value)}
-              labelFormatter={(label) => `Year ${label}`}
-            />
-            <Legend wrapperStyle={chartLegendStyle} />
-            <Line
-              type="monotone"
-              dataKey="total"
-              name="Total Value"
-              stroke={colors.accent.secondary}
-              strokeWidth={2}
-              dot={{ fill: colors.accent.secondary, strokeWidth: 2 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="investment"
-              name="Investment"
-              stroke={colors.accent.primary}
-              strokeWidth={2}
-              dot={{ fill: colors.accent.primary, strokeWidth: 2 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="returns"
-              name="Returns"
-              stroke={colors.accent.purple}
-              strokeWidth={2}
-              dot={{ fill: colors.accent.purple, strokeWidth: 2 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </ChartContainer>
+      <CalculatorChart
+        data={results.chartData.map(row => ({
+          ...row,
+          inflationAdjustedReturns: considerInflation ? row.total / Math.pow(1 + inflationRate / 100, row.year) - row.investment : undefined,
+          inflationAdjustedMaturity: considerInflation ? row.total / Math.pow(1 + inflationRate / 100, row.year) : undefined,
+        }))}
+        lines={[
+          { dataKey: 'total', color: colors.accent.secondary, name: 'Total Value' },
+          { dataKey: 'investment', color: colors.accent.primary, name: 'Investment' },
+          { dataKey: 'returns', color: colors.accent.purple, name: 'Returns' },
+          ...(considerInflation ? [
+            { dataKey: 'inflationAdjustedReturns', color: colors.accent.green || '#81c784', name: 'Inflation Adjusted Returns' },
+            { dataKey: 'inflationAdjustedMaturity', color: colors.accent.pink || '#e57373', name: 'Inflation Adjusted Maturity' },
+          ] : []),
+        ]}
+        xKey="year"
+        yLabel="Amount"
+        tooltipFormatter={(value: number) => formatCurrency(value)}
+        xAxisFormatter={(value: number) => `Year ${value}`}
+        yAxisFormatter={formatCurrency}
+        height={400}
+      />
+    </Paper>
+  );
+
+  const sipTableColumns = [
+    { label: 'Year', key: 'year' },
+    { label: 'Investment', key: 'investment' },
+    { label: 'Returns', key: 'returns' },
+    { label: 'Total Value', key: 'total' },
+    ...(considerInflation ? [{ label: 'Inflation Adjusted Value', key: 'inflationAdjusted' }] : []),
+  ];
+
+  // Prepare table data, adding inflationAdjusted if needed
+  const sipTableRows = results.chartData.map((row) => {
+    const formattedRow = {
+      ...row,
+      investment: formatCurrency2(row.investment),
+      returns: formatCurrency2(row.returns),
+      total: formatCurrency2(row.total),
+    };
+    if (considerInflation) {
+      return {
+        ...formattedRow,
+        inflationAdjusted: formatCurrency2(row.total / Math.pow(1 + inflationRate / 100, row.year)),
+      };
+    }
+    return formattedRow;
+  });
+
+  const tableSection = (
+    <CalculatorTable columns={sipTableColumns} rows={sipTableRows} />
+  );
+
+  // Add particularsSection (How SIP is Calculated)
+  const particularsSection = (
+    <Box component="ul" sx={{ m: 0, pl: 2, color: colors.secondary, fontSize: { xs: '0.98rem', md: '1.03rem' }, lineHeight: 1.6, listStyle: 'none' }}>
+      <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
+        <Box sx={{ width: 6, height: 6, bgcolor: colors.primary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+        <span><b>P (Monthly Investment):</b> The fixed amount invested every month.</span>
+      </Box>
+      <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
+        <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.green, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+        <span><b>r (Rate):</b> The monthly interest rate (annual rate / 12 / 100).</span>
+      </Box>
+      <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
+        <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.purple, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+        <span><b>n (Months):</b> The total number of monthly investments (years × 12).</span>
+      </Box>
+      <Box component="li" sx={{ mb: 0, display: 'flex', alignItems: 'flex-start' }}>
+        <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+        <span><b>A (Amount):</b> The maturity value after compounding.<br/>Formula: <b>A = P × [ (1 + r)^n – 1 ] / r × (1 + r)</b></span>
+      </Box>
     </Box>
   );
 
-  const tableSection = (
-    <StyledTableContainer>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: typography.fontFamily, fontSize: '0.9rem', color: colors.secondary }}>
-        <thead>
-          <tr>
-            <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>Year</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Investment</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Returns</th>
-            <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Total Value</th>
-            {considerInflation && (
-              <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>Inflation Adjusted Value</th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {results.chartData.map((row) => (
-            <tr key={row.year}>
-              <td style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>{row.year}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.investment)}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.returns)}</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.total)}</td>
-              {considerInflation && (
-                <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(row.total / Math.pow(1 + inflationRate / 100, row.year))}</td>
-              )}
-            </tr>
+  // Add FAQ section
+  const [faqOpen, setFaqOpen] = React.useState(false);
+  const faqSection = (
+    <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
+          Frequently Asked Questions
+        </Typography>
+        <span style={{ color: colors.secondary, fontWeight: 700 }}>{faqOpen ? '▲' : '▼'}</span>
+      </Box>
+      {faqOpen && (
+        <Box sx={{ mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
+          {[
+            { q: 'What is a SIP?', a: 'A Systematic Investment Plan (SIP) is a way to invest a fixed amount regularly in mutual funds or other investment vehicles.' },
+            { q: 'How is SIP maturity calculated?', a: 'A = P × [ (1 + r)^n – 1 ] / r × (1 + r), where A is maturity value, P is monthly investment, r is monthly rate, n is number of months.' },
+            { q: 'What are the benefits of SIP?', a: 'SIP allows rupee cost averaging, compounding, and disciplined investing.' },
+            { q: 'Can I change my SIP amount?', a: 'Yes, you can increase or decrease your SIP amount as per your financial goals.' },
+            { q: 'Is SIP safe?', a: 'SIP is a method of investing, not a product. The safety depends on the underlying investment.' },
+          ].map((item, idx, arr) => (
+            <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
+              <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
+              <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
+              {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
+            </Box>
           ))}
-        </tbody>
-      </table>
-    </StyledTableContainer>
+        </Box>
+      )}
+    </Paper>
   );
 
   return (
@@ -471,7 +426,20 @@ const SipCalculator: React.FC = () => {
       description="Calculate returns on your Systematic Investment Plan (SIP) investments"
       formSection={formSection}
       resultSection={resultSection}
-      tableSection={tableSection}
+      tableSection={
+        <>
+          {tableSection}
+          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary, mb: 2, fontSize: { xs: '1.15rem', md: '1.18rem' }, textAlign: 'left' }}>
+              How SIP is Calculated
+            </Typography>
+            {particularsSection}
+          </Box>
+          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>
+            {faqSection}
+          </Box>
+        </>
+      }
     />
   );
 };

@@ -3,44 +3,27 @@ import {
   Box,
   InputAdornment,
   Typography,
+  Paper,
   FormControlLabel,
   Switch,
-  TableContainer,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
 } from '@mui/material';
 import {
-  AccountBalance as AccountBalanceIcon,
   Percent as PercentIcon,
-  Calculate as CalculateIcon,
 } from '@mui/icons-material';
 import { CalculatorTemplate } from '../components/CalculatorTemplate';
 import { CustomNumberField } from '../components/CustomNumberField';
-import { StyledPaper, StyledSlider, ChartContainer, StyledTableContainer } from '../components/calculatorStyles';
+import { StyledPaper, StyledSlider } from '../components/calculatorStyles';
 import { ResultCard } from '../components/ResultCard';
 import { colors, typography } from '../components/calculatorStyles';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
-import { PieChart, Pie, Cell } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
+import { CalculatorTable } from '../components/CalculatorTable';
+import { calculateGst, GstCalculationParams, GstCalculationResult } from '../utils/calculatorUtils';
 
-interface GSTResults {
-  cgst: number;
-  sgst: number;
-  igst: number;
-  totalGST: number;
-  totalAmount: number;
-  chartData: Array<{
-    component: string;
-    amount: number;
-  }>;
-}
-
-const GstCalculator: React.FC = () => {
+function GstCalculator() {
   const [amount, setAmount] = useState<number>(10000);
   const [gstRate, setGstRate] = useState<number>(18);
   const [isInterState, setIsInterState] = useState<boolean>(false);
-  const [results, setResults] = useState<GSTResults>({
+  const [results, setResults] = useState<GstCalculationResult>({
     cgst: 0,
     sgst: 0,
     igst: 0,
@@ -50,82 +33,23 @@ const GstCalculator: React.FC = () => {
   });
 
   useEffect(() => {
-    calculateGST();
+    const params: GstCalculationParams = {
+      amount,
+      gstRate,
+      isInterState,
+    };
+    setResults(calculateGst(params));
   }, [amount, gstRate, isInterState]);
 
-  const calculateGST = () => {
-    const gstAmount = (amount * gstRate) / 100;
-    let cgst = 0;
-    let sgst = 0;
-    let igst = 0;
-
-    if (isInterState) {
-      igst = gstAmount;
-    } else {
-      cgst = gstAmount / 2;
-      sgst = gstAmount / 2;
-    }
-
-    const totalAmount = amount + gstAmount;
-
-    // Generate chart data
-    const chartData = [
-      { component: 'Base Amount', amount: amount },
-      { component: 'CGST', amount: cgst },
-      { component: 'SGST', amount: sgst },
-      { component: 'IGST', amount: igst },
-    ];
-
-    setResults({
-      cgst,
-      sgst,
-      igst,
-      totalGST: gstAmount,
-      totalAmount,
-      chartData,
-    });
-  };
-
-  const formatCurrency = (value: number) => {
+  // Helper for 2-decimal currency formatting, but no decimals if integer
+  const formatCurrency2 = (value: number) => {
+    const isInt = Number.isInteger(value);
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      minimumFractionDigits: isInt ? 0 : 2,
+      maximumFractionDigits: 2,
     }).format(value);
-  };
-
-  const chartAxisStyle = {
-    fill: colors.secondary,
-    fontSize: 12,
-    fontFamily: typography.fontFamily,
-  };
-
-  const chartTooltipStyle = {
-    backgroundColor: '#fff',
-    border: '1px solid #E0E0E0',
-    borderRadius: '8px',
-    padding: '12px',
-    fontFamily: typography.fontFamily,
-  };
-
-  const chartTooltipItemStyle = {
-    color: colors.secondary,
-    fontSize: '0.9rem',
-    fontFamily: typography.fontFamily,
-  };
-
-  const chartTooltipLabelStyle = {
-    color: colors.primary,
-    fontSize: '0.9rem',
-    fontWeight: 600,
-    fontFamily: typography.fontFamily,
-    marginBottom: '4px',
-  };
-
-  const chartLegendStyle = {
-    paddingTop: '20px',
-    fontFamily: typography.fontFamily,
   };
 
   const formSection = (
@@ -156,9 +80,9 @@ const GstCalculator: React.FC = () => {
           max={10000000}
           step={1000}
           valueLabelDisplay="auto"
+          valueLabelFormat={formatCurrency2}
         />
       </Box>
-
       <Box>
         <CustomNumberField
           fullWidth
@@ -186,129 +110,180 @@ const GstCalculator: React.FC = () => {
           valueLabelFormat={(value) => `${value}%`}
         />
       </Box>
-
-      <Box>
-        <CustomNumberField
-          fullWidth
-          label="Calculation Type"
-          value={isInterState ? 1 : 0}
-          onChange={(value) => setIsInterState(value === 1)}
-          min={0}
-          max={1}
-          step={1}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <CalculateIcon sx={{ color: '#00bfc6', fontWeight: 400, fontSize: 22, mr: 0.5 }} />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <StyledSlider
-          value={isInterState ? 1 : 0}
-          onChange={(_, newValue) => setIsInterState(newValue === 1)}
-          min={0}
-          max={1}
-          step={1}
-          valueLabelDisplay="auto"
-          valueLabelFormat={(value) => value === 1 ? 'Inter-State' : 'Intra-State'}
+      <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={isInterState}
+              onChange={(_, checked) => setIsInterState(checked)}
+              color="primary"
+            />
+          }
+          label={isInterState ? 'Inter-State' : 'Intra-State'}
         />
       </Box>
     </StyledPaper>
   );
 
-  const resultSection = (
-    <Box>
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-        <ResultCard title="Total GST" value={formatCurrency(results.totalGST)} variant="primary" />
-        <ResultCard title="CGST" value={formatCurrency(results.cgst)} variant="secondary" />
-        <ResultCard title="SGST" value={formatCurrency(results.sgst)} variant="purple" />
-      </Box>
-      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center', mb: 2 }}>
-        <ResultCard title="Base Amount" value={formatCurrency(amount)} variant="primary" />
-        <ResultCard title="GST Rate" value={`${gstRate}%`} variant="secondary" />
-        <ResultCard title="Total Amount" value={formatCurrency(results.totalAmount)} variant="purple" />
-      </Box>
+  // Result cards in logical order
+  const summaryCards = [
+    {
+      title: 'Total GST',
+      value: formatCurrency2(results.totalGST),
+      variant: 'primary' as const,
+    },
+    {
+      title: 'CGST',
+      value: formatCurrency2(results.cgst),
+      variant: 'secondary' as const,
+    },
+    {
+      title: 'SGST',
+      value: formatCurrency2(results.sgst),
+      variant: 'purple' as const,
+    },
+    {
+      title: 'IGST',
+      value: formatCurrency2(results.igst),
+      variant: 'green' as const,
+    },
+    {
+      title: 'Total Amount',
+      value: formatCurrency2(results.totalAmount),
+      variant: 'pink' as const,
+    },
+  ];
 
-      <ChartContainer>
+  // Result cards and chart
+  const resultSection = (
+    <Paper elevation={2} sx={{ p: { xs: 2, md: 3 }, mb: 2, borderRadius: 1, background: '#fff' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 2, mb: 2, fontFamily: typography.fontFamily }}>
+        {summaryCards.map((card) => (
+          <ResultCard key={card.title} title={card.title} value={card.value} variant={card.variant} fontSize="0.9rem" />
+        ))}
+      </Box>
+      <Box sx={{ width: '100%', mb: 3 }}>
         <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
           GST Breakdown
         </Typography>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
-              data={[
-                { name: 'Base Amount', value: amount },
-                { name: 'CGST', value: results.cgst },
-                { name: 'SGST', value: results.sgst }
-              ]}
+              data={results.chartData}
               cx="50%"
               cy="50%"
               innerRadius={60}
               outerRadius={80}
               fill="#8884d8"
               paddingAngle={5}
-              dataKey="value"
+              dataKey="amount"
             >
-              {[
-                { name: 'Base Amount', value: amount },
-                { name: 'CGST', value: results.cgst },
-                { name: 'SGST', value: results.sgst }
-              ].map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={index === 0 ? colors.accent.primary : index === 1 ? colors.accent.secondary : colors.accent.purple} />
+              {results.chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={index === 1 ? colors.accent.primary : index === 2 ? colors.accent.secondary : index === 3 ? colors.accent.green : colors.accent.purple} />
               ))}
             </Pie>
             <RechartsTooltip
-              contentStyle={chartTooltipStyle}
-              itemStyle={chartTooltipItemStyle}
-              labelStyle={chartTooltipLabelStyle}
-              formatter={(value: number) => formatCurrency(value)}
+              contentStyle={{ backgroundColor: '#fff', border: '1px solid #E0E0E0', borderRadius: '8px', padding: '12px', fontFamily: typography.fontFamily }}
+              itemStyle={{ color: colors.secondary, fontSize: '0.9rem', fontFamily: typography.fontFamily }}
+              labelStyle={{ color: colors.primary, fontSize: '0.9rem', fontWeight: 600, fontFamily: typography.fontFamily, marginBottom: '4px' }}
+              formatter={(value: number) => formatCurrency2(value)}
             />
-            <Legend wrapperStyle={chartLegendStyle} />
+            <Legend wrapperStyle={{ paddingTop: '20px', fontFamily: typography.fontFamily }} />
           </PieChart>
         </ResponsiveContainer>
-      </ChartContainer>
+      </Box>
+    </Paper>
+  );
+
+  // Table
+  const gstTableColumns = [
+    { label: 'Component', key: 'component' },
+    { label: 'Amount', key: 'amount' },
+  ];
+  const gstTableRows = results.chartData.map(row => ({
+    ...row,
+    amount: formatCurrency2(row.amount),
+  }));
+  const tableSection = (
+    <CalculatorTable columns={gstTableColumns} rows={gstTableRows} />
+  );
+
+  // Modern particulars section
+  const particularsSection = (
+    <Box sx={{ mt: 3, mb: 2 }}>
+      <Box sx={{ background: '#f4f7fa', borderRadius: 2, p: 2, mb: 2, display: 'flex', flexDirection: 'column', gap: 1, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+        <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem', mb: 0.5 }}>
+          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Formula:</span>
+          GST = (Base Amount × GST Rate) / 100
+        </Typography>
+        <Typography variant="body2" sx={{ color: colors.accent.primary, fontWeight: 500, fontFamily: 'JetBrains Mono, Fira Mono, monospace', fontSize: '1.02rem' }}>
+          <span style={{ color: colors.secondary, fontWeight: 400, marginRight: 8 }}>Example:</span>
+          GST = ₹{amount.toLocaleString('en-IN')} × {gstRate}% = <b>{formatCurrency2(results.totalGST)}</b>
+        </Typography>
+      </Box>
+      <Box component="ul" sx={{ m: 0, pl: 2, color: colors.secondary, fontSize: { xs: '0.98rem', md: '1.03rem' }, lineHeight: 1.6, listStyle: 'none' }}>
+        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
+          <Box sx={{ width: 6, height: 6, bgcolor: colors.primary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+          <span><b>CGST:</b> Central Goods and Services Tax (for intra-state transactions).</span>
+        </Box>
+        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
+          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.green, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+          <span><b>SGST:</b> State Goods and Services Tax (for intra-state transactions).</span>
+        </Box>
+        <Box component="li" sx={{ mb: 1.5, display: 'flex', alignItems: 'flex-start' }}>
+          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.purple, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+          <span><b>IGST:</b> Integrated Goods and Services Tax (for inter-state transactions).</span>
+        </Box>
+        <Box component="li" sx={{ mb: 0, display: 'flex', alignItems: 'flex-start' }}>
+          <Box sx={{ width: 6, height: 6, bgcolor: colors.accent.secondary, borderRadius: '50%', mt: '0.6em', mr: 1.5 }} />
+          <span><b>Total Amount:</b> The sum of base amount and GST.</span>
+        </Box>
+      </Box>
     </Box>
   );
 
-  const tableSection = (
-    <Box>
-      <Typography variant="h6" gutterBottom sx={{ color: colors.primary, fontWeight: 700, fontFamily: typography.fontFamily, mb: 3 }}>
-        GST Calculation Details
-      </Typography>
-      <StyledTableContainer>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: typography.fontFamily, fontSize: '0.9rem', color: colors.secondary }}>
-          <thead>
-            <tr>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0', color: colors.secondary, fontWeight: 600 }}>Component</th>
-              <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0', color: colors.secondary, fontWeight: 600 }}>Rate</th>
-              <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0', color: colors.secondary, fontWeight: 600 }}>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>Base Amount</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>-</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(amount)}</td>
-            </tr>
-            <tr>
-              <td style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>CGST</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{gstRate / 2}%</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(results.cgst)}</td>
-            </tr>
-            <tr>
-              <td style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0' }}>SGST</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{gstRate / 2}%</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{formatCurrency(results.sgst)}</td>
-            </tr>
-            <tr>
-              <td style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #E0E0E0', fontWeight: 600 }}>Total Amount</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0' }}>{gstRate}%</td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #E0E0E0', fontWeight: 600 }}>{formatCurrency(results.totalAmount)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </StyledTableContainer>
+  // Modern FAQ section
+  const [faqOpen, setFaqOpen] = React.useState(false);
+  const faqSection = (
+    <Box sx={{ p: { xs: 2, md: 3 }, mb: 2, background: '#fafdff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mb: 1 }} onClick={() => setFaqOpen((o) => !o)}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.primary, flex: 1, fontSize: { xs: '1.05rem', md: '1.12rem' }, letterSpacing: 0.1 }}>
+          Frequently Asked Questions
+        </Typography>
+        <Box component="span" sx={{ color: colors.secondary, ml: 1, display: 'flex', alignItems: 'center' }}>
+          <svg style={{ transform: faqOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.2s', width: 22, height: 22 }} viewBox="0 0 24 24"><path fill="currentColor" d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>
+        </Box>
+      </Box>
+      <Box sx={{ display: faqOpen ? 'block' : 'none', mt: 1, fontSize: { xs: '0.97rem', md: '1.01rem' }, fontFamily: typography.fontFamily }}>
+        {[
+          {
+            q: 'What is GST?',
+            a: 'Goods and Services Tax (GST) is a value-added tax levied on most goods and services sold for domestic consumption.'
+          },
+          {
+            q: 'What is the difference between CGST, SGST, and IGST?',
+            a: 'CGST and SGST are levied on intra-state transactions, while IGST is levied on inter-state transactions.'
+          },
+          {
+            q: 'How is GST calculated?',
+            a: 'GST = (Base Amount × GST Rate) / 100.'
+          },
+          {
+            q: 'Is GST applicable to all goods and services?',
+            a: 'Most goods and services are covered, but some are exempt or have special rates.'
+          },
+          {
+            q: 'Can I claim GST input credit?',
+            a: 'Businesses registered under GST can claim input credit for tax paid on purchases.'
+          }
+        ].map((item, idx, arr) => (
+          <Box key={item.q} sx={{ mb: idx !== arr.length - 1 ? 2.5 : 0 }}>
+            <Typography variant="body2" sx={{ color: colors.primary, fontWeight: 500, mb: 0.5, fontSize: '1.01rem' }}>{item.q}</Typography>
+            <Typography variant="body2" sx={{ color: colors.secondary, fontWeight: 400, fontSize: '0.98rem', lineHeight: 1.7 }}>{item.a}</Typography>
+            {idx !== arr.length - 1 && <Box sx={{ borderBottom: '1px solid #e5e8ee', my: 1 }} />}
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 
@@ -318,9 +293,22 @@ const GstCalculator: React.FC = () => {
       description="Calculate GST, CGST, and SGST for your goods and services."
       formSection={formSection}
       resultSection={resultSection}
-      tableSection={tableSection}
+      tableSection={
+        <>
+          {tableSection}
+          <Box sx={{ mt: 4, mb: 2, width: '100%', px: { xs: 0, sm: 0 } }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: colors.primary, mb: 2, fontSize: { xs: '1.15rem', md: '1.18rem' }, textAlign: 'left' }}>
+              How GST is Calculated
+            </Typography>
+            {particularsSection}
+          </Box>
+          <Box sx={{ width: '100%', px: { xs: 0, sm: 0 }, mt: 4, mb: 2 }}>
+            {faqSection}
+          </Box>
+        </>
+      }
     />
   );
-};
+}
 
 export default GstCalculator; 
